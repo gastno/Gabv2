@@ -1,0 +1,242 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #181313;
+}
+
+.app-container {
+  background: #181313;
+  min-height: 100vh;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: #232020;
+  border-bottom: 1px solid #333;
+}
+
+.logo-space {
+  width: 100px;
+  height: 50px;
+  background: #333;
+  border-radius: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.language-dropdown {
+  padding: 8px 12px;
+  background: #2a2727;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.login-button {
+  padding: 10px 25px;
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.login-button:hover {
+  background: #666;
+}
+
+/* Gradient Space */
+.gradient-space {
+  margin: 40px;
+  height: 150px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #9D4EDD 0%, #3A0CA3 100%);
+}
+
+/* Interactive Dual Button */
+.interactive-container {
+  margin: 40px;
+  display: flex;
+  height: 400px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.interactive-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  font-weight: bold;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.interactive-side:hover {
+  transform: scale(1.05);
+}
+
+.beauty-side {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('/public/beauty1.jpg');
+}
+
+.tattoo-side {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('/public/tattoo1.jpg');
+}
+
+.interactive-side > * {
+  position: relative;
+  z-index: 2;
+}
+
+
+.beauty-side .diagonal-separator {
+  display: block;
+}
+
+/* Footer */
+.footer {
+  background: #302B2B;
+  padding: 60px 40px;
+  margin-top: 60px;
+  color: white;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-logo {
+  margin-bottom: 40px;
+}
+
+.footer-logo-placeholder {
+  width: 100px;
+  height: 50px;
+  background: #444;
+  border-radius: 8px;
+}
+
+.footer-sections {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 60px;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ccc;
+}
+
+.footer-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #bbb;
+  margin: 0;
+}
+
+.footer-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 40px;
+}
+
+.footer-button {
+  background: none;
+  border: none;
+  color: #bbb;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  padding: 8px 0;
+  transition: color 0.3s;
+  font-family: Arial, sans-serif;
+}
+
+.footer-button:hover {
+  color: white;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.footer-top-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.footer-top-button {
+  width: 50px;
+  height: 50px;
+  background: #3f3a3a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.footer-top-button:hover {
+  background: #4a4545;
+}
+
+.footer-divider {
+  height: 1px;
+  background: #444;
+  margin-bottom: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-columns {
+    grid-template-columns: 1fr;
+  }
+}
