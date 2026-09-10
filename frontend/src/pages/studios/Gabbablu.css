@@ -1,0 +1,819 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #181313;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+
+/* =========================
+   PAGE
+========================= */
+
+.gabbablu-page {
+  min-height: 100vh;
+  background: #181313;
+}
+
+
+/* =========================
+   TOP BAR
+========================= */
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+
+  padding: 10px 20px;
+
+  background: #232020;
+  border-bottom: 1px solid #302b2b;
+}
+
+.logo-space {
+  width: 100px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  color: #ddd;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.language-dropdown {
+  background: transparent;
+
+  color: white;
+
+  border: none;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  outline: none;
+}
+
+.language-dropdown option {
+  background: #232020;
+}
+
+.login-button {
+  padding: 8px 20px;
+
+  color: white;
+  background: transparent;
+
+  border: 1px solid #444;
+  border-radius: 20px;
+
+  cursor: pointer;
+
+  transition: background 0.3s ease;
+}
+
+.login-button:hover {
+  background: #333;
+}
+
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.gabbablu-content {
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 20px 40px 80px;
+}
+
+
+/* =========================
+   PORTFOLIO GALLERY
+========================= */
+
+.portfolio-gallery {
+  width: 100%;
+  height: 420px;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px;
+
+  margin-bottom: 30px;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+.portfolio-main-image {
+  width: 100%;
+  height: 100%;
+
+  background: #353535;
+
+  overflow: hidden;
+}
+
+.portfolio-main-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.4s ease;
+}
+
+.portfolio-main-image:hover img {
+  transform: scale(1.03);
+}
+
+
+/* Right Grid */
+
+.portfolio-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+
+  gap: 8px;
+}
+
+.portfolio-image {
+  background: #353535;
+
+  overflow: hidden;
+}
+
+.portfolio-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: transform 0.4s ease;
+}
+
+.portfolio-image:hover img {
+  transform: scale(1.05);
+}
+
+
+/* =========================
+   STORE INFORMATION
+========================= */
+
+.store-information {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 0 30px;
+
+  border-bottom: 1px solid #333;
+}
+
+.store-details {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+}
+
+
+/* Store Circle */
+
+.store-icon {
+  width: 60px;
+  height: 60px;
+
+  min-width: 60px;
+
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #353535;
+
+  color: white;
+
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.store-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.store-name {
+  margin: 0 0 8px;
+
+  font-size: 24px;
+}
+
+.store-address {
+  margin: 0;
+
+  color: #aaa;
+
+  font-size: 13px;
+}
+
+
+/* =========================
+   BUSINESS HOURS
+========================= */
+
+.business-hours {
+  min-width: 260px;
+
+  padding-left: 40px;
+
+  border-left: 1px solid #333;
+}
+
+.business-hours h3 {
+  margin: 0 0 12px;
+
+  font-size: 14px;
+
+  color: #ccc;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+}
+
+.hours-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 30px;
+
+  margin-bottom: 7px;
+
+  font-size: 13px;
+
+  color: #aaa;
+}
+
+
+/* =========================
+   TABS
+========================= */
+
+.store-tabs {
+  display: flex;
+
+  gap: 40px;
+
+  border-bottom: 1px solid #333;
+
+  margin-top: 30px;
+}
+
+.tab-button {
+  position: relative;
+
+  padding: 15px 0;
+
+  background: none;
+
+  border: none;
+
+  color: #999;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  transition: color 0.3s ease;
+}
+
+.tab-button:hover {
+  color: white;
+}
+
+.tab-button.active {
+  color: white;
+}
+
+.tab-button.active::after {
+  content: "";
+
+  position: absolute;
+
+  bottom: -1px;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background: white;
+}
+
+
+/* =========================
+   TAB CONTENT
+========================= */
+
+.tab-content {
+  padding: 40px 0 60px;
+}
+
+.section-heading {
+  margin: 0 0 30px;
+
+  font-size: 24px;
+
+  color: #eee;
+}
+
+
+/* =========================
+   SERVICES
+========================= */
+
+.services-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 20px;
+}
+
+.service-card {
+  background: #242020;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  border: 1px solid #302b2b;
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+
+  border-color: #555;
+}
+
+.service-image-placeholder {
+  height: 160px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #353535;
+
+  color: #777;
+
+  font-size: 12px;
+}
+
+.service-content {
+  padding: 20px;
+}
+
+.service-content h3 {
+  margin: 0 0 10px;
+
+  font-size: 18px;
+}
+
+.service-content p {
+  margin: 0 0 20px;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+
+  color: #aaa;
+}
+
+.service-price {
+  color: white;
+
+  font-size: 14px;
+
+  font-weight: bold;
+}
+
+
+/* =========================
+   TEAM
+========================= */
+
+.team-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 30px;
+}
+
+.team-member {
+  text-align: center;
+}
+
+.team-profile-image {
+  width: 130px;
+  height: 130px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+
+  background: #353535;
+
+  margin-bottom: 15px;
+
+  border: 2px solid #302b2b;
+}
+
+.team-member h3 {
+  margin: 0 0 8px;
+
+  font-size: 16px;
+
+  color: #eee;
+}
+
+.team-member p {
+  margin: 0;
+
+  color: #999;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================
+   ABOUT
+========================= */
+
+.about-card {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 40px;
+
+  padding: 30px;
+
+  background: #242020;
+
+  border-radius: 12px;
+}
+
+.about-description p {
+  margin-top: 0;
+  margin-bottom: 16px;
+
+  color: #bbb;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================
+   MAP
+========================= */
+
+.map-container {
+  background: #1d1b1b;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+.map-placeholder {
+  position: relative;
+
+  height: 250px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2c2c2c,
+      #202020
+    );
+
+  color: #777;
+
+  font-size: 13px;
+}
+
+.map-pin {
+  position: absolute;
+
+  font-size: 30px;
+}
+
+.map-address {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 15px;
+
+  font-size: 12px;
+
+  color: #bbb;
+}
+
+.map-address button {
+  background: none;
+
+  border: none;
+
+  color: #6d9eff;
+
+  cursor: pointer;
+
+  font-size: 12px;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer {
+  background: #302b2b;
+
+  padding: 60px 40px;
+
+  color: white;
+}
+
+.footer-content {
+  max-width: 1200px;
+
+  margin: 0 auto;
+}
+
+.footer-top {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+.footer-logo-placeholder {
+  width: 100px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #3f3a3a;
+
+  border-radius: 8px;
+
+  font-size: 12px;
+
+  color: #999;
+}
+
+.footer-top-buttons {
+  display: flex;
+
+  gap: 15px;
+}
+
+.footer-top-button {
+  width: 50px;
+  height: 50px;
+
+  background: #3f3a3a;
+
+  border: none;
+
+  border-radius: 8px;
+
+  color: white;
+
+  cursor: pointer;
+
+  transition: background 0.3s ease;
+}
+
+.footer-top-button:hover {
+  background: #4a4545;
+}
+
+.footer-divider {
+  height: 1px;
+
+  background: #444;
+
+  margin-bottom: 40px;
+}
+
+.footer-sections {
+  display: grid;
+
+  grid-template-columns: 1fr 2fr;
+
+  gap: 60px;
+}
+
+.footer-columns {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 40px;
+}
+
+.footer-section {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.footer-title {
+  margin: 0 0 15px;
+
+  font-size: 14px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  color: #ccc;
+}
+
+.footer-text {
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+
+  color: #aaa;
+}
+
+.footer-button {
+  padding: 8px 0;
+
+  background: none;
+
+  border: none;
+
+  text-align: left;
+
+  color: #aaa;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.footer-button:hover {
+  color: white;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+  .portfolio-gallery {
+    height: auto;
+
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-main-image {
+    height: 350px;
+  }
+
+  .portfolio-grid {
+    height: 350px;
+  }
+
+  .store-information {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 30px;
+  }
+
+  .business-hours {
+    padding-left: 0;
+
+    border-left: none;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .about-card {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .gabbablu-content {
+    padding: 20px;
+  }
+
+  .portfolio-main-image {
+    height: 280px;
+  }
+
+  .portfolio-grid {
+    height: 280px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .store-tabs {
+    gap: 20px;
+  }
+
+  .footer {
+    padding: 40px 20px;
+  }
+
+  .footer-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    gap: 8px;
+  }
+}
