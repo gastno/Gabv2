@@ -1,0 +1,45 @@
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #232020;
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 1px solid #302b2b;
+}
+
+.main-header .logo-space {
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+.main-header .spacer {
+  flex: 1;
+}
+
+.main-header .controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.main-header .language-dropdown {
+  background: #181313;
+  color: #eee;
+  border: 1px solid #333;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.main-header .login-button {
+  background: #eee;
+  color: #181313;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}

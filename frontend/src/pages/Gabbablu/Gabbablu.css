@@ -1,0 +1,814 @@
+/* ==========================================================================
+   GABBABLU PAGE SPECIFIC STYLES
+   ========================================================================== */
+
+.gabbablu-page {
+  background-color: #181313;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.gabbablu-content {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  box-sizing: border-box;
+}
+
+/* Portfolio Gallery */
+.gabbablu-page .portfolio-gallery {
+  width: 100%;
+  height: 420px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.gabbablu-page .portfolio-grid {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.gabbablu-page .portfolio-image,
+.gabbablu-page .portfolio-main-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #353535;
+}
+
+.gabbablu-page .portfolio-image img,
+.gabbablu-page .portfolio-main-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Store Information Row */
+.gabbablu-page .store-information {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.gabbablu-page .store-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gabbablu-page .store-icon {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #242020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #333;
+}
+
+.gabbablu-page .store-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+.gabbablu-page .store-name {
+  font-size: 1.6rem;
+  margin: 0 0 4px 0;
+}
+
+.gabbablu-page .store-address {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin: 0;
+}
+
+/* Tabs */
+.gabbablu-page .store-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #302b2b;
+  margin-bottom: 24px;
+}
+
+.gabbablu-page .tab-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1rem;
+  padding: 12px 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.gabbablu-page .tab-button:hover {
+  color: #eee;
+}
+
+.gabbablu-page .tab-button.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.gabbablu-page .tab-button.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+}
+
+/* Services Expandable Accordion */
+.gabbablu-page .services-section {
+  width: 100%;
+}
+
+.gabbablu-page .section-heading {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.gabbablu-page .services-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gabbablu-page .accordion-category {
+  background-color: #242020;
+  border: 1px solid #302b2b;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+}
+
+.gabbablu-page .accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.gabbablu-page .accordion-header:hover {
+  background-color: #2a2525;
+}
+
+.gabbablu-page .accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gabbablu-page .category-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #181313;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.gabbablu-page .category-header-text h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.gabbablu-page .category-header-text p {
+  margin: 2px 0 0 0;
+  font-size: 0.82rem;
+  color: #aaa;
+}
+
+.gabbablu-page .accordion-arrow {
+  color: #aaa;
+  font-size: 0.85rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gabbablu-page .accordion-arrow.open {
+  transform: rotate(90deg);
+}
+
+.gabbablu-page .accordion-content-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease-out;
+}
+
+.gabbablu-page .accordion-content-wrapper.expanded {
+  max-height: 1200px;
+  opacity: 1;
+}
+
+.gabbablu-page .accordion-content {
+  border-top: 1px solid #302b2b;
+  background-color: #1e1a1a;
+}
+
+.gabbablu-page .service-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #282424;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.gabbablu-page .service-row-item:last-child {
+  border-bottom: none;
+}
+
+.gabbablu-page .service-row-item:hover {
+  background-color: #262121;
+}
+
+.gabbablu-page .service-row-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.gabbablu-page .service-thumb-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background-color: #353535;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #3a3a3a;
+}
+
+.gabbablu-page .service-thumb-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  z-index: 2;
+}
+
+.gabbablu-page .thumb-fallback {
+  position: absolute;
+  color: #777;
+  font-size: 0.65rem;
+  font-weight: 700;
+  z-index: 1;
+}
+
+.gabbablu-page .service-row-title {
+  color: #eee;
+  font-size: 0.92rem;
+}
+
+.gabbablu-page .service-row-price {
+  color: #ccc;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* Team Grid */
+.gabbablu-page .team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.gabbablu-page .team-member {
+  background: #242020;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #302b2b;
+}
+
+.gabbablu-page .team-profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.gabbablu-page .team-member h3 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+}
+
+.gabbablu-page .team-member p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* About Layout */
+.gabbablu-page .about-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  background: #242020;
+  padding: 24px;
+  border-radius: 10px;
+  border: 1px solid #302b2b;
+}
+
+.gabbablu-page .map-placeholder {
+  height: 180px;
+  background: #353535;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+.gabbablu-page .map-address {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.gabbablu-page .map-address button {
+  background: #302b2b;
+  color: #eee;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Modal Styling */
+.gabbablu-page .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.gabbablu-page .modal-content {
+  background-color: #242020;
+  border: 1px solid #333;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 14px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.gabbablu-page .modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.gabbablu-page .modal-step h2 {
+  margin: 0 0 6px 0;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.gabbablu-page .modal-subtitle {
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.gabbablu-page .employee-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gabbablu-page .employee-option-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #181313;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #302b2b;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.gabbablu-page .employee-option-card:hover {
+  border-color: #555;
+  background: #1e1919;
+}
+
+.gabbablu-page .employee-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #353535;
+}
+
+.gabbablu-page .employee-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gabbablu-page .employee-info {
+  flex: 1;
+}
+
+.gabbablu-page .employee-info h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.gabbablu-page .employee-info p {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.gabbablu-page .select-arrow {
+  color: #777;
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   MONTHLY CALENDAR GRID & TIME PICKER STYLES
+   ========================================================================== */
+
+.gabbablu-page .calendar-container {
+  background: #181313;
+  border: 1px solid #302b2b;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.gabbablu-page .calendar-header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.gabbablu-page .calendar-month-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #eee;
+}
+
+.gabbablu-page .calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  color: #777;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.gabbablu-page .calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.gabbablu-page .calendar-day-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #555;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+}
+
+/* Available Dates Color Highlight */
+.gabbablu-page .calendar-day-cell.available {
+  background-color: #2d1d3a;
+  border-color: #7b2cbf;
+  color: #e0aaff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gabbablu-page .calendar-day-cell.available:hover {
+  background-color: #3c234f;
+  border-color: #9d4edd;
+}
+
+/* Selected Date Style */
+.gabbablu-page .calendar-day-cell.selected {
+  background-color: #9d4edd !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+}
+
+.gabbablu-page .picker-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.gabbablu-page .time-slots-section {
+  margin-bottom: 20px;
+}
+
+.gabbablu-page .times-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.gabbablu-page .time-chip {
+  background: #181313;
+  border: 1px solid #302b2b;
+  color: #eee;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gabbablu-page .time-chip:hover {
+  border-color: #555;
+}
+
+.gabbablu-page .time-chip.selected {
+  background: #eee;
+  color: #181313;
+  font-weight: 600;
+  border-color: #eee;
+}
+
+.gabbablu-page .modal-next-btn {
+  width: 100%;
+  background: #fff;
+  color: #181313;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.gabbablu-page .modal-next-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Auth Buttons */
+.gabbablu-page .auth-choice-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.gabbablu-page .auth-btn {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.gabbablu-page .auth-btn.primary {
+  background: #fff;
+  color: #181313;
+}
+
+.gabbablu-page .auth-btn.secondary {
+  background: #302b2b;
+  color: #eee;
+  border: 1px solid #3a3535;
+}
+
+.gabbablu-page .auth-divider {
+  text-align: center;
+  color: #777;
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+
+/* Summary Card */
+.gabbablu-page .appointment-summary-card {
+  background: #181313;
+  border: 1px solid #302b2b;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+
+.gabbablu-page .summary-header {
+  margin-bottom: 10px;
+}
+
+.gabbablu-page .summary-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+  font-weight: 700;
+}
+
+.gabbablu-page .summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gabbablu-page .summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.gabbablu-page .summary-label {
+  color: #888;
+}
+
+.gabbablu-page .summary-value {
+  color: #eee;
+  font-weight: 500;
+}
+
+.gabbablu-page .summary-value.highlight {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Guest Form Inputs */
+.gabbablu-page .guest-booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gabbablu-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gabbablu-page .form-group label {
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.gabbablu-page .form-group input,
+.gabbablu-page .form-group textarea {
+  background: #181313;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.gabbablu-page .form-group input:focus,
+.gabbablu-page .form-group textarea:focus {
+  border-color: #666;
+}
+
+.gabbablu-page .form-checkbox-group {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+.gabbablu-page .form-checkbox-group input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: #eee;
+}
+
+.gabbablu-page .form-checkbox-group label {
+  font-size: 0.78rem;
+  color: #bbb;
+  line-height: 1.35;
+}
+
+.gabbablu-page .cancellation-warning-box {
+  background: #1c1818;
+  border: 1px solid #3a2c2c;
+  border-left: 3px solid #b34a4a;
+  padding: 12px 14px;
+  border-radius: 6px;
+}
+
+.gabbablu-page .cancellation-warning-box strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #e57373;
+  margin-bottom: 4px;
+}
+
+.gabbablu-page .cancellation-warning-box p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #aaa;
+  line-height: 1.35;
+}
+
+.gabbablu-page .submit-booking-btn {
+  background: #fff;
+  color: #181313;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* Responsive Rules */
+@media (max-width: 900px) {
+  .gabbablu-page .portfolio-gallery {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .gabbablu-page .portfolio-main-image {
+    height: 250px;
+  }
+  .gabbablu-page .portfolio-grid {
+    height: 250px;
+  }
+  .gabbablu-page .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .gabbablu-page .about-card {
+    grid-template-columns: 1fr;
+  }
+}

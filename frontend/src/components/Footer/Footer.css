@@ -1,0 +1,176 @@
+.site-footer {
+  background: #302b2b;
+
+  padding: 60px 40px;
+
+  color: white;
+}
+
+.site-footer-content {
+  max-width: 1200px;
+
+  margin: 0 auto;
+}
+
+/* =========================
+   TOP
+========================= */
+
+.site-footer-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+.site-footer-logo-placeholder {
+  width: 100px;
+  height: 50px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #3f3a3a;
+
+  border-radius: 8px;
+
+  color: #999;
+
+  font-size: 12px;
+}
+
+.site-footer-top-buttons {
+  display: flex;
+
+  gap: 15px;
+}
+
+.site-footer-top-button {
+  width: 50px;
+  height: 50px;
+
+  background: #3f3a3a;
+
+  border: none;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: background 0.3s ease;
+}
+
+.site-footer-top-button:hover {
+  background: #4a4545;
+}
+
+/* =========================
+   DIVIDER
+========================= */
+
+.site-footer-divider {
+  height: 1px;
+
+  background: #444;
+
+  margin-bottom: 40px;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+
+.site-footer-sections {
+  display: grid;
+
+  grid-template-columns: 1fr 2fr;
+
+  gap: 60px;
+}
+
+.site-footer-columns {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 40px;
+}
+
+.site-footer-section {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.site-footer-title {
+  margin: 0 0 15px;
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  color: #ccc;
+}
+
+.site-footer-text {
+  margin: 0;
+
+  color: #aaa;
+
+  font-size: 14px;
+
+  line-height: 1.6;
+}
+
+.site-footer-button {
+  padding: 8px 0;
+
+  background: none;
+
+  border: none;
+
+  color: #aaa;
+
+  text-align: left;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: color 0.3s ease;
+}
+
+.site-footer-button:hover {
+  color: white;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 40px 20px;
+  }
+
+  .site-footer-sections {
+    grid-template-columns: 1fr;
+
+    gap: 40px;
+  }
+
+  .site-footer-columns {
+    grid-template-columns: 1fr;
+
+    gap: 30px;
+  }
+}
