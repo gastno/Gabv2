@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Admin.css";
 
 function Admin() {
-  // Sidebar State
+  // Sidebar & Mobile Nav State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("calendar");
@@ -10,11 +10,20 @@ function Admin() {
   // Master Brand Filter
   const [selectedBrand, setSelectedBrand] = useState("Gabbablu");
 
+  // Categories State
+  const [categories, setCategories] = useState([
+    { id: "combos", brand: "Gabbablu", title: "Combos", subtitle: "Combined treatments & packages" },
+    { id: "lashes", brand: "Gabbablu", title: "Lashes Extension", subtitle: "Professional eyelash extension services" },
+    { id: "eyebrows", brand: "Gabbablu", title: "Eyebrows", subtitle: "Brow shaping, tinting & lamination" },
+    { id: "products", brand: "Gabbablu", title: "Products", subtitle: "Aftercare & beauty items" },
+  ]);
+
   // Services State
   const [services, setServices] = useState([
     {
       id: 1,
       brand: "Gabbablu",
+      category: "Lashes Extension",
       name: "Classic Lashes",
       description: "Full set classic extension treatment.",
       duration: "90 min",
@@ -24,6 +33,7 @@ function Admin() {
     {
       id: 2,
       brand: "Gabbablu",
+      category: "Eyebrows",
       name: "Brow Lamination",
       description: "Brow shaping, tinting & lamination set.",
       duration: "45 min",
@@ -94,13 +104,27 @@ function Admin() {
     },
   ]);
 
-  // Modals Control
+  // Modals Creation States
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [staffModalOpen, setStaffModalOpen] = useState(false);
 
-  // Form States
+  // Inspector / Detail Item States
+  const [inspectCategory, setInspectCategory] = useState(null);
+  const [inspectService, setInspectService] = useState(null);
+  const [inspectStaff, setInspectStaff] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Creation Form States
+  const [newCategory, setNewCategory] = useState({
+    brand: "Gabbablu",
+    title: "",
+    subtitle: "",
+  });
+
   const [newService, setNewService] = useState({
     brand: "Gabbablu",
+    category: "Lashes Extension",
     name: "",
     description: "",
     duration: "60 min",
@@ -117,7 +141,28 @@ function Admin() {
     photo: "",
   });
 
-  // Handlers
+  // Close Inspection Modals
+  const closeInspectModal = () => {
+    setInspectCategory(null);
+    setInspectService(null);
+    setInspectStaff(null);
+    setIsEditMode(false);
+  };
+
+  // Add Item Handlers
+  const handleAddCategory = (e) => {
+    e.preventDefault();
+    setCategories((prev) => [
+      ...prev,
+      {
+        id: newCategory.title.toLowerCase().replace(/\s+/g, "-"),
+        ...newCategory,
+      },
+    ]);
+    setCategoryModalOpen(false);
+    setNewCategory({ brand: "Gabbablu", title: "", subtitle: "" });
+  };
+
   const handleAddService = (e) => {
     e.preventDefault();
     setServices((prev) => [
@@ -129,7 +174,7 @@ function Admin() {
       },
     ]);
     setServiceModalOpen(false);
-    setNewService({ brand: "Gabbablu", name: "", description: "", duration: "60 min", price: "", image: "" });
+    setNewService({ brand: "Gabbablu", category: categories[0]?.title || "General", name: "", description: "", duration: "60 min", price: "", image: "" });
   };
 
   const handleAddStaff = (e) => {
@@ -144,6 +189,34 @@ function Admin() {
     ]);
     setStaffModalOpen(false);
     setNewStaff({ userId: "", password: "", name: "", description: "", brand: "Gabbablu", photo: "" });
+  };
+
+  // Save Edits Handlers
+  const handleSaveCategoryEdit = (e) => {
+    e.preventDefault();
+    if (!isEditMode) return;
+    setCategories((prev) =>
+      prev.map((c) => (c.id === inspectCategory.id ? inspectCategory : c))
+    );
+    closeInspectModal();
+  };
+
+  const handleSaveServiceEdit = (e) => {
+    e.preventDefault();
+    if (!isEditMode) return;
+    setServices((prev) =>
+      prev.map((s) => (s.id === inspectService.id ? inspectService : s))
+    );
+    closeInspectModal();
+  };
+
+  const handleSaveStaffEdit = (e) => {
+    e.preventDefault();
+    if (!isEditMode) return;
+    setStaffList((prev) =>
+      prev.map((st) => (st.id === inspectStaff.id ? inspectStaff : st))
+    );
+    closeInspectModal();
   };
 
   const handleStatusChange = (id, newStatus) => {
@@ -163,7 +236,7 @@ function Admin() {
         mobileSidebarOpen ? "mobile-sidebar-active" : ""
       }`}
     >
-      {/* MOBILE OVERLAY BACKDROP */}
+      {/* MOBILE BACKDROP */}
       {mobileSidebarOpen && (
         <div
           className="admin-mobile-backdrop"
@@ -171,7 +244,7 @@ function Admin() {
         />
       )}
 
-      {/* ================= SIDEBAR ================= */}
+      {/* SIDEBAR */}
       <aside className="admin-sidebar">
         <div className="sidebar-header">
           <div className="brand-logo-text">⚡ Admin HQ</div>
@@ -190,6 +263,14 @@ function Admin() {
           >
             <span className="nav-icon">📅</span>
             <span className="nav-label">Global Calendar</span>
+          </button>
+
+          <button
+            className={`nav-item ${activeTab === "categories" ? "active" : ""}`}
+            onClick={() => handleTabSelect("categories")}
+          >
+            <span className="nav-icon">🗂️</span>
+            <span className="nav-label">Categories</span>
           </button>
 
           <button
@@ -218,7 +299,7 @@ function Admin() {
         </nav>
       </aside>
 
-      {/* ================= MAIN CONTENT AREA ================= */}
+      {/* MAIN CONTENT AREA */}
       <main className="admin-main">
         {/* TOP BAR */}
         <header className="admin-top-bar">
@@ -245,7 +326,7 @@ function Admin() {
         </header>
 
         <div className="admin-tab-content">
-          {/* ================= SECTION 1: GLOBAL CALENDAR ================= */}
+          {/* SECTION 1: GLOBAL CALENDAR */}
           {activeTab === "calendar" && (
             <section className="admin-section">
               <div className="section-header">
@@ -296,13 +377,56 @@ function Admin() {
             </section>
           )}
 
-          {/* ================= SECTION 2: SERVICE CATALOG ================= */}
+          {/* SECTION 2: CATEGORIES MANAGEMENT */}
+          {activeTab === "categories" && (
+            <section className="admin-section">
+              <div className="section-header">
+                <div>
+                  <h3>Category Management</h3>
+                  <p className="subtitle">Organize services into accordion sections for customer view</p>
+                </div>
+                <button
+                  className="primary-action-btn"
+                  onClick={() => setCategoryModalOpen(true)}
+                >
+                  + Add New Category
+                </button>
+              </div>
+
+              <div className="categories-admin-grid">
+                {categories
+                  .filter((cat) => cat.brand === selectedBrand)
+                  .map((cat) => (
+                    <div
+                      className="admin-category-card clickable"
+                      key={cat.id}
+                      onClick={() => {
+                        setInspectCategory({ ...cat });
+                        setIsEditMode(false);
+                      }}
+                    >
+                      <div className="category-card-header">
+                        <span className="category-icon-circle">✦</span>
+                        <span className="brand-tag">{cat.brand}</span>
+                      </div>
+                      <h4>{cat.title}</h4>
+                      <p>{cat.subtitle}</p>
+                      <div className="category-meta">
+                        <span>Services in Category: {services.filter((s) => s.category === cat.title).length}</span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </section>
+          )}
+
+          {/* SECTION 3: SERVICE CATALOG */}
           {activeTab === "services" && (
             <section className="admin-section">
               <div className="section-header">
                 <div>
                   <h3>Service Management</h3>
-                  <p className="subtitle">Define services, pricing, and treatment details</p>
+                  <p className="subtitle">Define services, pricing, duration, and categories</p>
                 </div>
                 <button
                   className="primary-action-btn"
@@ -314,10 +438,20 @@ function Admin() {
 
               <div className="services-admin-grid">
                 {services.map((item) => (
-                  <div className="admin-service-card" key={item.id}>
+                  <div
+                    className="admin-service-card clickable"
+                    key={item.id}
+                    onClick={() => {
+                      setInspectService({ ...item });
+                      setIsEditMode(false);
+                    }}
+                  >
                     <div className="service-card-img">
                       <img src={item.image} alt={item.name} />
-                      <span className="brand-tag">{item.brand}</span>
+                      <div className="card-top-tags">
+                        <span className="category-tag">{item.category}</span>
+                        <span className="brand-tag">{item.brand}</span>
+                      </div>
                     </div>
                     <div className="service-card-body">
                       <h4>{item.name}</h4>
@@ -333,7 +467,7 @@ function Admin() {
             </section>
           )}
 
-          {/* ================= SECTION 3: STAFF ACCOUNTS ================= */}
+          {/* SECTION 4: STAFF ACCOUNTS */}
           {activeTab === "staff" && (
             <section className="admin-section">
               <div className="section-header">
@@ -351,7 +485,14 @@ function Admin() {
 
               <div className="staff-accounts-grid">
                 {staffList.map((emp) => (
-                  <div className="staff-account-card" key={emp.id}>
+                  <div
+                    className="staff-account-card clickable"
+                    key={emp.id}
+                    onClick={() => {
+                      setInspectStaff({ ...emp });
+                      setIsEditMode(false);
+                    }}
+                  >
                     <img src={emp.photo} alt={emp.name} className="account-avatar" />
                     <div className="account-info">
                       <h4>{emp.name}</h4>
@@ -368,7 +509,7 @@ function Admin() {
             </section>
           )}
 
-          {/* ================= SECTION 4: APPOINTMENTS LEDGER ================= */}
+          {/* SECTION 5: APPOINTMENTS LEDGER */}
           {activeTab === "ledger" && (
             <section className="admin-section">
               <div className="section-header">
@@ -426,21 +567,359 @@ function Admin() {
         </div>
       </main>
 
-      {/* ================= CREATE SERVICE MODAL ================= */}
+      {/* INSPECT / EDIT CATEGORY MODAL */}
+      {inspectCategory && (
+        <div className="admin-modal-backdrop" onClick={closeInspectModal}>
+          <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="modal-close" onClick={closeInspectModal}>✕</button>
+            <h3>Category Details</h3>
+            <form onSubmit={handleSaveCategoryEdit} className="admin-form">
+              <div className="form-group">
+                <label>Brand</label>
+                {isEditMode ? (
+                  <select
+                    value={inspectCategory.brand}
+                    onChange={(e) => setInspectCategory({ ...inspectCategory, brand: e.target.value })}
+                  >
+                    <option value="Gabbablu">Gabbablu</option>
+                  </select>
+                ) : (
+                  <div className="read-only-field">{inspectCategory.brand}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Category Title</label>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    required
+                    value={inspectCategory.title}
+                    onChange={(e) => setInspectCategory({ ...inspectCategory, title: e.target.value })}
+                  />
+                ) : (
+                  <div className="read-only-field">{inspectCategory.title}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Subtitle / Description</label>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    required
+                    value={inspectCategory.subtitle}
+                    onChange={(e) => setInspectCategory({ ...inspectCategory, subtitle: e.target.value })}
+                  />
+                ) : (
+                  <div className="read-only-field">{inspectCategory.subtitle}</div>
+                )}
+              </div>
+
+              <div className="modal-actions-row">
+                {!isEditMode ? (
+                  <button
+                    type="button"
+                    className="edit-toggle-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsEditMode(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <button type="submit" className="save-submit-btn">
+                    Save Changes
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* INSPECT / EDIT SERVICE MODAL */}
+      {inspectService && (
+        <div className="admin-modal-backdrop" onClick={closeInspectModal}>
+          <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="modal-close" onClick={closeInspectModal}>✕</button>
+            <h3>Service Details</h3>
+            <form onSubmit={handleSaveServiceEdit} className="admin-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Brand</label>
+                  {isEditMode ? (
+                    <select
+                      value={inspectService.brand}
+                      onChange={(e) => setInspectService({ ...inspectService, brand: e.target.value })}
+                    >
+                      <option value="Gabbablu">Gabbablu</option>
+                    </select>
+                  ) : (
+                    <div className="read-only-field">{inspectService.brand}</div>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  {isEditMode ? (
+                    <select
+                      value={inspectService.category}
+                      onChange={(e) => setInspectService({ ...inspectService, category: e.target.value })}
+                    >
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.title}>
+                          {c.title}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="read-only-field">{inspectService.category}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Service Name</label>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    required
+                    value={inspectService.name}
+                    onChange={(e) => setInspectService({ ...inspectService, name: e.target.value })}
+                  />
+                ) : (
+                  <div className="read-only-field">{inspectService.name}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Description</label>
+                {isEditMode ? (
+                  <textarea
+                    rows="3"
+                    value={inspectService.description}
+                    onChange={(e) => setInspectService({ ...inspectService, description: e.target.value })}
+                  />
+                ) : (
+                  <div className="read-only-field">{inspectService.description}</div>
+                )}
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Estimated Time</label>
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      value={inspectService.duration}
+                      onChange={(e) => setInspectService({ ...inspectService, duration: e.target.value })}
+                    />
+                  ) : (
+                    <div className="read-only-field">{inspectService.duration}</div>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label>Price</label>
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      required
+                      value={inspectService.price}
+                      onChange={(e) => setInspectService({ ...inspectService, price: e.target.value })}
+                    />
+                  ) : (
+                    <div className="read-only-field">{inspectService.price}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-actions-row">
+                {!isEditMode ? (
+                  <button
+                    type="button"
+                    className="edit-toggle-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsEditMode(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <button type="submit" className="save-submit-btn">
+                    Save Changes
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* INSPECT / EDIT STAFF MODAL */}
+      {inspectStaff && (
+        <div className="admin-modal-backdrop" onClick={closeInspectModal}>
+          <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="modal-close" onClick={closeInspectModal}>✕</button>
+            <h3>Staff Account Details</h3>
+            <form onSubmit={handleSaveStaffEdit} className="admin-form">
+              <div className="form-group">
+                <label>Full Name</label>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    required
+                    value={inspectStaff.name}
+                    onChange={(e) => setInspectStaff({ ...inspectStaff, name: e.target.value })}
+                  />
+                ) : (
+                  <div className="read-only-field">{inspectStaff.name}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Role / Title Description</label>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    value={inspectStaff.description}
+                    onChange={(e) => setInspectStaff({ ...inspectStaff, description: e.target.value })}
+                  />
+                ) : (
+                  <div className="read-only-field">{inspectStaff.description}</div>
+                )}
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>User ID</label>
+                  {isEditMode ? (
+                    <input
+                      type="text"
+                      required
+                      value={inspectStaff.userId}
+                      onChange={(e) => setInspectStaff({ ...inspectStaff, userId: e.target.value })}
+                    />
+                  ) : (
+                    <div className="read-only-field">{inspectStaff.userId}</div>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label>Password</label>
+                  {isEditMode ? (
+                    <input
+                      type="password"
+                      required
+                      value={inspectStaff.password}
+                      onChange={(e) => setInspectStaff({ ...inspectStaff, password: e.target.value })}
+                    />
+                  ) : (
+                    <div className="read-only-field">{inspectStaff.password}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-actions-row">
+                {!isEditMode ? (
+                  <button
+                    type="button"
+                    className="edit-toggle-btn"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsEditMode(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <button type="submit" className="save-submit-btn">
+                    Save Changes
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE CATEGORY MODAL */}
+      {categoryModalOpen && (
+        <div className="admin-modal-backdrop" onClick={() => setCategoryModalOpen(false)}>
+          <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setCategoryModalOpen(false)}>✕</button>
+            <h3>Create Service Category</h3>
+            <form onSubmit={handleAddCategory} className="admin-form">
+              <div className="form-group">
+                <label>Brand</label>
+                <select
+                  value={newCategory.brand}
+                  onChange={(e) => setNewCategory({ ...newCategory, brand: e.target.value })}
+                >
+                  <option value="Gabbablu">Gabbablu</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Category Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newCategory.title}
+                  onChange={(e) => setNewCategory({ ...newCategory, title: e.target.value })}
+                  placeholder="e.g. Eyebrows & Lashes"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Subtitle / Description</label>
+                <input
+                  type="text"
+                  required
+                  value={newCategory.subtitle}
+                  onChange={(e) => setNewCategory({ ...newCategory, subtitle: e.target.value })}
+                  placeholder="e.g. Brow shaping, tinting & lamination"
+                />
+              </div>
+
+              <button type="submit" className="save-submit-btn">Save Category</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CREATE SERVICE MODAL */}
       {serviceModalOpen && (
         <div className="admin-modal-backdrop" onClick={() => setServiceModalOpen(false)}>
           <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setServiceModalOpen(false)}>✕</button>
             <h3>Create New Service</h3>
             <form onSubmit={handleAddService} className="admin-form">
-              <div className="form-group">
-                <label>Brand</label>
-                <select
-                  value={newService.brand}
-                  onChange={(e) => setNewService({ ...newService, brand: e.target.value })}
-                >
-                  <option value="Gabbablu">Gabbablu</option>
-                </select>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Brand</label>
+                  <select
+                    value={newService.brand}
+                    onChange={(e) => setNewService({ ...newService, brand: e.target.value })}
+                  >
+                    <option value="Gabbablu">Gabbablu</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <select
+                    value={newService.category}
+                    onChange={(e) => setNewService({ ...newService, category: e.target.value })}
+                  >
+                    {categories
+                      .filter((c) => c.brand === newService.brand)
+                      .map((cat) => (
+                        <option key={cat.id} value={cat.title}>
+                          {cat.title}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
 
               <div className="form-group">
@@ -500,7 +979,7 @@ function Admin() {
         </div>
       )}
 
-      {/* ================= CREATE STAFF MODAL ================= */}
+      {/* CREATE STAFF MODAL */}
       {staffModalOpen && (
         <div className="admin-modal-backdrop" onClick={() => setStaffModalOpen(false)}>
           <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>

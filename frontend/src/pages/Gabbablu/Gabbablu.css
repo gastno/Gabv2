@@ -812,3 +812,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Service Info Column & Duration Badge */
+.gabbablu-page .service-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gabbablu-page .service-duration-badge {
+  font-size: 0.78rem;
+  color: #aaa;
+  font-weight: 500;
+}

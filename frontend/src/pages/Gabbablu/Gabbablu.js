@@ -12,7 +12,7 @@ function Gabbablu() {
     "Lashes Extension": false,
   });
 
-  // Modal Flow State: 1: Select Employee, 2: Select Date & Time, 3: Auth Option, 4: Guest Form
+  // Modal Flow State
   const [bookingModal, setBookingModal] = useState({
     isOpen: false,
     step: 1,
@@ -67,15 +67,15 @@ function Gabbablu() {
 
   const availableTimes = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"];
 
-  // Categories & Provided Services Data
+  // Categories & Provided Services Data with Durations
   const categoriesData = [
     {
       id: "combos",
       title: "Combos",
       subtitle: "Combined treatments & packages",
       services: [
-        { name: "Lash Lift & Brow Lamination Combo", price: "18,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Lash Extension & Eyebrow Styling Combo", price: "22,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Lash Lift & Brow Lamination Combo", duration: "90 min", price: "18,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Lash Extension & Eyebrow Styling Combo", duration: "105 min", price: "22,000 kr", image: "/placeholder-service.jpg" },
       ],
     },
     {
@@ -83,21 +83,21 @@ function Gabbablu() {
       title: "Lashes Extension",
       subtitle: "Professional eyelash extension services",
       services: [
-        { name: "Classic Lashes", price: "14,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Classic Lashes - Refill", price: "10,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Wet Lashes", price: "15,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Wet Lashes - Refill", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Closed Fans", price: "16,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Closed Fans - Refill", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Tec Volume", price: "15,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Tec Volume - Refill", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Hybrid / Manga / Kim", price: "16,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Hybrid / Manga / Kim - Refill", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "American Volume", price: "17,000 kr", image: "/placeholder-service.jpg" },
-        { name: "American Volume - Refill", price: "13,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Mega Volume", price: "18,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Mega Volume - Refill", price: "14,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Removal", price: "3,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Classic Lashes", duration: "90 min", price: "14,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Classic Lashes - Refill", duration: "60 min", price: "10,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Wet Lashes", duration: "90 min", price: "15,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Wet Lashes - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Closed Fans", duration: "90 min", price: "16,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Closed Fans - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Tec Volume", duration: "105 min", price: "15,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Tec Volume - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Hybrid / Manga / Kim", duration: "105 min", price: "16,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Hybrid / Manga / Kim - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
+        { name: "American Volume", duration: "120 min", price: "17,000 kr", image: "/placeholder-service.jpg" },
+        { name: "American Volume - Refill", duration: "75 min", price: "13,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Mega Volume", duration: "120 min", price: "18,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Mega Volume - Refill", duration: "75 min", price: "14,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Removal", duration: "30 min", price: "3,000 kr", image: "/placeholder-service.jpg" },
       ],
     },
     {
@@ -105,8 +105,8 @@ function Gabbablu() {
       title: "Eyebrows",
       subtitle: "Brow shaping, tinting & lamination",
       services: [
-        { name: "Eyebrow Shape & Tint", price: "6,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Brow Lamination", price: "11,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Eyebrow Shape & Tint", duration: "30 min", price: "6,000 kr", image: "/placeholder-service.jpg" },
+        { name: "Brow Lamination", duration: "45 min", price: "11,000 kr", image: "/placeholder-service.jpg" },
       ],
     },
     {
@@ -114,8 +114,8 @@ function Gabbablu() {
       title: "Products",
       subtitle: "Aftercare & beauty items",
       services: [
-        { name: "Lash Cleanser Foam", price: "3,500 kr", image: "/placeholder-service.jpg" },
-        { name: "Eyelash Serum", price: "7,900 kr", image: "/placeholder-service.jpg" },
+        { name: "Lash Cleanser Foam", duration: "15 min", price: "3,500 kr", image: "/placeholder-service.jpg" },
+        { name: "Eyelash Serum", duration: "15 min", price: "7,900 kr", image: "/placeholder-service.jpg" },
       ],
     },
   ];
@@ -181,16 +181,16 @@ function Gabbablu() {
 
   return (
     <div className="gabbablu-page">
-      {/* ========================= HEADER ========================= */}
+      {/* HEADER */}
       <Header
         language={language}
         onLanguageChange={setLanguage}
         onLoginClick={() => alert("Login clicked")}
       />
 
-      {/* ========================= MAIN CONTENT ========================= */}
+      {/* MAIN CONTENT */}
       <main className="gabbablu-content">
-        {/* ========================= PORTFOLIO GALLERY ========================= */}
+        {/* PORTFOLIO GALLERY */}
         <section className="portfolio-gallery">
           <div className="portfolio-main-image">
             <img src="/portfolio/gabbablu/1.jpg" alt="Gabbablu portfolio" />
@@ -203,7 +203,7 @@ function Gabbablu() {
           </div>
         </section>
 
-        {/* ========================= STORE INFORMATION ========================= */}
+        {/* STORE INFORMATION */}
         <section className="store-information">
           <div className="store-details">
             <div className="store-icon">
@@ -216,7 +216,7 @@ function Gabbablu() {
           </div>
         </section>
 
-        {/* ========================= TABS ========================= */}
+        {/* TABS */}
         <section className="store-tabs">
           <button
             className={`tab-button ${activeTab === "services" ? "active" : ""}`}
@@ -238,7 +238,7 @@ function Gabbablu() {
           </button>
         </section>
 
-        {/* ========================= TAB CONTENT ========================= */}
+        {/* TAB CONTENT */}
         <section className="tab-content">
           {/* SERVICES TAB */}
           {activeTab === "services" && (
@@ -280,7 +280,10 @@ function Gabbablu() {
                                   <img src={item.image} alt={item.name} onError={(e) => { e.target.style.display = 'none'; }} />
                                   <span className="thumb-fallback">IMG</span>
                                 </div>
-                                <span className="service-row-title">{item.name}</span>
+                                <div className="service-info-col">
+                                  <span className="service-row-title">{item.name}</span>
+                                  <span className="service-duration-badge">⏱ {item.duration}</span>
+                                </div>
                               </div>
                               <span className="service-row-price">{item.price}</span>
                             </div>
@@ -334,7 +337,7 @@ function Gabbablu() {
         </section>
       </main>
 
-      {/* ========================= BOOKING MODAL ========================= */}
+      {/* BOOKING MODAL */}
       {bookingModal.isOpen && (
         <div className="modal-backdrop" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -344,7 +347,7 @@ function Gabbablu() {
             {bookingModal.step === 1 && (
               <div className="modal-step">
                 <h2>Choose an employee</h2>
-                <p className="modal-subtitle">Service: {bookingModal.selectedService?.name}</p>
+                <p className="modal-subtitle">Service: {bookingModal.selectedService?.name} (⏱ {bookingModal.selectedService?.duration})</p>
 
                 <div className="employee-selection-list">
                   {employees.map((emp) => (
@@ -375,13 +378,11 @@ function Gabbablu() {
                   {bookingModal.selectedService?.name} with {bookingModal.selectedEmployee?.name}
                 </p>
 
-                {/* Calendar View */}
                 <div className="calendar-container">
                   <div className="calendar-header">
                     <span className="calendar-month-title">September 2026</span>
                   </div>
 
-                  {/* Day Headers */}
                   <div className="calendar-weekdays">
                     <span>Mo</span>
                     <span>Tu</span>
@@ -392,7 +393,6 @@ function Gabbablu() {
                     <span>Su</span>
                   </div>
 
-                  {/* Calendar Days Grid */}
                   <div className="calendar-days-grid">
                     {calendarDays.map((day, idx) => {
                       const isSelected = bookingModal.selectedDate?.dayNumber === day.dayNumber;
@@ -421,7 +421,6 @@ function Gabbablu() {
                   </div>
                 </div>
 
-                {/* Available Hours (Visible when an available date is selected) */}
                 {bookingModal.selectedDate && (
                   <div className="time-slots-section">
                     <label className="picker-label">Available Hours ({bookingModal.selectedDate.fullDate})</label>
@@ -481,7 +480,6 @@ function Gabbablu() {
                 <p className="modal-subtitle">Complete your details to finish booking</p>
 
                 <form className="guest-booking-form" onSubmit={handleGuestSubmit}>
-                  {/* APPOINTMENT SUMMARY DETAIL VIEW */}
                   <div className="appointment-summary-card">
                     <div className="summary-header">
                       <span className="summary-badge">Appointment Details</span>
@@ -490,6 +488,10 @@ function Gabbablu() {
                       <div className="summary-row">
                         <span className="summary-label">Service:</span>
                         <span className="summary-value">{bookingModal.selectedService?.name}</span>
+                      </div>
+                      <div className="summary-row">
+                        <span className="summary-label">Duration:</span>
+                        <span className="summary-value">⏱ {bookingModal.selectedService?.duration}</span>
                       </div>
                       <div className="summary-row">
                         <span className="summary-label">Price:</span>
@@ -551,7 +553,6 @@ function Gabbablu() {
                     />
                   </div>
 
-                  {/* CONSENT CHECKBOX */}
                   <div className="form-checkbox-group">
                     <input
                       type="checkbox"
@@ -564,7 +565,6 @@ function Gabbablu() {
                     </label>
                   </div>
 
-                  {/* NO-SHOW / CANCELLATION WARNING */}
                   <div className="cancellation-warning-box">
                     <strong>Cancellation & No-Show Policy</strong>
                     <p>
@@ -582,7 +582,7 @@ function Gabbablu() {
         </div>
       )}
 
-      {/* ========================= FOOTER ========================= */}
+      {/* FOOTER */}
       <Footer />
     </div>
   );

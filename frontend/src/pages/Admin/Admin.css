@@ -540,3 +540,136 @@
     width: 100%;
   }
 }
+
+/* CATEGORIES MANAGEMENT STYLES */
+
+.categories-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.admin-category-card {
+  background: #1e1919;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.category-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #141010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a0a0a0;
+  font-size: 0.85rem;
+}
+
+.admin-category-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.admin-category-card p {
+  margin: 0 0 16px 0;
+  font-size: 0.82rem;
+  color: #aaa;
+  flex: 1;
+}
+
+.category-meta {
+  font-size: 0.78rem;
+  color: #777;
+  border-top: 1px solid #2e2828;
+  padding-top: 10px;
+}
+
+.card-top-tags {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.category-tag {
+  background: rgba(157, 78, 221, 0.85);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* CLICKABLE CARD INTERACTION & READ-ONLY INSPECTION STYLES */
+
+.admin-category-card.clickable,
+.admin-service-card.clickable,
+.staff-account-card.clickable {
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-category-card.clickable:hover,
+.admin-service-card.clickable:hover,
+.staff-account-card.clickable:hover {
+  border-color: #7b2cbf;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.read-only-field {
+  background: #141010;
+  border: 1px solid #3d3535;
+  color: #eee;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.modal-actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.edit-toggle-btn {
+  flex: 1;
+  background: #2e2828;
+  color: #fff;
+  border: 1px solid #3d3535;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.edit-toggle-btn:hover {
+  background: #3d3535;
+}
+
+.save-submit-btn {
+  flex: 1;
+  background: #9d4edd;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
