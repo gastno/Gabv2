@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: appointment_system_db
+    restart: always
+    environment:
+      POSTGRES_DB: appointment_db
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01_init.sql
+
+volumes:
+  postgres_data:
