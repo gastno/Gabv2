@@ -46,7 +46,7 @@ def seed_database():
         # 4. Insert Initial Specialist Staff
         cursor.execute("""
             INSERT INTO staff (id, role_id, username, password_hash, full_name, description) VALUES
-                (1, 3, 'anna_gabbablu', '$2b$12$eImiTXuWVxfM37uY4JANjO5E/8vM6eM9rEa3Nl8a5kE8m', 'Anna María', 'Lash & Brow Specialist')
+                (1, 2, 'gabbablu', '$2b$10$1IUDHUtOhELtoGJF44RFZug4ZT7DuxSuoX/uxgwEIbHaf50y978ne', 'Gabbablu Admin', 'Brand Administrator')
             ON CONFLICT (username) DO NOTHING;
         """)
 

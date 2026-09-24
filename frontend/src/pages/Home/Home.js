@@ -1,10 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 
 function Home() {
   const [language, setLanguage] = useState("en");
+  const navigate = useNavigate();
+
+  const handleNavigate = (path) => {
+    if (navigate) {
+      navigate(path);
+    } else {
+      window.location.href = path;
+    }
+  };
 
   return (
     <div className="home-page">
@@ -12,17 +22,19 @@ function Home() {
       <Header
         language={language}
         onLanguageChange={setLanguage}
-        onLoginClick={() => alert("Login clicked")}
       />
 
       <main className="home-content">
-        {/* Gradient Space */}
+        {/* Gradient Banner Space */}
         <div className="gradient-space" />
 
         {/* Interactive Dual Section */}
         <div className="interactive-container">
-          {/* Gabbablu */}
-          <div className="interactive-side beauty-side">
+          {/* Gabbablu Card */}
+          <div 
+            className="interactive-side beauty-side"
+            onClick={() => handleNavigate("/studios/gabbablu")}
+          >
             <img
               src="/gabbablulogo.png"
               alt="Gabbablu"
@@ -34,8 +46,11 @@ function Home() {
             </div>
           </div>
 
-          {/* Amor Tattoo */}
-          <div className="interactive-side tattoo-side">
+          {/* Amor Tattoo Card */}
+          <div 
+            className="interactive-side tattoo-side"
+            onClick={() => handleNavigate("/studios/amortattoo")}
+          >
             <img
               src="/amortattoo.png"
               alt="Amor Tattoo"

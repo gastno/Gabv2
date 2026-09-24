@@ -1,28 +1,27 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Staff.css";
 
 function Staff() {
-  // Login State
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginForm, setLoginForm] = useState({ userId: "", password: "" });
-  const [loginError, setLoginError] = useState("");
+  const navigate = useNavigate();
 
-  // Staff & Brand Context
-  const staffInfo = { name: "Anna María (Staff #104)", brand: "Gabbablu" };
+  // Retrieve cached staff info
+  const staffName = localStorage.getItem("auth_user_name") || "Anna María";
+  const staffInfo = { name: staffName, brand: "Gabbablu" };
 
   // Month Navigation State
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
-  const [currentMonthIdx, setCurrentMonthIdx] = useState(8); // Default: September (index 8)
+  const [currentMonthIdx, setCurrentMonthIdx] = useState(8);
   const [currentYear, setCurrentYear] = useState(2026);
 
   // Calendar View State
   const [calendarView, setCalendarView] = useState("month");
   const [selectedDayNum, setSelectedDayNum] = useState(15);
 
-  // Appointments Placeholder Data
+  // Appointments State Data
   const [appointments, setAppointments] = useState([
     {
       id: 101,
@@ -74,7 +73,7 @@ function Staff() {
 
   const daysArray = Array.from({ length: 30 }, (_, i) => i + 1);
 
-  // Month Navigation Handlers
+  // Handlers
   const handlePrevMonth = () => {
     if (currentMonthIdx === 0) {
       setCurrentMonthIdx(11);
@@ -93,14 +92,11 @@ function Staff() {
     }
   };
 
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    if (loginForm.userId.trim() && loginForm.password.trim()) {
-      setIsLoggedIn(true);
-      setLoginError("");
-    } else {
-      setLoginError("Please enter your User ID and Password.");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("staff_role");
+    localStorage.removeItem("auth_user_name");
+    navigate("/staff-login");
   };
 
   const handleOpenApptModal = (appt) => {
@@ -144,41 +140,6 @@ function Staff() {
     setSlotModal({ isOpen: false, dayNumber: null, mode: "appt" });
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="staff-page login-page">
-        <div className="staff-login-card">
-          <h2>Staff Portal Login</h2>
-          <p className="login-subtitle">Access your schedule & appointment management</p>
-          <form onSubmit={handleLoginSubmit}>
-            <div className="form-group">
-              <label>User ID / Username</label>
-              <input
-                type="text"
-                required
-                value={loginForm.userId}
-                onChange={(e) => setLoginForm({ ...loginForm, userId: e.target.value })}
-                placeholder="e.g. anna"
-              />
-            </div>
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                required
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                placeholder="••••••••"
-              />
-            </div>
-            {loginError && <p className="login-error-msg">{loginError}</p>}
-            <button type="submit" className="login-submit-btn">Log In to Schedule</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="staff-page">
       {/* HEADER */}
@@ -188,7 +149,7 @@ function Staff() {
         </div>
         <div className="staff-bar-right">
           <span className="brand-badge">✨ {staffInfo.brand}</span>
-          <button className="logout-btn" onClick={() => setIsLoggedIn(false)}>Log Out</button>
+          <button className="logout-btn" onClick={handleLogout}>Log Out</button>
         </div>
       </header>
 
@@ -219,7 +180,6 @@ function Staff() {
         {/* MONTH VIEW */}
         {calendarView === "month" && (
           <div className="staff-calendar-container">
-            {/* Month Navigation Controls */}
             <div className="calendar-month-bar">
               <button
                 type="button"
