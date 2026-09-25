@@ -27,21 +27,23 @@ def seed_database():
             ON CONFLICT (name) DO NOTHING;
         """)
 
-        # 2. Insert Default Brand
+        # 2. Insert Default Brand with slug
         cursor.execute("""
-            INSERT INTO brands (id, name, location, about_description) VALUES
-                (1, 'Gabbablu', 'Reykjavík, Iceland', 'Premier lash and brow specialist salon')
+            INSERT INTO brands (id, name, slug, location, about_description) VALUES
+                (1, 'Gabbablu', 'gabbablu', 'Reykjavík, Iceland', 'Premier lash and brow specialist salon'),
+                (2, 'Amor Tattoo', 'amor-tattoo', 'Reykjavík, Iceland', 'Tattoo and piercing studio')
             ON CONFLICT (id) DO NOTHING;
         """)
 
         # 3. Insert Initial Categories
-        cursor.execute("""
-            INSERT INTO categories (id, brand_id, name, description) VALUES
-                (1, 1, 'Combos', 'Combined treatments and packages'),
-                (2, 1, 'Lashes Extension', 'Professional eyelash extensions'),
-                (3, 1, 'Eyebrows', 'Brow shaping, tinting and lamination')
-            ON CONFLICT (id) DO NOTHING;
-        """)
+        #cursor.execute("""
+        #    INSERT INTO categories (id, brand_id, name, description) VALUES
+        #        (1, 1, 'Combos', 'Combined treatments and packages'),
+        #        (2, 1, 'Lashes Extension', 'Professional eyelash extensions'),
+        #        (3, 1, 'Eyebrows', 'Brow shaping, tinting and lamination')
+        #    ON CONFLICT (id) DO NOTHING;
+        #""")
+        
 
         # 4. Insert Initial Specialist Staff
         cursor.execute("""

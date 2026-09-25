@@ -673,3 +673,253 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.admin-logout-btn {
+  background: #3d1c1d;
+  color: #e63946;
+  border: 1px solid #e63946;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.admin-logout-btn:hover {
+  background: #e63946;
+  color: #fff;
+}
+
+/* BRANDS GRID STYLING */
+.brands-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.admin-brand-card {
+  background: #1e1919;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.brand-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #141010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.brand-slug-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #aaa;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.admin-brand-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.brand-location {
+  margin: 0 0 8px 0;
+  font-size: 0.82rem;
+  color: #e0aaff;
+}
+
+.brand-about {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+/* DISCARD BUTTON & DISABLED READONLY FIELDS */
+.discard-cancel-btn {
+  flex: 1;
+  background: #2e2828;
+  color: #aaa;
+  border: 1px solid #3d3535;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.discard-cancel-btn:hover {
+  background: #3d3535;
+  color: #fff;
+}
+
+.disabled-slug {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Card Hover Highlight Effect */
+.admin-category-card,
+.admin-service-card,
+.staff-account-card,
+.admin-brand-card,
+.employee-option-card,
+.accordion-category {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s ease,
+              box-shadow 0.25s ease,
+              background-color 0.25s ease;
+}
+
+.admin-category-card:hover,
+.admin-service-card:hover,
+.staff-account-card:hover,
+.admin-brand-card:hover,
+.employee-option-card:hover,
+.accordion-category:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: #9d4edd !important; /* Gabbablu Accent Color */
+  box-shadow: 0 8px 24px rgba(157, 78, 221, 0.25);
+  background-color: #261f2f;
+}
+
+/* STAFF TABLE INTERACTIVE STYLING */
+.staff-table-interactive {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.interactive-staff-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+/* Row Hover Highlight */
+.interactive-staff-row:hover {
+  background-color: #2a2035 !important;
+  box-shadow: inset 4px 0 0 #9d4edd;
+}
+
+.staff-table-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #3d3535;
+}
+
+.password-mask {
+  font-family: monospace;
+  letter-spacing: 1.5px;
+  color: #aaa;
+}
+
+.brand-tag-table {
+  background: rgba(157, 78, 221, 0.2);
+  color: #e0aaff;
+  border: 1px solid rgba(157, 78, 221, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* Modal Action Button Layout */
+.modal-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.save-submit-btn {
+  flex: 1;
+  background: #9d4edd;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-submit-btn:hover {
+  background: #8338ec;
+}
+
+.discard-cancel-btn {
+  flex: 1;
+  background: #2e2828;
+  color: #aaa;
+  border: 1px solid #3d3535;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.discard-cancel-btn:hover {
+  background: #3d3535;
+  color: #fff;
+}
+
+/* Multi-Pill Brand Selector Styles */
+.brand-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.brand-pills-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.brand-select-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #d1d5db;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-select-pill:hover:not(.disabled) {
+  border-color: #9ca3af;
+  background-color: #e5e7eb;
+}
+
+.brand-select-pill.selected {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.brand-select-pill.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}

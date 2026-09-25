@@ -63,3 +63,34 @@ export const apptApi = {
   // Fetch protected staff schedule
   getStaffSchedule: () => request("/appointments/staff-schedule", { method: "GET" }),
 };
+
+export const staffApi = {
+  // Fetch all staff accounts
+  getAll: () => request("/staff"),
+
+  // Create a new staff account
+  create: (data) =>
+    request("/staff", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  // Update existing staff account
+  update: (id, data) =>
+    request(`/staff/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+};
+
+export const brandApi = {
+  // Fetch all brands
+  getAll: () => request("/brands"),
+
+  // Update a brand (name, location, about_description)
+  update: (id, data) =>
+    request(`/brands/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+};

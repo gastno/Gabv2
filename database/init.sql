@@ -13,6 +13,7 @@ CREATE TYPE system_role AS ENUM ('admin', 'staff', 'super_admin');
 CREATE TABLE brands (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,
     location TEXT NOT NULL,
     about_description TEXT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -31,6 +32,7 @@ CREATE TABLE staff (
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
     description TEXT,
+    avatar_url VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
