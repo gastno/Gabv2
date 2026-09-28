@@ -1,4 +1,3 @@
-// src/index.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -22,8 +21,8 @@ app.use('/api/appointments', apptRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/brands', brandRoutes);
 
-// Serve the /uploads folder statically
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve static assets from <root>/uploads
+app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
 // Health Check
 app.get('/health', (req, res) => {
@@ -33,4 +32,3 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 API Server running on http://localhost:${PORT}`);
 });
-

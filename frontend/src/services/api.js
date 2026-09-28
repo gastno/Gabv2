@@ -1,6 +1,16 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-// Helper for HTTP requests
+export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
+export const getAssetUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+    return path;
+  }
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${SERVER_BASE_URL}${cleanPath}`;
+};
+
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("auth_token");
 
@@ -15,7 +25,7 @@ async function request(endpoint, options = {}) {
     headers,
   });
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     throw new Error(data.error || "An error occurred with the request.");
@@ -24,70 +34,80 @@ async function request(endpoint, options = {}) {
   return data;
 }
 
-// Authentication API Endpoints
 export const authApi = {
-  // Staff Login
   staffLogin: (username, password) =>
     request("/auth/staff/login", {
       method: "POST",
       body: JSON.stringify({ username, password }),
     }),
 
-  // Customer Login
   customerLogin: (email, password) =>
     request("/auth/customer/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     }),
 
-  // Customer Registration
   customerRegister: (userData) =>
     request("/auth/customer/register", {
       method: "POST",
       body: JSON.stringify(userData),
     }),
 
-  // Get current logged-in user details
   getMe: () => request("/auth/me", { method: "GET" }),
 };
 
-// Appointments API Endpoints
 export const apptApi = {
-  // Create Appointment (Guest or Registered)
   createAppointment: (bookingData) =>
     request("/appointments", {
       method: "POST",
       body: JSON.stringify(bookingData),
     }),
 
-  // Fetch protected staff schedule
   getStaffSchedule: () => request("/appointments/staff-schedule", { method: "GET" }),
 };
 
 export const staffApi = {
-  // Fetch all staff accounts
-  getAll: () => request("/staff"),
+  getAll: () => request("/staff", { method: "GET" }),
 
-  // Create a new staff account
-  create: (data) =>
+  create: (staffData) =>
     request("/staff", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(staffData),
     }),
 
-  // Update existing staff account
-  update: (id, data) =>
+  update: (id, staffData) =>
     request(`/staff/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: JSON.stringify(staffData),
     }),
+
+  uploadAvatar: async (staffId, file) => {
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    const token = localStorage.getItem("auth_token");
+    
+    const response = await fetch(`${API_BASE_URL}/staff/${staffId}/avatar`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to upload avatar photo");
+    }
+
+    return data;
+  },
 };
 
 export const brandApi = {
-  // Fetch all brands
   getAll: () => request("/brands"),
 
-  // Update a brand (name, location, about_description)
   update: (id, data) =>
     request(`/brands/${id}`, {
       method: "PUT",

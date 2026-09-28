@@ -4,12 +4,47 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
-const pool = require('../config/db');
-
 
 const SALT_ROUNDS = 10;
 
-// 1. GET ALL STAFF (Aggregates assigned brands into an array)
+// Resolves directory path to <root>/uploads/avatars
+const getUploadDirectory = () => {
+  return path.join(__dirname, '../../../uploads', 'avatars');
+};
+
+const processAndSaveAvatar = async (fileBuffer) => {
+  const uploadDir = getUploadDirectory();
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  const filename = `${uuidv4()}.webp`;
+  const filepath = path.join(uploadDir, filename);
+  const dbRelativeUrl = `/uploads/avatars/${filename}`;
+
+  await sharp(fileBuffer)
+    .resize(400, 400, { fit: 'cover' })
+    .webp({ quality: 80 })
+    .toFile(filepath);
+
+  return dbRelativeUrl;
+};
+
+const removeOldAvatarFile = (avatarUrl) => {
+  if (avatarUrl && avatarUrl.startsWith('/uploads/avatars/')) {
+    const filename = path.basename(avatarUrl);
+    const targetFilePath = path.join(getUploadDirectory(), filename);
+    if (fs.existsSync(targetFilePath)) {
+      try {
+        fs.unlinkSync(targetFilePath);
+      } catch (err) {
+        console.error('Failed to remove old avatar file:', err);
+      }
+    }
+  }
+};
+
+// 1. GET ALL STAFF
 exports.getAllStaff = async (req, res) => {
   try {
     const queryText = `
@@ -19,6 +54,7 @@ exports.getAllStaff = async (req, res) => {
         s.full_name AS name,
         s.description,
         s.is_active,
+        s.avatar_url,
         r.name AS role,
         s.role_id,
         COALESCE(
@@ -43,18 +79,28 @@ exports.getAllStaff = async (req, res) => {
   }
 };
 
-// 2. CREATE STAFF (Accepts brand_ids array)
+// 2. CREATE STAFF ACCOUNT
 exports.createStaff = async (req, res) => {
-  const { username, userId, password, full_name, name, description, brand_ids, role_id } = req.body;
+  const { 
+    username, 
+    userId, 
+    password, 
+    full_name, 
+    name, 
+    description, 
+    brand_ids, 
+    role_id,
+    photo 
+  } = req.body;
 
   const targetUsername = username || userId;
   const staffName = full_name || name;
 
-  if (role_id === undefined || role_id === null || role_id === '') {
-    return res.status(400).json({ error: 'role_id is required and cannot be omitted.' });
+  const parsedRoleId = role_id ? parseInt(role_id, 10) : 3;
+  if (isNaN(parsedRoleId)) {
+    return res.status(400).json({ error: 'role_id must be a valid integer.' });
   }
 
-  const parsedRoleId = parseInt(role_id, 10);
   if (!targetUsername || !password || !staffName) {
     return res.status(400).json({ error: 'Username, password, and full name are required.' });
   }
@@ -62,12 +108,17 @@ exports.createStaff = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
+    let avatarUrl = photo || null;
+    if (req.file) {
+      avatarUrl = await processAndSaveAvatar(req.file.buffer);
+    }
+
     await db.query('BEGIN');
 
     const insertStaffQuery = `
-      INSERT INTO staff (role_id, username, password_hash, full_name, description)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, role_id, username, full_name, description;
+      INSERT INTO staff (role_id, username, password_hash, full_name, description, avatar_url)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, role_id, username, full_name, description, avatar_url;
     `;
 
     const staffResult = await db.query(insertStaffQuery, [
@@ -76,14 +127,21 @@ exports.createStaff = async (req, res) => {
       hashedPassword,
       staffName,
       description || null,
+      avatarUrl
     ]);
 
     const newStaff = staffResult.rows[0];
 
-    // Handle multiple brands (default to brand [1] if empty or omitted)
-    const targetBrandIds = Array.isArray(brand_ids) && brand_ids.length > 0 ? brand_ids : [1];
+    let parsedBrandIds = [];
+    if (typeof brand_ids === 'string') {
+      try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = [1]; }
+    } else if (Array.isArray(brand_ids) && brand_ids.length > 0) {
+      parsedBrandIds = brand_ids;
+    } else {
+      parsedBrandIds = [1];
+    }
 
-    for (const bId of targetBrandIds) {
+    for (const bId of parsedBrandIds) {
       await db.query(
         `INSERT INTO staff_brands (staff_id, brand_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
         [newStaff.id, bId]
@@ -100,7 +158,8 @@ exports.createStaff = async (req, res) => {
         username: newStaff.username,
         full_name: newStaff.full_name,
         description: newStaff.description,
-        brand_ids: targetBrandIds,
+        avatar_url: newStaff.avatar_url,
+        brand_ids: parsedBrandIds,
       },
     });
   } catch (error) {
@@ -115,10 +174,19 @@ exports.createStaff = async (req, res) => {
   }
 };
 
-// 3. UPDATE STAFF (Re-syncs multi-brand associations)
+// 3. UPDATE STAFF ACCOUNT
 exports.updateStaff = async (req, res) => {
   const { id } = req.params;
-  const { username, userId, password, full_name, name, description, role_id, brand_ids } = req.body;
+  const { 
+    username, 
+    userId, 
+    password, 
+    full_name, 
+    name, 
+    description, 
+    role_id, 
+    brand_ids 
+  } = req.body;
 
   const targetUsername = username || userId;
   const staffName = full_name || name;
@@ -129,9 +197,17 @@ exports.updateStaff = async (req, res) => {
       return res.status(404).json({ error: 'Staff member not found.' });
     }
 
+    const currentStaff = checkResult.rows[0];
+    let newAvatarUrl = currentStaff.avatar_url;
+
+    if (req.file) {
+      newAvatarUrl = await processAndSaveAvatar(req.file.buffer);
+      removeOldAvatarFile(currentStaff.avatar_url);
+    }
+
     await db.query('BEGIN');
 
-    const isNewPasswordProvided = password && password.trim() !== '' && !password.includes('••');
+    const isNewPasswordProvided = password && password.trim() !== '' && !password.includes('•');
 
     if (isNewPasswordProvided) {
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -141,9 +217,10 @@ exports.updateStaff = async (req, res) => {
              full_name = COALESCE($2, full_name),
              description = COALESCE($3, description),
              role_id = COALESCE($4, role_id),
-             password_hash = $5
-         WHERE id = $6`,
-        [targetUsername, staffName, description, role_id, hashedPassword, id]
+             avatar_url = $5,
+             password_hash = $6
+         WHERE id = $7`,
+        [targetUsername, staffName, description, role_id || currentStaff.role_id, newAvatarUrl, hashedPassword, id]
       );
     } else {
       await db.query(
@@ -151,16 +228,21 @@ exports.updateStaff = async (req, res) => {
          SET username = COALESCE($1, username),
              full_name = COALESCE($2, full_name),
              description = COALESCE($3, description),
-             role_id = COALESCE($4, role_id)
-         WHERE id = $5`,
-        [targetUsername, staffName, description, role_id, id]
+             role_id = COALESCE($4, role_id),
+             avatar_url = $5
+         WHERE id = $6`,
+        [targetUsername, staffName, description, role_id || currentStaff.role_id, newAvatarUrl, id]
       );
     }
 
-    // Sync multi-brand associations if brand_ids was provided
-    if (Array.isArray(brand_ids)) {
+    let parsedBrandIds = brand_ids;
+    if (typeof brand_ids === 'string') {
+      try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = null; }
+    }
+
+    if (Array.isArray(parsedBrandIds)) {
       await db.query('DELETE FROM staff_brands WHERE staff_id = $1', [id]);
-      for (const bId of brand_ids) {
+      for (const bId of parsedBrandIds) {
         await db.query(
           'INSERT INTO staff_brands (staff_id, brand_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
           [id, bId]
@@ -169,7 +251,6 @@ exports.updateStaff = async (req, res) => {
     }
 
     await db.query('COMMIT');
-
     res.json({ message: 'Staff account updated successfully' });
   } catch (error) {
     await db.query('ROLLBACK');
@@ -178,7 +259,7 @@ exports.updateStaff = async (req, res) => {
   }
 };
 
-// POST /api/staff/:id/avatar
+// 4. STANDALONE AVATAR UPLOAD
 exports.uploadAvatar = async (req, res) => {
   try {
     const staffId = req.params.id;
@@ -187,47 +268,21 @@ exports.uploadAvatar = async (req, res) => {
       return res.status(400).json({ error: 'No image file uploaded.' });
     }
 
-    // 1. Ensure target folder exists: ./uploads/avatars
-    const uploadDir = path.join(__dirname, '../../../uploads', 'avatars');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    // 2. Generate unique filename and relative path for DB
-    const filename = `${uuidv4()}.webp`;
-    const filepath = path.join(uploadDir, filename);
-    const dbRelativeUrl = `/uploads/avatars/${filename}`;
-
-    // 3. Process image with Sharp: crop to 400x400 square, convert to WebP
-    await sharp(req.file.buffer)
-      .resize(400, 400, { fit: 'cover' })
-      .webp({ quality: 80 })
-      .toFile(filepath);
-
-    // 4. Retrieve current avatar_url to delete old image file if it exists
-    const currentStaffResult = await pool.query('SELECT avatar_url FROM staff WHERE id = $1', [staffId]);
+    const currentStaffResult = await db.query('SELECT avatar_url FROM staff WHERE id = $1', [staffId]);
 
     if (currentStaffResult.rows.length === 0) {
-      // Cleanup newly uploaded file if staff member doesn't exist
-      if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
       return res.status(404).json({ error: 'Staff member not found.' });
     }
 
     const oldAvatarUrl = currentStaffResult.rows[0].avatar_url;
+    const dbRelativeUrl = await processAndSaveAvatar(req.file.buffer);
 
-    // 5. Update database record with new relative path
-    const updateResult = await pool.query(
+    const updateResult = await db.query(
       'UPDATE staff SET avatar_url = $1 WHERE id = $2 RETURNING id, username, full_name, avatar_url',
       [dbRelativeUrl, staffId]
     );
 
-    // 6. Delete old avatar file from disk if present
-    if (oldAvatarUrl) {
-      const oldFilePath = path.join(__dirname, '../../../', oldAvatarUrl);
-      if (fs.existsSync(oldFilePath)) {
-        fs.unlinkSync(oldFilePath);
-      }
-    }
+    removeOldAvatarFile(oldAvatarUrl);
 
     return res.status(200).json({
       message: 'Staff avatar uploaded successfully.',
