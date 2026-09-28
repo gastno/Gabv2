@@ -1,9 +1,12 @@
+// src/pages/Admin/tabs/CategoriesTab.jsx
+
 import React from "react";
 
 function CategoriesTab({
   selectedBrand,
   categories,
   services,
+  loadingCategories,
   setCategoryModalOpen,
   setInspectCategory,
   setIsEditMode,
@@ -25,36 +28,40 @@ function CategoriesTab({
         </button>
       </div>
 
-      <div className="categories-admin-grid">
-        {categories
-          .filter((cat) => cat.brand === selectedBrand)
-          .map((cat) => (
-            <div
-              className="admin-category-card clickable"
-              key={cat.id}
-              onClick={() => {
-                setInspectCategory({ ...cat });
-                setIsEditMode(false);
-              }}
-            >
-              <div className="category-card-header">
-                <span className="category-icon-circle">✦</span>
-                <span className="brand-tag">{cat.brand}</span>
+      {loadingCategories ? (
+        <p>Loading categories from database...</p>
+      ) : (
+        <div className="categories-admin-grid">
+          {categories
+            .filter((cat) => cat.brand === selectedBrand)
+            .map((cat) => (
+              <div
+                className="admin-category-card clickable"
+                key={cat.id}
+                onClick={() => {
+                  setInspectCategory({ ...cat });
+                  setIsEditMode(false);
+                }}
+              >
+                <div className="category-card-header">
+                  <span className="category-icon-circle">✦</span>
+                  <span className="brand-tag">{cat.brand}</span>
+                </div>
+                <h4>{cat.title}</h4>
+                <p>{cat.subtitle}</p>
+                <div className="category-meta">
+                  <span>
+                    Services in Category:{" "}
+                    {
+                      services.filter((s) => s.category === cat.title)
+                        .length
+                    }
+                  </span>
+                </div>
               </div>
-              <h4>{cat.title}</h4>
-              <p>{cat.subtitle}</p>
-              <div className="category-meta">
-                <span>
-                  Services in Category:{" "}
-                  {
-                    services.filter((s) => s.category === cat.title)
-                      .length
-                  }
-                </span>
-              </div>
-            </div>
-          ))}
-      </div>
+            ))}
+        </div>
+      )}
     </section>
   );
 }

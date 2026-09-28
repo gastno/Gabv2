@@ -114,3 +114,17 @@ export const brandApi = {
       body: JSON.stringify(data),
     }),
 };
+
+export const categoryApi = {
+  getAll: () => request("/categories"),
+  create: (data) =>
+    request("/categories", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: (id, data) =>
+    request(`/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+};

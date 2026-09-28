@@ -1,6 +1,8 @@
+// src/pages/Admin/Admin.jsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { staffApi, brandApi, getAssetUrl } from "../../services/api";
+import { staffApi, brandApi, categoryApi, getAssetUrl } from "../../services/api";
 import "./Admin.css";
 
 // Layout
@@ -27,12 +29,10 @@ import CreateStaffModal from "./modals/CreateStaffModal";
 function Admin() {
   const navigate = useNavigate();
 
-  // Navigation & Sidebar State
+  // Navigation & Layout State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("calendar");
-
-  // Master Brand Filter
   const [selectedBrand, setSelectedBrand] = useState("Gabbablu");
 
   // Master Entity Lists
@@ -42,41 +42,16 @@ function Admin() {
   const [staffList, setStaffList] = useState([]);
   const [loadingStaff, setLoadingStaff] = useState(false);
 
-  // File & Transient Preview States for Avatars
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // File & Avatar States
   const [createAvatarFile, setCreateAvatarFile] = useState(null);
   const [createAvatarPreview, setCreateAvatarPreview] = useState(null);
-
   const [editAvatarFile, setEditAvatarFile] = useState(null);
   const [editAvatarPreview, setEditAvatarPreview] = useState(null);
 
-  // Categories & Services State
-  const [categories, setCategories] = useState([
-    {
-      id: "combos",
-      brand: "Gabbablu",
-      title: "Combos",
-      subtitle: "Combined treatments & packages",
-    },
-    {
-      id: "lashes",
-      brand: "Gabbablu",
-      title: "Lashes Extension",
-      subtitle: "Professional eyelash extension services",
-    },
-    {
-      id: "eyebrows",
-      brand: "Gabbablu",
-      title: "Eyebrows",
-      subtitle: "Brow shaping, tinting & lamination",
-    },
-    {
-      id: "products",
-      brand: "Gabbablu",
-      title: "Products",
-      subtitle: "Aftercare & beauty items",
-    },
-  ]);
-
+  // Local Services & Ledger State
   const [services, setServices] = useState([
     {
       id: 1,
@@ -100,7 +75,6 @@ function Admin() {
     },
   ]);
 
-  // Appointments Ledger State
   const [appointments, setAppointments] = useState([
     {
       id: 501,
@@ -116,18 +90,16 @@ function Admin() {
     },
   ]);
 
-  // Modal Visibility States
+  // Modal Control States
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [staffModalOpen, setStaffModalOpen] = useState(false);
 
-  // Inspector & Edit States
+  // Inspection & Edit States
   const [inspectBrand, setInspectBrand] = useState(null);
   const [tempInspectBrand, setTempInspectBrand] = useState(null);
-
   const [inspectStaff, setInspectStaff] = useState(null);
   const [tempInspectStaff, setTempInspectStaff] = useState(null);
-
   const [inspectCategory, setInspectCategory] = useState(null);
   const [inspectService, setInspectService] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -138,6 +110,7 @@ function Admin() {
     title: "",
     subtitle: "",
   });
+
   const [newService, setNewService] = useState({
     brand: "Gabbablu",
     category: "Lashes Extension",
@@ -147,6 +120,7 @@ function Admin() {
     price: "",
     image: "",
   });
+
   const [newStaff, setNewStaff] = useState({
     userId: "",
     password: "",
@@ -156,7 +130,8 @@ function Admin() {
     photo: "",
   });
 
-  // DATA FETCHING
+  // ================= API FETCHERS =================
+
   const fetchBrands = async () => {
     setLoadingBrands(true);
     try {
@@ -167,7 +142,7 @@ function Admin() {
         }
       }
     } catch (err) {
-      console.warn("Using fallback brands list:", err);
+      console.warn("Error fetching brands:", err);
     } finally {
       setLoadingBrands(false);
     }
@@ -200,9 +175,31 @@ function Admin() {
     }
   };
 
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    try {
+      if (categoryApi && categoryApi.getAll) {
+        const data = await categoryApi.getAll();
+        const formatted = (data || []).map((c) => ({
+          id: c.id,
+          brand_id: c.brand_id,
+          brand: c.brand || "Gabbablu",
+          title: c.title || c.name,
+          subtitle: c.subtitle || c.description || "",
+        }));
+        setCategories(formatted);
+      }
+    } catch (err) {
+      console.warn("Failed loading categories from API:", err);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
   useEffect(() => {
     fetchBrands();
     fetchStaffAccounts();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -212,6 +209,7 @@ function Admin() {
     };
   }, [createAvatarPreview, editAvatarPreview]);
 
+  // Logout Handler
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("staff_role");
@@ -219,6 +217,7 @@ function Admin() {
     navigate("/staff-login");
   };
 
+  // Close Inspection Modals
   const closeInspectModal = () => {
     setInspectBrand(null);
     setTempInspectBrand(null);
@@ -234,7 +233,69 @@ function Admin() {
     }
   };
 
-  // BRAND HANDLERS
+  // ================= CATEGORY HANDLERS =================
+
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+
+    const selectedBrandObj = brandsList.find((b) => b.name === newCategory.brand);
+    const brandId = selectedBrandObj ? selectedBrandObj.id : 1;
+
+    try {
+      if (categoryApi && categoryApi.create) {
+        await categoryApi.create({
+          brand_id: brandId,
+          brand: newCategory.brand,
+          title: newCategory.title,
+          subtitle: newCategory.subtitle,
+        });
+        await fetchCategories();
+      } else {
+        setCategories((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            brand_id: brandId,
+            ...newCategory,
+          },
+        ]);
+      }
+      setCategoryModalOpen(false);
+      setNewCategory({ brand: selectedBrand, title: "", subtitle: "" });
+    } catch (err) {
+      alert(err.message || "Failed to create category.");
+    }
+  };
+
+  const handleSaveCategoryEdit = async (e) => {
+    e.preventDefault();
+    if (!isEditMode || !inspectCategory) return;
+
+    const selectedBrandObj = brandsList.find((b) => b.name === inspectCategory.brand);
+    const brandId = selectedBrandObj ? selectedBrandObj.id : inspectCategory.brand_id;
+
+    try {
+      if (categoryApi && categoryApi.update) {
+        await categoryApi.update(inspectCategory.id, {
+          brand_id: brandId,
+          brand: inspectCategory.brand,
+          title: inspectCategory.title,
+          subtitle: inspectCategory.subtitle,
+        });
+        await fetchCategories();
+      } else {
+        setCategories((prev) =>
+          prev.map((c) => (c.id === inspectCategory.id ? inspectCategory : c))
+        );
+      }
+      closeInspectModal();
+    } catch (err) {
+      alert(err.message || "Failed to update category.");
+    }
+  };
+
+  // ================= BRAND HANDLERS =================
+
   const handleOpenBrandModal = (brand) => {
     setInspectBrand({ ...brand });
     setTempInspectBrand({ ...brand });
@@ -270,7 +331,8 @@ function Admin() {
     }
   };
 
-  // STAFF HANDLERS
+  // ================= STAFF HANDLERS =================
+
   const handleOpenStaffModal = (emp) => {
     setInspectStaff({ ...emp });
     setTempInspectStaff({ ...emp });
@@ -339,12 +401,7 @@ function Admin() {
         createdStaffId = response?.staff?.id || response?.id;
       }
 
-      if (
-        createdStaffId &&
-        createAvatarFile &&
-        staffApi &&
-        staffApi.uploadAvatar
-      ) {
+      if (createdStaffId && createAvatarFile && staffApi && staffApi.uploadAvatar) {
         await staffApi.uploadAvatar(createdStaffId, createAvatarFile);
       }
 
@@ -405,19 +462,7 @@ function Admin() {
     }
   };
 
-  // CATEGORY & SERVICE HANDLERS
-  const handleAddCategory = (e) => {
-    e.preventDefault();
-    setCategories((prev) => [
-      ...prev,
-      {
-        id: newCategory.title.toLowerCase().replace(/\s+/g, "-"),
-        ...newCategory,
-      },
-    ]);
-    setCategoryModalOpen(false);
-    setNewCategory({ brand: "Gabbablu", title: "", subtitle: "" });
-  };
+  // ================= SERVICES & LEDGER HANDLERS =================
 
   const handleAddService = (e) => {
     e.preventDefault();
@@ -441,15 +486,6 @@ function Admin() {
     });
   };
 
-  const handleSaveCategoryEdit = (e) => {
-    e.preventDefault();
-    if (!isEditMode) return;
-    setCategories((prev) =>
-      prev.map((c) => (c.id === inspectCategory.id ? inspectCategory : c))
-    );
-    closeInspectModal();
-  };
-
   const handleSaveServiceEdit = (e) => {
     e.preventDefault();
     if (!isEditMode) return;
@@ -461,9 +497,7 @@ function Admin() {
 
   const handleStatusChange = (id, newStatus) => {
     setAppointments((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: newStatus } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
     );
   };
 
@@ -474,29 +508,28 @@ function Admin() {
 
   return (
     <div
-      className={`admin-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${mobileSidebarOpen ? "mobile-sidebar-active" : ""}`}
+      className={`admin-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${
+        mobileSidebarOpen ? "mobile-sidebar-active" : ""
+      }`}
     >
-      {mobileSidebarOpen && (
-        <div
-          className="admin-mobile-backdrop"
-          onClick={() => setMobileSidebarOpen(false)}
-        />
-      )}
-
+      {/* SIDEBAR & BACKDROP */}
       <AdminSidebar
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
+        mobileSidebarOpen={mobileSidebarOpen}
+        setMobileSidebarOpen={setMobileSidebarOpen}
         activeTab={activeTab}
         handleTabSelect={handleTabSelect}
       />
 
+      {/* MAIN LAYOUT */}
       <main className="admin-main">
         <AdminTopBar
+          setMobileSidebarOpen={setMobileSidebarOpen}
           selectedBrand={selectedBrand}
           setSelectedBrand={setSelectedBrand}
           brandsList={brandsList}
           handleLogout={handleLogout}
-          setMobileSidebarOpen={setMobileSidebarOpen}
         />
 
         <div className="admin-tab-content">
@@ -521,6 +554,7 @@ function Admin() {
               selectedBrand={selectedBrand}
               categories={categories}
               services={services}
+              loadingCategories={loadingCategories}
               setCategoryModalOpen={setCategoryModalOpen}
               setInspectCategory={setInspectCategory}
               setIsEditMode={setIsEditMode}
@@ -575,12 +609,12 @@ function Admin() {
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
           editAvatarPreview={editAvatarPreview}
-          setEditAvatarFile={setEditAvatarFile}
           setEditAvatarPreview={setEditAvatarPreview}
+          setEditAvatarFile={setEditAvatarFile}
+          handleToggleBrandForInspectStaff={handleToggleBrandForInspectStaff}
           closeInspectModal={closeInspectModal}
           handleSaveStaffEdit={handleSaveStaffEdit}
           handleDiscardStaffChanges={handleDiscardStaffChanges}
-          handleToggleBrandForInspectStaff={handleToggleBrandForInspectStaff}
         />
       )}
 
@@ -636,11 +670,11 @@ function Admin() {
           setNewStaff={setNewStaff}
           brandsList={brandsList}
           createAvatarPreview={createAvatarPreview}
-          setCreateAvatarFile={setCreateAvatarFile}
           setCreateAvatarPreview={setCreateAvatarPreview}
+          setCreateAvatarFile={setCreateAvatarFile}
+          handleToggleBrandForNewStaff={handleToggleBrandForNewStaff}
           setStaffModalOpen={setStaffModalOpen}
           handleAddStaff={handleAddStaff}
-          handleToggleBrandForNewStaff={handleToggleBrandForNewStaff}
         />
       )}
     </div>
