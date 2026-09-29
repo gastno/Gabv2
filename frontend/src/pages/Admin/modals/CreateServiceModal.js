@@ -1,3 +1,5 @@
+// src/pages/Admin/modals/CreateServiceModal.jsx
+
 import React from "react";
 
 function CreateServiceModal({
@@ -5,6 +7,9 @@ function CreateServiceModal({
   setNewService,
   brandsList,
   categories,
+  createServiceImagePreview,
+  setCreateServiceImagePreview,
+  setCreateServiceImageFile,
   setServiceModalOpen,
   handleAddService,
 }) {
@@ -86,17 +91,18 @@ function CreateServiceModal({
 
           <div className="form-row">
             <div className="form-group">
-              <label>Estimated Time</label>
+              <label>Estimated Time (Minutes or formatted string)</label>
               <input
                 type="text"
                 value={newService.duration}
                 onChange={(e) =>
                   setNewService({ ...newService, duration: e.target.value })
                 }
+                placeholder="e.g. 60 min"
               />
             </div>
             <div className="form-group">
-              <label>Price</label>
+              <label>Price (ISK)</label>
               <input
                 type="text"
                 required
@@ -109,15 +115,55 @@ function CreateServiceModal({
             </div>
           </div>
 
+          {/* SERVICE IMAGE UPLOAD */}
           <div className="form-group">
-            <label>Photo URL</label>
+            <label>Service Photo Upload</label>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "8px",
+              }}
+            >
+              {createServiceImagePreview ? (
+                <img
+                  src={createServiceImagePreview}
+                  alt="Service Preview"
+                  style={{
+                    width: "80px",
+                    height: "56px",
+                    borderRadius: "6px",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "80px",
+                    height: "56px",
+                    borderRadius: "6px",
+                    backgroundColor: "#f0f0f0",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "20px",
+                  }}
+                >
+                  ✨
+                </div>
+              )}
+            </div>
             <input
-              type="text"
-              value={newService.image}
-              onChange={(e) =>
-                setNewService({ ...newService, image: e.target.value })
-              }
-              placeholder="/placeholder-service.jpg"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  const file = e.target.files[0];
+                  setCreateServiceImageFile(file);
+                  setCreateServiceImagePreview(URL.createObjectURL(file));
+                }
+              }}
             />
           </div>
 

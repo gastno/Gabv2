@@ -64,6 +64,7 @@ CREATE TABLE services (
     description TEXT,
     duration_minutes INT NOT NULL,
     price_isk DECIMAL(12,2) NOT NULL,
+    image_url VARCHAR(512),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

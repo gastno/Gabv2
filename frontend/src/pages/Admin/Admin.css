@@ -302,14 +302,13 @@
 }
 
 .brand-tag {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.65);
   color: #fff;
-  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  backdrop-filter: blur(4px);
 }
 
 .service-card-body {
@@ -600,9 +599,35 @@
 .card-top-tags {
   position: absolute;
   top: 10px;
+  left: 10px;
   right: 10px;
   display: flex;
-  gap: 6px;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.card-top-tags .brand-tag {
+  position: relative;
+  top: auto;
+  right: auto;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}
+
+.card-top-tags .category-tag {
+  background: rgba(157, 78, 221, 0.85);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
 .category-tag {

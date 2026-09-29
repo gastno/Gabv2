@@ -2,7 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { staffApi, brandApi, categoryApi, getAssetUrl } from "../../services/api";
+import {
+  staffApi,
+  brandApi,
+  categoryApi,
+  serviceApi,
+  getAssetUrl,
+} from "../../services/api";
 import "./Admin.css";
 
 // Layout
@@ -45,36 +51,22 @@ function Admin() {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
 
-  // File & Avatar States
+  const [services, setServices] = useState([]);
+  const [loadingServices, setLoadingServices] = useState(false);
+
+  // File & Image States for Staff Avatars
   const [createAvatarFile, setCreateAvatarFile] = useState(null);
   const [createAvatarPreview, setCreateAvatarPreview] = useState(null);
   const [editAvatarFile, setEditAvatarFile] = useState(null);
   const [editAvatarPreview, setEditAvatarPreview] = useState(null);
 
-  // Local Services & Ledger State
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      brand: "Gabbablu",
-      category: "Lashes Extension",
-      name: "Classic Lashes",
-      description: "Full set classic extension treatment.",
-      duration: "90 min",
-      price: "14,000 kr",
-      image: "/placeholder-service.jpg",
-    },
-    {
-      id: 2,
-      brand: "Gabbablu",
-      category: "Eyebrows",
-      name: "Brow Lamination",
-      description: "Brow shaping, tinting & lamination set.",
-      duration: "45 min",
-      price: "11,000 kr",
-      image: "/placeholder-service.jpg",
-    },
-  ]);
+  // File & Image States for Services
+  const [createServiceImageFile, setCreateServiceImageFile] = useState(null);
+  const [createServiceImagePreview, setCreateServiceImagePreview] = useState(null);
+  const [editServiceImageFile, setEditServiceImageFile] = useState(null);
+  const [editServiceImagePreview, setEditServiceImagePreview] = useState(null);
 
+  // Ledger State
   const [appointments, setAppointments] = useState([
     {
       id: 501,
@@ -118,7 +110,6 @@ function Admin() {
     description: "",
     duration: "60 min",
     price: "",
-    image: "",
   });
 
   const [newStaff, setNewStaff] = useState({
@@ -196,18 +187,53 @@ function Admin() {
     }
   };
 
+  const fetchServices = async () => {
+    setLoadingServices(true);
+    try {
+      if (serviceApi && serviceApi.getAll) {
+        const data = await serviceApi.getAll();
+        const formatted = (data || []).map((s) => ({
+          id: s.id,
+          brand_id: s.brand_id,
+          category_id: s.category_id,
+          brand: s.brand || "Gabbablu",
+          category: s.category || "General",
+          name: s.name,
+          description: s.description || "",
+          duration: s.duration || `${s.duration_minutes || 60} min`,
+          price: s.price || `${s.price_isk || 0} kr`,
+          image: getAssetUrl(s.image_url),
+          rawImageUrl: s.image_url,
+        }));
+        setServices(formatted);
+      }
+    } catch (err) {
+      console.warn("Failed loading services from API:", err);
+    } finally {
+      setLoadingServices(false);
+    }
+  };
+
   useEffect(() => {
     fetchBrands();
     fetchStaffAccounts();
     fetchCategories();
+    fetchServices();
   }, []);
 
   useEffect(() => {
     return () => {
       if (createAvatarPreview) URL.revokeObjectURL(createAvatarPreview);
       if (editAvatarPreview) URL.revokeObjectURL(editAvatarPreview);
+      if (createServiceImagePreview) URL.revokeObjectURL(createServiceImagePreview);
+      if (editServiceImagePreview) URL.revokeObjectURL(editServiceImagePreview);
     };
-  }, [createAvatarPreview, editAvatarPreview]);
+  }, [
+    createAvatarPreview,
+    editAvatarPreview,
+    createServiceImagePreview,
+    editServiceImagePreview,
+  ]);
 
   // Logout Handler
   const handleLogout = () => {
@@ -226,10 +252,105 @@ function Admin() {
     setInspectCategory(null);
     setInspectService(null);
     setIsEditMode(false);
+
     setEditAvatarFile(null);
     if (editAvatarPreview) {
       URL.revokeObjectURL(editAvatarPreview);
       setEditAvatarPreview(null);
+    }
+
+    setEditServiceImageFile(null);
+    if (editServiceImagePreview) {
+      URL.revokeObjectURL(editServiceImagePreview);
+      setEditServiceImagePreview(null);
+    }
+  };
+
+  // ================= SERVICE HANDLERS =================
+
+  const handleAddService = async (e) => {
+    e.preventDefault();
+
+    const selectedBrandObj = brandsList.find((b) => b.name === newService.brand);
+    const brandId = selectedBrandObj ? selectedBrandObj.id : 1;
+
+    const selectedCatObj = categories.find((c) => c.title === newService.category);
+    const categoryId = selectedCatObj ? selectedCatObj.id : 1;
+
+    try {
+      let createdServiceId = null;
+
+      if (serviceApi && serviceApi.create) {
+        const response = await serviceApi.create({
+          brand_id: brandId,
+          brand: newService.brand,
+          category_id: categoryId,
+          category: newService.category,
+          name: newService.name,
+          description: newService.description,
+          duration: newService.duration,
+          price: newService.price,
+        });
+
+        createdServiceId = response?.service?.id || response?.id;
+      }
+
+      if (createdServiceId && createServiceImageFile && serviceApi && serviceApi.uploadImage) {
+        await serviceApi.uploadImage(createdServiceId, createServiceImageFile);
+      }
+
+      await fetchServices();
+      setServiceModalOpen(false);
+      setCreateServiceImageFile(null);
+      if (createServiceImagePreview) {
+        URL.revokeObjectURL(createServiceImagePreview);
+        setCreateServiceImagePreview(null);
+      }
+      setNewService({
+        brand: selectedBrand,
+        category: categories[0]?.title || "General",
+        name: "",
+        description: "",
+        duration: "60 min",
+        price: "",
+      });
+    } catch (err) {
+      alert(err.message || "Failed to create service.");
+    }
+  };
+
+  const handleSaveServiceEdit = async (e) => {
+    e.preventDefault();
+    if (!isEditMode || !inspectService) return;
+
+    const selectedBrandObj = brandsList.find((b) => b.name === inspectService.brand);
+    const brandId = selectedBrandObj ? selectedBrandObj.id : inspectService.brand_id;
+
+    const selectedCatObj = categories.find((c) => c.title === inspectService.category);
+    const categoryId = selectedCatObj ? selectedCatObj.id : inspectService.category_id;
+
+    try {
+      if (serviceApi && serviceApi.update) {
+        await serviceApi.update(inspectService.id, {
+          brand_id: brandId,
+          brand: inspectService.brand,
+          category_id: categoryId,
+          category: inspectService.category,
+          name: inspectService.name,
+          description: inspectService.description,
+          duration: inspectService.duration,
+          price: inspectService.price,
+        });
+      }
+
+      if (editServiceImageFile && serviceApi && serviceApi.uploadImage) {
+        await serviceApi.uploadImage(inspectService.id, editServiceImageFile);
+      }
+
+      await fetchServices();
+      closeInspectModal();
+    } catch (err) {
+      alert(err.message || "Failed to update service.");
     }
   };
 
@@ -250,15 +371,6 @@ function Admin() {
           subtitle: newCategory.subtitle,
         });
         await fetchCategories();
-      } else {
-        setCategories((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            brand_id: brandId,
-            ...newCategory,
-          },
-        ]);
       }
       setCategoryModalOpen(false);
       setNewCategory({ brand: selectedBrand, title: "", subtitle: "" });
@@ -283,10 +395,6 @@ function Admin() {
           subtitle: inspectCategory.subtitle,
         });
         await fetchCategories();
-      } else {
-        setCategories((prev) =>
-          prev.map((c) => (c.id === inspectCategory.id ? inspectCategory : c))
-        );
       }
       closeInspectModal();
     } catch (err) {
@@ -462,39 +570,6 @@ function Admin() {
     }
   };
 
-  // ================= SERVICES & LEDGER HANDLERS =================
-
-  const handleAddService = (e) => {
-    e.preventDefault();
-    setServices((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...newService,
-        image: newService.image || "/placeholder-service.jpg",
-      },
-    ]);
-    setServiceModalOpen(false);
-    setNewService({
-      brand: "Gabbablu",
-      category: categories[0]?.title || "General",
-      name: "",
-      description: "",
-      duration: "60 min",
-      price: "",
-      image: "",
-    });
-  };
-
-  const handleSaveServiceEdit = (e) => {
-    e.preventDefault();
-    if (!isEditMode) return;
-    setServices((prev) =>
-      prev.map((s) => (s.id === inspectService.id ? inspectService : s))
-    );
-    closeInspectModal();
-  };
-
   const handleStatusChange = (id, newStatus) => {
     setAppointments((prev) =>
       prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
@@ -512,7 +587,6 @@ function Admin() {
         mobileSidebarOpen ? "mobile-sidebar-active" : ""
       }`}
     >
-      {/* SIDEBAR & BACKDROP */}
       <AdminSidebar
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
@@ -522,7 +596,6 @@ function Admin() {
         handleTabSelect={handleTabSelect}
       />
 
-      {/* MAIN LAYOUT */}
       <main className="admin-main">
         <AdminTopBar
           setMobileSidebarOpen={setMobileSidebarOpen}
@@ -564,6 +637,7 @@ function Admin() {
           {activeTab === "services" && (
             <ServicesTab
               services={services}
+              loadingServices={loadingServices}
               setServiceModalOpen={setServiceModalOpen}
               setInspectService={setInspectService}
               setIsEditMode={setIsEditMode}
@@ -638,6 +712,9 @@ function Admin() {
           categories={categories}
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
+          editServiceImagePreview={editServiceImagePreview}
+          setEditServiceImagePreview={setEditServiceImagePreview}
+          setEditServiceImageFile={setEditServiceImageFile}
           closeInspectModal={closeInspectModal}
           handleSaveServiceEdit={handleSaveServiceEdit}
         />
@@ -659,6 +736,9 @@ function Admin() {
           setNewService={setNewService}
           brandsList={brandsList}
           categories={categories}
+          createServiceImagePreview={createServiceImagePreview}
+          setCreateServiceImagePreview={setCreateServiceImagePreview}
+          setCreateServiceImageFile={setCreateServiceImageFile}
           setServiceModalOpen={setServiceModalOpen}
           handleAddService={handleAddService}
         />

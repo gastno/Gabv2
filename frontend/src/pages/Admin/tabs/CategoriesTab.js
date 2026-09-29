@@ -44,8 +44,8 @@ function CategoriesTab({
                 }}
               >
                 <div className="category-card-header">
-                  <span className="category-icon-circle">✦</span>
                   <span className="brand-tag">{cat.brand}</span>
+                  <span className="category-icon-circle">✦</span>
                 </div>
                 <h4>{cat.title}</h4>
                 <p>{cat.subtitle}</p>

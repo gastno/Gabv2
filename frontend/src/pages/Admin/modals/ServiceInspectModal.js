@@ -1,3 +1,5 @@
+// src/pages/Admin/modals/ServiceInspectModal.jsx
+
 import React from "react";
 
 function ServiceInspectModal({
@@ -7,6 +9,9 @@ function ServiceInspectModal({
   categories,
   isEditMode,
   setIsEditMode,
+  editServiceImagePreview,
+  setEditServiceImagePreview,
+  setEditServiceImageFile,
   closeInspectModal,
   handleSaveServiceEdit,
 }) {
@@ -22,6 +27,46 @@ function ServiceInspectModal({
         </button>
         <h3>Service Details</h3>
         <form onSubmit={handleSaveServiceEdit} className="admin-form">
+          {/* SERVICE IMAGE VIEW & EDIT */}
+          <div className="form-group">
+            <label>Service Photo</label>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "8px",
+              }}
+            >
+              <img
+                src={editServiceImagePreview || inspectService.image}
+                alt={inspectService.name}
+                style={{
+                  width: "90px",
+                  height: "60px",
+                  borderRadius: "6px",
+                  objectFit: "cover",
+                }}
+                onError={(e) => {
+                  e.target.src = "/placeholder-service.jpg";
+                }}
+              />
+              {isEditMode && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      const file = e.target.files[0];
+                      setEditServiceImageFile(file);
+                      setEditServiceImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              )}
+            </div>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Brand</label>

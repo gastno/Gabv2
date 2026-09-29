@@ -36,8 +36,8 @@ function ServicesTab({
             <div className="service-card-img">
               <img src={item.image} alt={item.name} />
               <div className="card-top-tags">
-                <span className="category-tag">{item.category}</span>
                 <span className="brand-tag">{item.brand}</span>
+                <span className="category-tag">{item.category}</span>
               </div>
             </div>
             <div className="service-card-body">

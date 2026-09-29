@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const apptRoutes = require('./routes/apptRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const brandRoutes = require('./routes/brandRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/appointments', apptRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/brands', brandRoutes);
+app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
 
 // Serve static assets from <root>/uploads

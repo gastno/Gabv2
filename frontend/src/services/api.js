@@ -128,3 +128,38 @@ export const categoryApi = {
       body: JSON.stringify(data),
     }),
 };
+
+export const serviceApi = {
+  getAll: () => request("/services"),
+  create: (data) =>
+    request("/services", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: (id, data) =>
+    request(`/services/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  uploadImage: async (serviceId, file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const token = localStorage.getItem("auth_token");
+
+    const response = await fetch(`${API_BASE_URL}/services/${serviceId}/image`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || "Failed to upload service image");
+    }
+
+    return await response.json();
+  },
+};
