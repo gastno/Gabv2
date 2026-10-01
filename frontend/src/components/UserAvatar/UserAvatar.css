@@ -1,0 +1,13 @@
+.user-avatar-placeholder {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #353535;
+  color: #aaa;
+  font-size: 1.2rem;
+  line-height: 1;
+}

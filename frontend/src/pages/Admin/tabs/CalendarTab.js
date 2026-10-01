@@ -1,5 +1,6 @@
 import React from "react";
 import "./CalendarTab.css";
+import UserAvatar from "../../../components/UserAvatar/UserAvatar";
 
 function CalendarTab({ selectedBrand, staffList, appointments }) {
   const filteredStaff = staffList.filter(
@@ -26,7 +27,7 @@ function CalendarTab({ selectedBrand, staffList, appointments }) {
           return (
             <div className="staff-calendar-column" key={staff.id}>
               <div className="staff-column-header">
-                <img
+                <UserAvatar
                   src={staff.photo}
                   alt={staff.name}
                   className="staff-thumb"

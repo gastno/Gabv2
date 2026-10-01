@@ -21,10 +21,20 @@ function AdminSidebar({
         <div className="sidebar-header">
           <div className="brand-logo-text">⚡ Admin HQ</div>
           <button
+            type="button"
             className="collapse-toggle-btn"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {sidebarCollapsed ? "❯" : "❮"}
+          </button>
+          <button
+            type="button"
+            className="mobile-sidebar-close-btn"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-label="Close navigation menu"
+          >
+            ✕
           </button>
         </div>
 

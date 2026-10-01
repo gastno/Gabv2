@@ -2,6 +2,7 @@ import "./Gabbablu.css";
 import { useState } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import UserAvatar from "../../components/UserAvatar/UserAvatar";
 
 function Gabbablu() {
   const [language, setLanguage] = useState("en");
@@ -304,7 +305,7 @@ function Gabbablu() {
               <div className="team-grid">
                 {employees.map((emp) => (
                   <div className="team-member" key={emp.id}>
-                    <img src={emp.img} alt={emp.name} className="team-profile-image" />
+                    <UserAvatar src={emp.img} alt={emp.name} className="team-profile-image" />
                     <h3>{emp.name}</h3>
                     <p>{emp.title}</p>
                   </div>
@@ -357,7 +358,7 @@ function Gabbablu() {
                       onClick={() => handleSelectEmployee(emp)}
                     >
                       <div className="employee-avatar">
-                        <img src={emp.img} alt={emp.name} />
+                        <UserAvatar src={emp.img} alt={emp.name} />
                       </div>
                       <div className="employee-info">
                         <h4>{emp.name}</h4>

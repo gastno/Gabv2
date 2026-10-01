@@ -1,5 +1,6 @@
 import React from "react";
 import "./AdminModals.css";
+import UserAvatar from "../../../components/UserAvatar/UserAvatar";
 
 function CreateStaffModal({
   newStaff,
@@ -114,19 +115,11 @@ function CreateStaffModal({
           <div className="form-group">
             <label>Avatar Photo Upload</label>
             <input type="file" accept="image/*" onChange={handleAvatarChange} />
-            {createAvatarPreview && (
-              <img
-                src={createAvatarPreview}
-                alt="Avatar Preview"
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  marginTop: 8,
-                }}
-              />
-            )}
+            <UserAvatar
+              src={createAvatarPreview}
+              alt="Avatar Preview"
+              style={{ width: 60, height: 60, borderRadius: "50%", objectFit: "cover", marginTop: 8 }}
+            />
           </div>
 
           <button type="submit" className="save-submit-btn">

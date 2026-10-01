@@ -58,6 +58,10 @@
   cursor: pointer;
 }
 
+.mobile-sidebar-close-btn {
+  display: none;
+}
+
 .sidebar-nav {
   display: flex;
   flex-direction: column;
@@ -475,6 +479,27 @@
 
   .collapse-toggle-btn {
     display: none;
+  }
+
+  .mobile-sidebar-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #282222;
+    border: 1px solid #3d3535;
+    border-radius: 6px;
+    color: #eee;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .admin-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    background: rgba(0, 0, 0, 0.58);
   }
 
   .admin-sidebar {

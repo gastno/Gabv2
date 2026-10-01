@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./ServiceStaffModal.css";
 import { staffServiceApi, getAssetUrl } from "../../../services/api";
-
-const DEFAULT_AVATAR =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='%23888888'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+import UserAvatar from "../../../components/UserAvatar/UserAvatar";
 
 function ServiceStaffModal({
   selectedService,
@@ -143,8 +141,6 @@ function ServiceStaffModal({
                     // Hide unassigned staff when in read-only mode
                     if (!isEditMode && !isAssigned) return null;
 
-                    const avatarSrc = worker.photo || DEFAULT_AVATAR;
-
                     return (
                       <div
                         key={worker.id}
@@ -154,14 +150,10 @@ function ServiceStaffModal({
                         onClick={() => handleToggleWorker(worker.id)}
                       >
                         <div className="staff-card-avatar-wrapper">
-                          <img
-                            src={avatarSrc}
+                          <UserAvatar
+                            src={worker.photo || worker.avatar_url}
                             alt={worker.name}
                             className="staff-card-avatar"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = DEFAULT_AVATAR;
-                            }}
                           />
                           {isAssigned && <span className="card-check-badge">✓</span>}
                         </div>

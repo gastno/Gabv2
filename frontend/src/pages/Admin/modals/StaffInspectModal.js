@@ -1,5 +1,6 @@
 import React from "react";
 import "./AdminModals.css";
+import UserAvatar from "../../../components/UserAvatar/UserAvatar";
 
 function StaffInspectModal({
   tempInspectStaff,
@@ -30,11 +31,15 @@ function StaffInspectModal({
   const handleToggleService = (serviceId) => {
     if (!isEditMode) return;
     setAssignedServiceIds((prev) =>
-      prev.includes(serviceId)
-        ? prev.filter((id) => id !== serviceId)
+      prev.some((id) => String(id) === String(serviceId))
+        ? prev.filter((id) => String(id) !== String(serviceId))
         : [...prev, serviceId]
     );
   };
+
+  const availableServices = services.filter((service) =>
+    tempInspectStaff.brands.includes(service.brand)
+  );
 
   return (
     <div className="admin-modal-backdrop" onClick={closeInspectModal}>
@@ -50,15 +55,10 @@ function StaffInspectModal({
 
         <form onSubmit={handleSaveStaffEdit} className="admin-form">
           <div className="form-group" style={{ textAlign: "center" }}>
-            <img
+            <UserAvatar
               src={editAvatarPreview || tempInspectStaff.photo}
               alt={tempInspectStaff.name}
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                objectFit: "cover",
-              }}
+              style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover" }}
             />
             {isEditMode && (
               <input
@@ -109,7 +109,27 @@ function StaffInspectModal({
           </div>
 
           <div className="form-group">
-            <label>Role / Title</label>
+            <label>Password</label>
+            {isEditMode ? (
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Leave blank to keep current password"
+                value={tempInspectStaff.password || ""}
+                onChange={(e) =>
+                  setTempInspectStaff({
+                    ...tempInspectStaff,
+                    password: e.target.value,
+                  })
+                }
+              />
+            ) : (
+              <div className="read-only-field">••••••••</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Description</label>
             {isEditMode ? (
               <input
                 type="text"
@@ -149,12 +169,18 @@ function StaffInspectModal({
             </div>
           </div>
 
-          {services && services.length > 0 && (
-            <div className="form-group">
-              <label>Assigned Services</label>
+          <div className="form-group">
+            <label>Assigned Services</label>
+            {availableServices.length === 0 ? (
+              <div className="read-only-field">
+                No services available for the assigned brands.
+              </div>
+            ) : (
               <div className="brand-pills-selector">
-                {services.map((srv) => {
-                  const isAssigned = assignedServiceIds.includes(srv.id);
+                {availableServices.map((srv) => {
+                  const isAssigned = assignedServiceIds.some(
+                    (id) => String(id) === String(srv.id)
+                  );
                   return (
                     <button
                       type="button"
@@ -169,8 +195,8 @@ function StaffInspectModal({
                   );
                 })}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="modal-actions-row">
             {!isEditMode ? (
@@ -179,6 +205,7 @@ function StaffInspectModal({
                 className="edit-toggle-btn"
                 onClick={(e) => {
                   e.preventDefault();
+                  setTempInspectStaff((staff) => ({ ...staff, password: "" }));
                   setIsEditMode(true);
                 }}
               >

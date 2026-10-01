@@ -565,7 +565,15 @@ function Admin() {
       }
 
       if (staffServiceApi?.syncServices) {
-        await staffServiceApi.syncServices(tempInspectStaff.id, assignedServiceIds);
+        const eligibleServiceIds = new Set(
+          services
+            .filter((service) => tempInspectStaff.brands.includes(service.brand))
+            .map((service) => String(service.id))
+        );
+        const serviceIdsToSync = assignedServiceIds.filter((serviceId) =>
+          eligibleServiceIds.has(String(serviceId))
+        );
+        await staffServiceApi.syncServices(tempInspectStaff.id, serviceIdsToSync);
       }
 
       await fetchStaffAccounts();
@@ -604,9 +612,6 @@ function Admin() {
       <main className="admin-main">
         <AdminTopBar
           setMobileSidebarOpen={setMobileSidebarOpen}
-          selectedBrand={selectedBrand}
-          setSelectedBrand={setSelectedBrand}
-          brandsList={brandsList}
           handleLogout={handleLogout}
         />
 

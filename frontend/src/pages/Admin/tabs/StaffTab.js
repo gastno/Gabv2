@@ -1,5 +1,6 @@
 import React from "react";
 import "./StaffTab.css";
+import UserAvatar from "../../../components/UserAvatar/UserAvatar";
 
 function StaffTab({
   loadingStaff,
@@ -46,7 +47,7 @@ function StaffTab({
                 >
                   <td>
                     <div className="staff-table-cell-user">
-                      <img
+                      <UserAvatar
                         src={emp.photo}
                         alt={emp.name}
                         className="staff-table-avatar"
