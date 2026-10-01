@@ -448,6 +448,28 @@
   cursor: pointer;
 }
 
+@keyframes booking-step-enter {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.gabbablu-page .modal-step {
+  animation: booking-step-enter 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gabbablu-page .modal-step {
+    animation: none;
+  }
+}
+
 .gabbablu-page .modal-step h2 {
   margin: 0 0 6px 0;
   font-size: 1.3rem;
@@ -460,6 +482,102 @@
   color: #aaa;
 }
 
+.gabbablu-page .booking-step-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #302b2b;
+}
+
+.gabbablu-page .booking-step-indicator {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gabbablu-page .booking-step-indicator li {
+  min-width: 0;
+}
+
+.gabbablu-page .booking-progress-step {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+  border: 0;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+}
+
+.gabbablu-page .booking-progress-step:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.gabbablu-page .booking-progress-step.current,
+.gabbablu-page .booking-progress-step.complete {
+  color: #e0aaff;
+}
+
+.gabbablu-page .booking-progress-dot {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #777;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.gabbablu-page .booking-progress-step.current .booking-progress-dot,
+.gabbablu-page .booking-progress-step.complete .booking-progress-dot {
+  border-color: #9d4edd;
+  background: #9d4edd;
+}
+
+.gabbablu-page .booking-progress-step.current .booking-progress-dot {
+  box-shadow: 0 0 8px rgba(157, 78, 221, 0.55);
+}
+
+.gabbablu-page .booking-progress-step:focus-visible,
+.gabbablu-page .booking-back-btn:focus-visible {
+  outline: 2px solid #c77dff;
+  outline-offset: 3px;
+}
+
+.gabbablu-page .booking-progress-label {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gabbablu-page .booking-back-btn {
+  padding: 6px 14px;
+  border: 1px solid #4a4141;
+  border-radius: 6px;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.gabbablu-page .booking-back-btn:hover {
+  border-color: #9d4edd;
+  color: #fff;
+}
+
 .gabbablu-page .employee-selection-list {
   display: flex;
   flex-direction: column;
@@ -468,6 +586,7 @@
 
 .gabbablu-page .employee-option-card {
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 16px;
   background: #181313;
@@ -475,6 +594,9 @@
   border-radius: 10px;
   border: 1px solid #302b2b;
   cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 

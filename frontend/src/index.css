@@ -7,6 +7,55 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@keyframes modal-backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-panel-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-modal-backdrop,
+.staff-modal-backdrop,
+.gabbablu-page .modal-backdrop,
+.header-auth-backdrop {
+  animation: modal-backdrop-fade-in 220ms ease-out both;
+}
+
+.admin-modal-box,
+.staff-modal-box,
+.gabbablu-page .modal-content,
+.header-auth-modal {
+  animation: modal-panel-fade-in 260ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-modal-backdrop,
+  .staff-modal-backdrop,
+  .gabbablu-page .modal-backdrop,
+  .header-auth-backdrop,
+  .admin-modal-box,
+  .staff-modal-box,
+  .gabbablu-page .modal-content,
+  .header-auth-modal {
+    animation: none;
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

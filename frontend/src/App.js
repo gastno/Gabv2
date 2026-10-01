@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Admin from "./pages/Admin/Admin";
@@ -34,15 +34,13 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 };
 
 function App() {
-  const [language, setLanguage] = useState("en");
-
   return (
     <Router>
       <Routes>
         {/* Customer Public Pages */}
         <Route
           path="/"
-          element={<Home language={language} setLanguage={setLanguage} />}
+          element={<Home />}
         />
         <Route 
           path="/studios/gabbablu" 

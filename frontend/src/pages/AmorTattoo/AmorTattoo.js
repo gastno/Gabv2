@@ -1,4 +1,4 @@
-import { StudioPage } from "../Gabbablu/Gabbablu";
+import StudioPage from "../Gabbablu/StudioPage";
 
 function AmorTattoo() {
   return <StudioPage brandId={2} />;

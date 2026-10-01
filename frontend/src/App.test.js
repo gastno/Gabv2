@@ -48,3 +48,30 @@ test('loads team profiles from the selected service assignments', async () => {
   expect(screen.getByText('Tattoo artist')).toBeInTheDocument();
   await waitFor(() => expect(staffServiceApi.getByServiceId).toHaveBeenCalledWith(101));
 });
+
+test('booking progress supports forward and backward navigation', async () => {
+  render(<StudioPage brandId={1} />);
+
+  const serviceName = await screen.findByText('Classic Lashes');
+  fireEvent.click(serviceName.closest('.service-row-item'));
+  fireEvent.click(await screen.findByText('Artist One'));
+
+  expect(screen.getByRole('heading', { name: 'Select Date & Time' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: '15' }));
+  fireEvent.click(screen.getByRole('button', { name: '10:30' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Continue as Guest' }));
+
+  expect(screen.getByRole('heading', { name: 'Customer Information' })).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText('Full Name *'), { target: { value: 'Birta Helgadóttir' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+  expect(screen.getByRole('heading', { name: 'Booking Details' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Continue as Guest' }));
+  expect(screen.getByLabelText('Full Name *')).toHaveValue('Birta Helgadóttir');
+  fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+
+  fireEvent.click(screen.getByRole('button', { name: 'Step 2: Date & time' }));
+  expect(screen.getByRole('heading', { name: 'Select Date & Time' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+  expect(screen.getByRole('heading', { name: 'Choose an employee' })).toBeInTheDocument();
+});
