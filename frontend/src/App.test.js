@@ -1,8 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { StudioPage } from './pages/Gabbablu/Gabbablu';
-import { brandApi, categoryApi, serviceApi, staffServiceApi } from './services/api';
+import { apptApi, brandApi, categoryApi, serviceApi, staffServiceApi } from './services/api';
 
 jest.mock('./services/api', () => ({
+  apptApi: { getAvailability: jest.fn() },
   brandApi: { getAll: jest.fn() },
   categoryApi: { getAll: jest.fn() },
   serviceApi: { getAll: jest.fn() },
@@ -26,6 +27,12 @@ beforeEach(() => {
   staffServiceApi.getByServiceId.mockResolvedValue([
     { id: 7, name: 'Artist One', description: 'Tattoo artist', avatar_url: '/uploads/artist.webp' },
   ]);
+  apptApi.getAvailability.mockResolvedValue({
+    slots: [
+      { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T09:00:00.000Z', end_time: '2099-01-01T10:30:00.000Z' },
+      { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T11:00:00.000Z', end_time: '2099-01-01T12:30:00.000Z' },
+    ],
+  });
 });
 
 test('loads brand 2 details and only its categories and services', async () => {
@@ -50,15 +57,26 @@ test('loads team profiles from the selected service assignments', async () => {
 });
 
 test('booking progress supports forward and backward navigation', async () => {
-  render(<StudioPage brandId={1} />);
+  const { container } = render(<StudioPage brandId={1} />);
 
   const serviceName = await screen.findByText('Classic Lashes');
   fireEvent.click(serviceName.closest('.service-row-item'));
   fireEvent.click(await screen.findByText('Artist One'));
 
   expect(screen.getByRole('heading', { name: 'Select Date & Time' })).toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: '15' }));
-  fireEvent.click(screen.getByRole('button', { name: '10:30' }));
+  await waitFor(() => expect(apptApi.getAvailability).toHaveBeenCalled());
+  const availableDay = await waitFor(() => {
+    const day = container.querySelector('.calendar-day-cell.available');
+    expect(day).toBeTruthy();
+    return day;
+  });
+  fireEvent.click(availableDay);
+  const timeChip = await waitFor(() => {
+    const chip = container.querySelector('.time-chip');
+    expect(chip).toBeTruthy();
+    return chip;
+  });
+  fireEvent.click(timeChip);
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
   fireEvent.click(screen.getByRole('button', { name: 'Continue as Guest' }));
 

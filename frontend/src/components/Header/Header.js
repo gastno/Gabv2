@@ -23,12 +23,7 @@ function Header({ language, onLanguageChange }) {
 
   // Check auth session and cached user details on mount
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    const cachedName = localStorage.getItem("auth_user_name");
-
-    if (cachedName) {
-      setCurrentUser({ full_name: cachedName });
-    }
+    const token = localStorage.getItem("customer_auth_token");
 
     if (token) {
       checkAuthStatus();
@@ -39,6 +34,9 @@ function Header({ language, onLanguageChange }) {
     try {
       const data = await authApi.getMe();
       const userPayload = data.user || data.customer || data.data || data;
+      if (userPayload.type !== "customer" && userPayload.role !== "customer") {
+        throw new Error("A customer account is required.");
+      }
       
       if (userPayload) {
         const resolvedName =
@@ -48,15 +46,15 @@ function Header({ language, onLanguageChange }) {
           userPayload.display_name;
 
         if (resolvedName) {
-          localStorage.setItem("auth_user_name", resolvedName);
+          localStorage.setItem("customer_auth_user_name", resolvedName);
         }
 
         setCurrentUser(userPayload);
       }
     } catch (err) {
       console.error("Session verification failed:", err);
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("auth_user_name");
+      localStorage.removeItem("customer_auth_token");
+      localStorage.removeItem("customer_auth_user_name");
       setCurrentUser(null);
     }
   };
@@ -91,11 +89,8 @@ function Header({ language, onLanguageChange }) {
         userPayload.name ||
         userPayload.display_name;
 
-      if (data.token) {
-        localStorage.setItem("auth_token", data.token);
-      }
       if (resolvedName) {
-        localStorage.setItem("auth_user_name", resolvedName);
+        localStorage.setItem("customer_auth_user_name", resolvedName);
       }
 
       setCurrentUser(userPayload);
@@ -126,11 +121,7 @@ function Header({ language, onLanguageChange }) {
       // Extended delay (1.5 seconds) so the user sees the spinner animation
       await delay(1500);
 
-      if (data.token) {
-        localStorage.setItem("auth_token", data.token);
-      }
-      
-      localStorage.setItem("auth_user_name", signupForm.fullName);
+      localStorage.setItem("customer_auth_user_name", signupForm.fullName);
 
       const userPayload = data.customer || { full_name: signupForm.fullName, email: signupForm.email };
       setCurrentUser(userPayload);
@@ -145,8 +136,8 @@ function Header({ language, onLanguageChange }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("auth_user_name");
+    localStorage.removeItem("customer_auth_token");
+    localStorage.removeItem("customer_auth_user_name");
     setCurrentUser(null);
   };
 
@@ -157,7 +148,7 @@ function Header({ language, onLanguageChange }) {
       currentUser.fullName ||
       currentUser.name ||
       currentUser.display_name ||
-      localStorage.getItem("auth_user_name") ||
+      localStorage.getItem("customer_auth_user_name") ||
       "User"
     );
   };

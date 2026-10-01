@@ -10,10 +10,30 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+const createDatabase = poolInstance => ({
+  query: (text, params) => poolInstance.query(text, params),
+  withTransaction: async callback => {
+    const client = await poolInstance.connect();
+    try {
+      await client.query('BEGIN');
+      const result = await callback(client);
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        // Preserve the original failure for the caller.
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
+});
+
 pool.on('connect', () => {
   console.log('Connected to PostgreSQL database (appointment_db)');
 });
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-};
+module.exports = { ...createDatabase(pool), createDatabase };

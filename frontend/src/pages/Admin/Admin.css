@@ -164,6 +164,25 @@
 .admin-tab-content {
   padding: 24px;
   flex: 1;
+  animation: admin-tab-enter 220ms ease-out both;
+}
+
+@keyframes admin-tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-tab-content {
+    animation: none;
+  }
 }
 
 .section-header {

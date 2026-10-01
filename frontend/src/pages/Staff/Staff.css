@@ -527,3 +527,832 @@
     width: 100%;
   }
 }
+
+.staff-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.staff-profile-avatar {
+  width: 42px;
+  height: 42px;
+  border: 1px solid #3d3737;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.staff-profile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.staff-profile-caption {
+  color: #888;
+  font-size: 0.72rem;
+}
+
+.staff-calendar-container {
+  overflow: hidden;
+}
+
+.calendar-grid-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.calendar-weekdays-header,
+.staff-month-grid {
+  min-width: 770px;
+}
+
+.staff-day-cell {
+  min-width: 0;
+  min-height: 112px;
+  cursor: default;
+}
+
+.staff-day-cell.is-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+button.cell-day-number {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: #aaa;
+  cursor: pointer;
+}
+
+button.cell-day-number:hover,
+button.cell-day-number.is-today {
+  background: #9d4edd;
+  color: #fff;
+}
+
+.cell-appts-list {
+  min-width: 0;
+}
+
+button.appt-chip {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  font-family: inherit;
+}
+
+button.appt-chip.status-confirmed {
+  background: #1a3328;
+  border-color: #36785b;
+  color: #9be0be;
+}
+
+button.appt-chip.status-cancelled,
+button.appt-chip.status-no_show {
+  background: #302222;
+  border-color: #654040;
+  color: #d9a3a3;
+}
+
+.calendar-overflow {
+  padding: 2px 5px;
+  color: #aaa;
+  font-size: 0.68rem;
+}
+
+.unavailability-chip {
+  display: block;
+  overflow: hidden;
+  padding: 3px 5px;
+  border: 1px solid #72502d;
+  border-radius: 4px;
+  background: #3c2c1d;
+  color: #f0c88f;
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-toggle-buttons {
+  max-width: 420px;
+}
+
+.staff-error-banner,
+.staff-error-message {
+  border: 1px solid #744040;
+  border-radius: 6px;
+  background: #302020;
+  color: #f2aaaa;
+}
+
+.staff-error-banner {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+}
+
+.staff-error-message {
+  margin: 0;
+  padding: 9px 11px;
+  font-size: 0.82rem;
+}
+
+.staff-loading-state,
+.staff-empty-state {
+  padding: 18px 0;
+  color: #999;
+}
+
+.day-nav-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #3d3737;
+  border-radius: 6px;
+  background: #181313;
+  color: #eee;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.zoom-date-picker-row input {
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #3d3737;
+  border-radius: 6px;
+  background: #181313;
+  color: #eee;
+  font: inherit;
+}
+
+.day-schedule-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #302b2b;
+}
+
+.day-schedule-summary h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.day-summary-shifts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #aaa;
+  font-size: 0.82rem;
+}
+
+.day-summary-shifts strong {
+  color: #ddd;
+}
+
+.day-summary-shifts span {
+  padding: 5px 8px;
+  border: 1px solid #3d3737;
+  border-radius: 4px;
+  background: #181313;
+}
+
+.day-unavailability {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #c18b4e;
+  background: #30261d;
+  color: #e8c99f;
+  font-size: 0.85rem;
+}
+
+.day-appointments-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.day-appointments-heading h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.day-appointments-heading > span {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.day-appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+button.zoom-appt-card {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.zoom-appt-time {
+  grid-row: span 2;
+  color: #e0aaff;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.zoom-appt-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px 16px;
+}
+
+.status-text {
+  text-transform: capitalize;
+}
+
+.status-text.status-pending { color: #f0c36d; }
+.status-text.status-confirmed { color: #8fd4ad; }
+.status-text.status-completed { color: #8fd4ad; }
+.status-text.status-cancelled,
+.status-text.status-no_show { color: #e79a9a; }
+
+.availability-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.availability-editor,
+.unavailability-editor {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #302b2b;
+  border-radius: 8px;
+  background: #242020;
+}
+
+.availability-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.availability-section-heading h2 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.availability-section-heading p {
+  margin: 0;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.availability-section-heading .save-btn {
+  flex: 0 0 auto;
+}
+
+.weekly-schedule-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.weekday-schedule-row {
+  display: grid;
+  grid-template-columns: minmax(125px, 0.65fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid #302b2b;
+}
+
+.weekday-schedule-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.weekday-schedule-heading strong {
+  font-size: 0.88rem;
+}
+
+.add-shift-btn,
+.remove-unavailability-btn {
+  padding: 6px 9px;
+  border: 1px solid #4a3a55;
+  border-radius: 5px;
+  background: #30263a;
+  color: #e0aaff;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.schedule-shift-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34px;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+
+.schedule-shift-fields:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-shift-fields label,
+.unavailability-form label,
+.appointment-status-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  color: #aaa;
+  font-size: 0.76rem;
+}
+
+.schedule-shift-fields input,
+.unavailability-form input,
+.appointment-status-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 7px 9px;
+  border: 1px solid #3d3737;
+  border-radius: 5px;
+  background: #181313;
+  color: #eee;
+  font: inherit;
+}
+
+.remove-shift-btn {
+  width: 34px;
+  height: 38px;
+  border: 1px solid #503737;
+  border-radius: 5px;
+  background: #302020;
+  color: #e0a0a0;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.no-shift-label {
+  margin: 5px 0;
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.availability-date-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 260px;
+  margin-bottom: 14px;
+  color: #aaa;
+  font-size: 0.78rem;
+}
+
+.availability-date-picker input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 38px;
+  padding: 7px 9px;
+  border: 1px solid #3d3737;
+  border-radius: 5px;
+  background: #181313;
+  color: #eee;
+  font: inherit;
+}
+
+.unavailability-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.unavailability-reason-field {
+  grid-column: 1 / -1;
+}
+
+.unavailability-form .save-btn {
+  grid-column: 1 / -1;
+}
+
+.unavailability-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
+.unavailability-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #302b2b;
+}
+
+.unavailability-list-row > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 12px;
+  min-width: 0;
+}
+
+.unavailability-list-row strong {
+  font-size: 0.82rem;
+}
+
+.unavailability-list-row span,
+.unavailability-list-row small {
+  color: #aaa;
+  font-size: 0.78rem;
+}
+
+.appointment-detail-modal .modal-eyebrow {
+  margin: 0 0 6px;
+  color: #c18bda;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.appointment-detail-list {
+  display: flex;
+  flex-direction: column;
+  margin: 16px 0;
+  border-top: 1px solid #302b2b;
+}
+
+.appointment-detail-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid #302b2b;
+  font-size: 0.85rem;
+}
+
+.appointment-detail-list > div > span {
+  color: #999;
+}
+
+.appointment-status-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.appointment-modal-actions .edit-toggle-btn,
+.appointment-modal-actions .cancel-appt-btn {
+  flex: 1;
+}
+
+.secondary-modal-btn {
+  flex: 1;
+  border: 1px solid #3d3737;
+  border-radius: 8px;
+  background: #302b2b;
+  color: #ddd;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.staff-admin-logout-btn {
+  background: #3d1c1d;
+  color: #e63946;
+  border: 1px solid #e63946;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.staff-admin-logout-btn:hover {
+  background: #e63946;
+  color: #fff;
+}
+
+.staff-view-container {
+  min-height: 280px;
+}
+
+.staff-schedule-view {
+  animation: staff-view-enter 0.2s ease-out both;
+}
+
+@keyframes staff-view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calendar-day-cell {
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.calendar-day-cell:hover {
+  border-color: #5a4765;
+  background: #211a24;
+}
+
+.calendar-day-blocks,
+.day-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.calendar-day-blocks {
+  flex: 1;
+}
+
+.calendar-time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #eee;
+  font-family: inherit;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.15s ease, border-color 0.15s ease;
+}
+
+.calendar-time-block:hover {
+  filter: brightness(1.18);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.calendar-time-block-available {
+  background: #20372d;
+  border-color: #385b49;
+  color: #b2e0c7;
+}
+
+.calendar-time-block-unavailable {
+  background: #3c2c1d;
+  border-color: #72502d;
+  color: #f0c88f;
+}
+
+.calendar-time-block-appointment {
+  background: #352642;
+  border-color: #684b7d;
+  color: #e0c2f1;
+}
+
+.calendar-time-range {
+  flex: 0 0 auto;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.calendar-time-label {
+  display: -webkit-box;
+  overflow: hidden;
+  width: 100%;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+
+.calendar-add-hours {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 3px 5px;
+  border: 1px solid #3d3737;
+  border-radius: 4px;
+  background: #242020;
+  color: #aaa;
+  font-size: 0.65rem;
+  cursor: pointer;
+}
+
+.calendar-add-hours:hover,
+.day-empty-add:hover {
+  border-color: #9d4edd;
+  color: #e0aaff;
+}
+
+.day-timeline {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.day-timeline .calendar-time-block {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 10px 12px;
+  font-size: 0.86rem;
+}
+
+.day-timeline .calendar-time-range {
+  font-size: 0.82rem;
+}
+
+.day-empty-add {
+  width: 100%;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px dashed #54425d;
+  border-radius: 6px;
+  background: #201a23;
+  color: #c8aecf;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendar-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.calendar-block-kind {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #3d3737;
+  border-radius: 7px;
+  background: #181313;
+}
+
+.calendar-block-kind button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #aaa;
+  font: inherit;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+.calendar-block-kind button.active {
+  background: #302b2b;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px #5a4a63;
+}
+
+.calendar-block-modal .save-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.calendar-modal-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #3d3737;
+  border-radius: 6px;
+  background: #181313;
+  color: #eee;
+  font: inherit;
+}
+
+.staff-error-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.staff-error-banner span {
+  flex: 1 1 100%;
+}
+
+.staff-error-banner button {
+  border: 1px solid #744040;
+  border-radius: 4px;
+  background: #3b2929;
+  color: #f2caca;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staff-schedule-view {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .calendar-weekdays-header,
+  .staff-month-grid {
+    min-width: 770px;
+  }
+
+  .calendar-weekdays-header {
+    display: grid;
+  }
+
+  .staff-month-grid {
+    grid-template-columns: repeat(7, minmax(100px, 1fr));
+  }
+
+  .view-toggle-buttons {
+    max-width: none;
+  }
+
+  .weekday-schedule-row {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .weekday-schedule-heading {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0;
+  }
+
+  .day-schedule-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  button.zoom-appt-card {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .zoom-appt-time {
+    grid-row: auto;
+  }
+
+  .unavailability-editor,
+  .availability-editor {
+    padding: 14px;
+  }
+
+  .day-timeline .calendar-time-block {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .availability-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .availability-section-heading .save-btn {
+    width: 100%;
+  }
+
+  .unavailability-list-row {
+    align-items: flex-start;
+  }
+}

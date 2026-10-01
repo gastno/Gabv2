@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const apptController = require('../controllers/apptController');
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+const availabilityController = require('../controllers/availabilityController');
+const { authenticateToken, optionalAuthenticateToken, requireRole } = require('../middleware/authMiddleware');
+
+router.get('/availability', availabilityController.getAvailability);
 
 // Public route: Guest or Logged-in customer creates booking
-router.post('/', apptController.createAppointment);
+router.post('/', optionalAuthenticateToken, apptController.createAppointment);
 
-// Protected route: Only staff or admins can view staff schedules / appointments
-router.get('/staff-schedule', authenticateToken, requireRole('staff', 'admin', 'super_admin'), (req, res) => {
-  res.json({ message: 'Welcome to the protected staff schedule route', staffUser: req.user });
-});
+router.get('/', authenticateToken, apptController.listAppointments);
+router.get('/:id', authenticateToken, apptController.getAppointment);
+router.patch('/:id/status', authenticateToken, requireRole('staff', 'admin', 'super_admin'), apptController.updateAppointmentStatus);
+router.post('/:id/cancel', authenticateToken, apptController.cancelAppointment);
 
 module.exports = router;

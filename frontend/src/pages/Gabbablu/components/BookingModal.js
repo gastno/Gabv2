@@ -1,18 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserAvatar from "../../../components/UserAvatar/UserAvatar";
-import { staffServiceApi } from "../../../services/api";
+import { apptApi, staffServiceApi } from "../../../services/api";
 import { toTeamMember } from "../studioData";
+import {
+  formatStudioDate,
+  formatStudioTime,
+  getMonthCells,
+  getStudioDateKey,
+  pickTimeOptions,
+  shiftMonth,
+} from "./scheduleAvailability";
 
 const BOOKING_STEPS = ["Specialist", "Date & time", "Account", "Your details"];
-const AVAILABLE_TIMES = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"];
-const CALENDAR_DAYS = Array.from({ length: 30 }, (_, index) => {
-  const dayNumber = index + 1;
-  return {
-    dayNumber,
-    isAvailable: [14, 15, 16, 17, 18, 21, 22, 24, 25, 29, 30].includes(dayNumber),
-    fullDate: `September ${dayNumber}, 2026`,
-  };
-});
+const WEEKDAY_LABELS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
 
 function SpecialistStep({ service, employees, isLoading, onSelect }) {
   return (
@@ -48,57 +49,90 @@ function SpecialistStep({ service, employees, isLoading, onSelect }) {
   );
 }
 
-function ScheduleStep({ service, employee, selectedDate, selectedTime, onDateSelect, onTimeSelect, onNext }) {
+function ScheduleStep({
+  service,
+  employee,
+  monthLabel,
+  canGoPrevMonth,
+  onPrevMonth,
+  onNextMonth,
+  calendarCells,
+  selectedDateKey,
+  onDateSelect,
+  isLoadingAvailability,
+  availabilityError,
+  selectedDateLabel,
+  timeOptions,
+  selectedSlot,
+  onTimeSelect,
+  onNext,
+}) {
   return (
     <div className="modal-step" key="schedule">
       <h2>Select Date &amp; Time</h2>
       <p className="modal-subtitle">{service.name} with {employee?.name}</p>
       <div className="calendar-container">
         <div className="calendar-header">
-          <span className="calendar-month-title">September 2026</span>
+          <button type="button" className="calendar-nav-btn" onClick={onPrevMonth} disabled={!canGoPrevMonth} aria-label="Previous month">
+            ‹
+          </button>
+          <span className="calendar-month-title">{monthLabel}</span>
+          <button type="button" className="calendar-nav-btn" onClick={onNextMonth} aria-label="Next month">
+            ›
+          </button>
         </div>
         <div className="calendar-weekdays">
-          {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((weekday) => (
+          {WEEKDAY_LABELS.map((weekday) => (
             <span key={weekday}>{weekday}</span>
           ))}
         </div>
         <div className="calendar-days-grid">
-          {CALENDAR_DAYS.map((day) => (
-            <button
-              key={day.dayNumber}
-              type="button"
-              disabled={!day.isAvailable}
-              className={`calendar-day-cell ${day.isAvailable ? "available" : "disabled"} ${selectedDate?.dayNumber === day.dayNumber ? "selected" : ""}`}
-              onClick={() => onDateSelect(day)}
-            >
-              {day.dayNumber}
-            </button>
+          {calendarCells.map((day, index) => (
+            day ? (
+              <button
+                key={day.dateKey}
+                type="button"
+                disabled={!day.isAvailable}
+                className={`calendar-day-cell ${day.isAvailable ? "available" : "disabled"} ${selectedDateKey === day.dateKey ? "selected" : ""}`}
+                onClick={() => onDateSelect(day.dateKey)}
+              >
+                {day.day}
+              </button>
+            ) : (
+              <span key={`empty-${index}`} className="calendar-day-cell-empty" aria-hidden="true" />
+            )
           ))}
         </div>
+        {isLoadingAvailability && <p className="placeholder-message">Checking availability...</p>}
+        {availabilityError && <p className="placeholder-message">{availabilityError}</p>}
       </div>
-      {selectedDate && (
+      {selectedDateKey && (
         <div className="time-slots-section">
           <label className="picker-label">
-            Available Hours ({selectedDate.fullDate})
+            Available Hours ({selectedDateLabel})
           </label>
-          <div className="times-grid">
-            {AVAILABLE_TIMES.map((time) => (
-              <button
-                key={time}
-                type="button"
-                className={`time-chip ${selectedTime === time ? "selected" : ""}`}
-                onClick={() => onTimeSelect(time)}
-              >
-                {time}
-              </button>
-            ))}
-          </div>
+          {timeOptions.length === 0 ? (
+            <p className="placeholder-message">No available times left for this day.</p>
+          ) : (
+            <div className="times-grid">
+              {timeOptions.map((option) => (
+                <button
+                  key={option.start_time}
+                  type="button"
+                  className={`time-chip ${selectedSlot?.start_time === option.start_time ? "selected" : ""}`}
+                  onClick={() => onTimeSelect(option)}
+                >
+                  {formatStudioTime(option.start_time)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
       <button
         type="button"
         className="modal-next-btn"
-        disabled={!selectedDate || !selectedTime}
+        disabled={!selectedDateKey || !selectedSlot}
         onClick={onNext}
       >
         Next
@@ -107,12 +141,12 @@ function ScheduleStep({ service, employee, selectedDate, selectedTime, onDateSel
   );
 }
 
-function AccountStep({ service, selectedDate, selectedTime, onContinue }) {
+function AccountStep({ service, dateLabel, timeLabel, onContinue }) {
   return (
     <div className="modal-step" key="account">
       <h2>Booking Details</h2>
       <p className="modal-subtitle">
-        {service.name} on {selectedDate?.fullDate} at {selectedTime}
+        {service.name} on {dateLabel} at {timeLabel}
       </p>
       <div className="auth-choice-container">
         <button type="button" className="auth-btn primary" onClick={() => window.alert("Redirecting to Log in...")}>
@@ -127,7 +161,7 @@ function AccountStep({ service, selectedDate, selectedTime, onContinue }) {
   );
 }
 
-function GuestDetailsStep({ brandName, service, employee, selectedDate, selectedTime, guestForm, onFieldChange, onSubmit }) {
+function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, guestForm, onFieldChange, onSubmit }) {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!guestForm.consentPrivacy) {
@@ -151,7 +185,7 @@ function GuestDetailsStep({ brandName, service, employee, selectedDate, selected
             <div className="summary-row"><span className="summary-label">Duration:</span><span className="summary-value">⏱ {service.duration}</span></div>
             <div className="summary-row"><span className="summary-label">Price:</span><span className="summary-value highlight">{service.price}</span></div>
             <div className="summary-row"><span className="summary-label">Specialist:</span><span className="summary-value">{employee?.name}</span></div>
-            <div className="summary-row"><span className="summary-label">Date &amp; Time:</span><span className="summary-value highlight">{selectedDate?.fullDate} at {selectedTime}</span></div>
+            <div className="summary-row"><span className="summary-label">Date &amp; Time:</span><span className="summary-value highlight">{dateLabel} at {timeLabel}</span></div>
           </div>
         </div>
 
@@ -190,6 +224,9 @@ function GuestDetailsStep({ brandName, service, employee, selectedDate, selected
 }
 
 function BookingModal({ service, brandName, onClose }) {
+  const todayDateKey = useMemo(() => getStudioDateKey(new Date()), []);
+  const [initialYear, initialMonth] = todayDateKey.split("-").map(Number);
+
   const [step, setStep] = useState(1);
   const [guestForm, setGuestForm] = useState({
     fullName: "",
@@ -201,8 +238,12 @@ function BookingModal({ service, brandName, onClose }) {
   const [employees, setEmployees] = useState([]);
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
+  const [monthCursor, setMonthCursor] = useState({ year: initialYear, month: initialMonth - 1 });
+  const [availabilityByDate, setAvailabilityByDate] = useState({});
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState("");
+  const [selectedDateKey, setSelectedDateKey] = useState(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
   useEffect(() => {
     let isCurrent = true;
@@ -226,8 +267,90 @@ function BookingModal({ service, brandName, onClose }) {
     };
   }, [service.id]);
 
+  // Fetch bookable slots for every future date in the visible month for the chosen specialist,
+  // so the calendar can highlight only days that actually have availability.
+  useEffect(() => {
+    if (!selectedEmployee) return undefined;
+
+    const datesToFetch = getMonthCells(monthCursor.year, monthCursor.month)
+      .filter(Boolean)
+      .map((cell) => cell.dateKey)
+      .filter((dateKey) => dateKey >= todayDateKey)
+      .filter((dateKey) => !Object.prototype.hasOwnProperty.call(availabilityByDate, dateKey));
+
+    if (datesToFetch.length === 0) return undefined;
+
+    let isCurrent = true;
+    setIsLoadingAvailability(true);
+    setAvailabilityError("");
+
+    Promise.allSettled(
+      datesToFetch.map((dateKey) =>
+        apptApi.getAvailability({ serviceId: service.id, staffId: selectedEmployee.id, date: dateKey })
+      )
+    ).then((results) => {
+      if (!isCurrent) return;
+      const updates = {};
+      let hadError = false;
+      results.forEach((result, index) => {
+        const dateKey = datesToFetch[index];
+        if (result.status === "fulfilled" && Array.isArray(result.value?.slots)) {
+          updates[dateKey] = result.value.slots;
+        } else {
+          updates[dateKey] = [];
+          hadError = true;
+        }
+      });
+      setAvailabilityByDate((previous) => ({ ...previous, ...updates }));
+      if (hadError) setAvailabilityError("Some dates could not be checked for availability.");
+    }).finally(() => {
+      if (isCurrent) setIsLoadingAvailability(false);
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [selectedEmployee, monthCursor, service.id, availabilityByDate, todayDateKey]);
+
+  const handleSelectEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setMonthCursor({ year: initialYear, month: initialMonth - 1 });
+    setAvailabilityByDate({});
+    setAvailabilityError("");
+    setSelectedDateKey(null);
+    setSelectedSlot(null);
+    setStep(2);
+  };
+
+  const handleMonthChange = (offset) => {
+    setMonthCursor((previous) => shiftMonth(previous, offset));
+    setSelectedDateKey(null);
+    setSelectedSlot(null);
+  };
+
+  const handleDateSelect = (dateKey) => {
+    setSelectedDateKey(dateKey);
+    setSelectedSlot(null);
+  };
+
+  const monthLabel = new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })
+    .format(new Date(Date.UTC(monthCursor.year, monthCursor.month, 1)));
+  const canGoPrevMonth = monthCursor.year > initialYear || monthCursor.month > initialMonth - 1;
+  const calendarCells = getMonthCells(monthCursor.year, monthCursor.month).map((cell) => (
+    cell && {
+      ...cell,
+      isAvailable: cell.dateKey >= todayDateKey && (availabilityByDate[cell.dateKey]?.length || 0) > 0,
+    }
+  ));
+  const timeOptions = useMemo(
+    () => pickTimeOptions(availabilityByDate[selectedDateKey] || []),
+    [availabilityByDate, selectedDateKey]
+  );
+  const selectedDateLabel = selectedDateKey ? formatStudioDate(selectedDateKey) : "";
+  const selectedTimeLabel = selectedSlot ? formatStudioTime(selectedSlot.start_time) : "";
+
   const handleGuestSubmit = () => {
-    window.alert(`Appointment confirmed for ${service.name} with ${selectedEmployee.name} on ${selectedDate?.fullDate} at ${selectedTime}!`);
+    window.alert(`Appointment confirmed for ${service.name} with ${selectedEmployee.name} on ${selectedDateLabel} at ${selectedTimeLabel}!`);
     onClose();
   };
 
@@ -242,31 +365,34 @@ function BookingModal({ service, brandName, onClose }) {
             service={service}
             employees={employees}
             isLoading={isLoadingEmployees}
-            onSelect={(employee) => {
-              setSelectedEmployee(employee);
-              setStep(2);
-            }}
+            onSelect={handleSelectEmployee}
           />
         )}
         {step === 2 && (
           <ScheduleStep
             service={service}
             employee={selectedEmployee}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            onDateSelect={(date) => {
-              setSelectedDate(date);
-              setSelectedTime(null);
-            }}
-            onTimeSelect={setSelectedTime}
+            monthLabel={monthLabel}
+            canGoPrevMonth={canGoPrevMonth}
+            onPrevMonth={() => handleMonthChange(-1)}
+            onNextMonth={() => handleMonthChange(1)}
+            calendarCells={calendarCells}
+            selectedDateKey={selectedDateKey}
+            onDateSelect={handleDateSelect}
+            isLoadingAvailability={isLoadingAvailability}
+            availabilityError={availabilityError}
+            selectedDateLabel={selectedDateLabel}
+            timeOptions={timeOptions}
+            selectedSlot={selectedSlot}
+            onTimeSelect={setSelectedSlot}
             onNext={() => setStep(3)}
           />
         )}
         {step === 3 && (
           <AccountStep
             service={service}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
+            dateLabel={selectedDateLabel}
+            timeLabel={selectedTimeLabel}
             onContinue={() => setStep(4)}
           />
         )}
@@ -275,8 +401,8 @@ function BookingModal({ service, brandName, onClose }) {
             brandName={brandName}
             service={service}
             employee={selectedEmployee}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
+            dateLabel={selectedDateLabel}
+            timeLabel={selectedTimeLabel}
             guestForm={guestForm}
             onFieldChange={(field, value) => {
               setGuestForm((previous) => ({ ...previous, [field]: value }));

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authApi } from "../../services/api";
+import { authApi, getAssetUrl } from "../../services/api";
 import "./StaffLogin.css";
 
 function StaffLogin() {
@@ -25,10 +25,20 @@ function StaffLogin() {
 
       // 3. Save to localStorage
       if (response?.token) {
-        localStorage.setItem("auth_token", response.token);
+        localStorage.setItem("staff_auth_token", response.token);
       }
       localStorage.setItem("staff_role", userRole);
       localStorage.setItem("auth_user_name", displayName);
+      if (userData.description) localStorage.setItem("auth_user_description", userData.description);
+      else localStorage.removeItem("auth_user_description");
+      if (userData.id) localStorage.setItem("staff_id", userData.id);
+      else localStorage.removeItem("staff_id");
+      const avatarUrl = userData.avatar_url || userData.photo;
+      if (avatarUrl) {
+        localStorage.setItem("auth_user_avatar", getAssetUrl(avatarUrl));
+      } else {
+        localStorage.removeItem("auth_user_avatar");
+      }
 
       // 4. Role-based redirect
       if (userRole === "admin" || userRole === "super_admin") {

@@ -1,6 +1,13 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+const STAFF_TOKEN_KEY = "staff_auth_token";
+const CUSTOMER_TOKEN_KEY = "customer_auth_token";
+
+function getStaffToken() {
+  return localStorage.getItem(STAFF_TOKEN_KEY)
+    || (localStorage.getItem("staff_role") ? localStorage.getItem("auth_token") : null);
+}
 
 export const getAssetUrl = (path) => {
   if (!path) return null;
@@ -11,8 +18,12 @@ export const getAssetUrl = (path) => {
   return `${SERVER_BASE_URL}${cleanPath}`;
 };
 
-async function request(endpoint, options = {}) {
-  const token = localStorage.getItem("auth_token");
+async function request(endpoint, options = {}, tokenKey = STAFF_TOKEN_KEY) {
+  const token = tokenKey === STAFF_TOKEN_KEY
+    ? getStaffToken()
+    : tokenKey
+      ? localStorage.getItem(tokenKey)
+      : null;
 
   const headers = {
     "Content-Type": "application/json",
@@ -39,21 +50,27 @@ export const authApi = {
     request("/auth/staff/login", {
       method: "POST",
       body: JSON.stringify({ username, password }),
-    }),
+    }, null),
 
-  customerLogin: (email, password) =>
-    request("/auth/customer/login", {
+  customerLogin: async (email, password) => {
+    const data = await request("/auth/customer/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
-    }),
+    }, null);
+    if (data.token) localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
+    return data;
+  },
 
-  customerRegister: (userData) =>
-    request("/auth/customer/register", {
+  customerRegister: async (userData) => {
+    const data = await request("/auth/customer/register", {
       method: "POST",
       body: JSON.stringify(userData),
-    }),
+    }, null);
+    if (data.token) localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
+    return data;
+  },
 
-  getMe: () => request("/auth/me", { method: "GET" }),
+  getMe: () => request("/auth/me", { method: "GET" }, CUSTOMER_TOKEN_KEY),
 };
 
 export const apptApi = {
@@ -61,9 +78,52 @@ export const apptApi = {
     request("/appointments", {
       method: "POST",
       body: JSON.stringify(bookingData),
+    }, CUSTOMER_TOKEN_KEY),
+
+  // Public: get bookable slots for a service (optionally filtered to one staff member) on a given date.
+  getAvailability: ({ serviceId, staffId, date }) => {
+    const params = new URLSearchParams({ service_id: serviceId, date });
+    if (staffId) params.set("staff_id", staffId);
+    return request(`/appointments/availability?${params.toString()}`, { method: "GET" }, null);
+  },
+
+  listAppointments: () => request("/appointments"),
+
+  updateStatus: (appointmentId, status) =>
+    request(`/appointments/${appointmentId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
+
+  cancelAppointment: (appointmentId, reason) =>
+    request(`/appointments/${appointmentId}/cancel`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
     }),
 
   getStaffSchedule: () => request("/appointments/staff-schedule", { method: "GET" }),
+};
+
+export const staffAvailabilityApi = {
+  getForDate: (date) =>
+    request(`/staff-availability/me/availability/${encodeURIComponent(date)}`),
+
+  replaceForDate: (date, shifts) =>
+    request(`/staff-availability/me/availability/${encodeURIComponent(date)}`, {
+      method: "PUT",
+      body: JSON.stringify({ shifts }),
+    }),
+
+  addUnavailability: (period) =>
+    request("/staff-availability/me/unavailabilities", {
+      method: "POST",
+      body: JSON.stringify(period),
+    }),
+
+  removeUnavailability: (id) =>
+    request(`/staff-availability/me/unavailabilities/${id}`, {
+      method: "DELETE",
+    }),
 };
 
 export const staffApi = {
@@ -85,7 +145,7 @@ export const staffApi = {
     const formData = new FormData();
     formData.append("avatar", file);
 
-    const token = localStorage.getItem("auth_token");
+    const token = getStaffToken();
 
     const response = await fetch(`${API_BASE_URL}/staff/${staffId}/avatar`, {
       method: "POST",
@@ -150,7 +210,7 @@ export const serviceApi = {
     const formData = new FormData();
     formData.append("image", file);
 
-    const token = localStorage.getItem("auth_token");
+    const token = getStaffToken();
 
     const response = await fetch(`${API_BASE_URL}/services/${serviceId}/image`, {
       method: "POST",

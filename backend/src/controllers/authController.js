@@ -2,6 +2,8 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { normalizeKennitala } = require('../services/bookingContract');
+const { registerCustomerProfile } = require('../services/customerIdentityService');
 
 const SALT_ROUNDS = 10;
 
@@ -65,20 +67,28 @@ exports.staffLogin = async (req, res) => {
 
 // 2. Customer Registration
 exports.registerCustomer = async (req, res) => {
-  const { full_name, phone_number, kennitala, email, password } = req.body;
+  const { full_name, phone_number, email, password } = req.body || {};
+  const kennitala = normalizeKennitala(req.body?.kennitala);
+
+  if (typeof full_name !== 'string' || !full_name.trim()
+      || full_name.trim().length > 255
+      || typeof phone_number !== 'string' || !phone_number.trim()
+      || phone_number.trim().length > 50
+      || !kennitala
+      || typeof email !== 'string' || !email.trim()
+      || typeof password !== 'string' || !password) {
+    return res.status(400).json({ error: 'Full name, phone number, Kennitala, email, and password are required.' });
+  }
 
   try {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-
-    const queryText = `
-      INSERT INTO customers (full_name, phone_number, kennitala, email, password_hash, is_registered)
-      VALUES ($1, $2, $3, $4, $5, TRUE)
-      RETURNING id, full_name, email;
-    `;
-
-    const values = [full_name, phone_number, kennitala, email, hashedPassword];
-    const result = await db.query(queryText, values);
-    const customer = result.rows[0];
+    const customer = await registerCustomerProfile(db, {
+      fullName: full_name.trim(),
+      phoneNumber: phone_number.trim(),
+      kennitala,
+      email: email.trim(),
+      passwordHash: hashedPassword,
+    });
 
     const tokenPayload = {
       id: customer.id,
@@ -95,7 +105,9 @@ exports.registerCustomer = async (req, res) => {
       customer,
     });
   } catch (error) {
-    console.error('Registration Error:', error);
+    if (error.status === 409 || error.code === '23505') {
+      return res.status(409).json({ error: 'Registration could not be completed with these details.' });
+    }
     res.status(500).json({ error: 'Failed to register customer' });
   }
 };

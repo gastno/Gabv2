@@ -1,5 +1,6 @@
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "btree_gist";
 
 -- Define Custom Enumerated Types
 CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'completed', 'cancelled', 'no_show');
@@ -66,6 +67,9 @@ CREATE TABLE services (
     price_isk DECIMAL(12,2) NOT NULL,
     image_url VARCHAR(512),
     is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT uq_services_id_brand UNIQUE (id, brand_id),
+    CONSTRAINT services_valid_duration CHECK (duration_minutes > 0),
+    CONSTRAINT services_valid_price CHECK (price_isk >= 0),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 CREATE INDEX idx_services_brand_cat ON services(brand_id, category_id);
@@ -93,7 +97,8 @@ CREATE TABLE customers (
     consent_privacy BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_customers_kennitala ON customers(kennitala);
+CREATE UNIQUE INDEX uq_customers_kennitala_digits
+    ON customers (regexp_replace(kennitala, '[^0-9]', '', 'g'));
 CREATE INDEX idx_customers_phone ON customers(phone_number);
 CREATE INDEX idx_customers_email ON customers(email);
 
@@ -113,8 +118,8 @@ CREATE TABLE appointments (
     service_id BIGINT NOT NULL REFERENCES services(id) ON DELETE RESTRICT,
     staff_id BIGINT NOT NULL REFERENCES staff(id) ON DELETE RESTRICT,
     customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
     duration_snapshot_minutes INT NOT NULL,
     price_snapshot_isk DECIMAL(12,2) NOT NULL,
     custom_options JSONB,
@@ -123,7 +128,17 @@ CREATE TABLE appointments (
     row_version INT NOT NULL DEFAULT 1,
     cancellation_reason TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT appointments_valid_time_window CHECK (end_time > start_time),
+    CONSTRAINT appointments_valid_duration CHECK (duration_snapshot_minutes > 0),
+    CONSTRAINT appointments_service_brand_fk
+        FOREIGN KEY (service_id, brand_id) REFERENCES services(id, brand_id) ON DELETE RESTRICT,
+    CONSTRAINT appointments_staff_brand_fk
+        FOREIGN KEY (staff_id, brand_id) REFERENCES staff_brands(staff_id, brand_id) ON DELETE RESTRICT,
+    CONSTRAINT appointments_active_no_overlap EXCLUDE USING gist (
+        staff_id WITH =,
+        (tstzrange(start_time, end_time, '[)')) WITH &&
+    ) WHERE (status IN ('pending', 'confirmed'))
 );
 CREATE INDEX idx_appointments_staff_time ON appointments(staff_id, start_time, end_time);
 CREATE INDEX idx_appointments_customer_time ON appointments(customer_id, start_time);
@@ -133,21 +148,28 @@ CREATE INDEX idx_appointments_brand_status ON appointments(brand_id, status);
 -- DOMAIN 4: AVAILABILITY & CALENDAR ENGINE
 -- --------------------------------------------------------------------------
 
-CREATE TABLE staff_schedules (
+CREATE TABLE staff_availabilities (
     id BIGSERIAL PRIMARY KEY,
     staff_id BIGINT NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
-    day_of_week INT NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
-    shift_start TIME NOT NULL,
-    shift_end TIME NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE
+    availability_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    CONSTRAINT staff_availabilities_valid_window CHECK (end_time > start_time),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT staff_availabilities_no_overlapping_shifts EXCLUDE USING gist (
+        staff_id WITH =,
+        availability_date WITH =,
+        (tsrange(availability_date + start_time, availability_date + end_time, '[)')) WITH &&
+    ) WHERE (is_active)
 );
-CREATE INDEX idx_staff_schedules_staff_day ON staff_schedules(staff_id, day_of_week);
+CREATE INDEX idx_staff_availabilities_staff_date ON staff_availabilities(staff_id, availability_date);
 
 CREATE TABLE staff_unavailabilities (
     id BIGSERIAL PRIMARY KEY,
     staff_id BIGINT NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
-    block_start TIMESTAMP NOT NULL,
-    block_end TIMESTAMP NOT NULL,
-    reason VARCHAR(255)
+    block_start TIMESTAMPTZ NOT NULL,
+    block_end TIMESTAMPTZ NOT NULL,
+    reason VARCHAR(255),
+    CONSTRAINT staff_unavailabilities_valid_window CHECK (block_end > block_start)
 );
 CREATE INDEX idx_staff_unavailabilities_time ON staff_unavailabilities(staff_id, block_start, block_end);

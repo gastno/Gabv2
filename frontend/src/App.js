@@ -1,16 +1,17 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home/Home";
-import Admin from "./pages/Admin/Admin";
-import Staff from "./pages/Staff/Staff";
+import AdminDashboard from "./pages/Admin/Admin";
+import Staff from "./pages/Staff/StaffPortal";
 import StaffLogin from "./pages/StaffLogin/StaffLogin";
 import Gabbablu from "./pages/Gabbablu/Gabbablu";
 import AmorTattoo from "./pages/AmorTattoo/AmorTattoo";
 
 // Protected Route Guard with Defensive Checks
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const token = localStorage.getItem("auth_token");
   const role = localStorage.getItem("staff_role");
+  const token = localStorage.getItem("staff_auth_token")
+    || (role ? localStorage.getItem("auth_token") : null);
 
   // 1. If not authenticated, redirect to login
   if (!token) {
@@ -72,7 +73,7 @@ function App() {
           path="/admin"
           element={
             <ProtectedRoute requiredRole="admin">
-              <Admin />
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

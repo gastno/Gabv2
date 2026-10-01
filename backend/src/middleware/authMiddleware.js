@@ -19,6 +19,23 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
+const optionalAuthenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return next();
+
+  const [scheme, token] = authHeader.split(' ');
+  if (scheme !== 'Bearer' || !token) {
+    return res.status(401).json({ error: 'Authorization must use a Bearer token.' });
+  }
+
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    return next();
+  } catch (error) {
+    return res.status(403).json({ error: 'Invalid or expired token.' });
+  }
+};
+
 // Middleware to restrict access based on user role (e.g., admin or staff)
 const requireRole = (...allowedRoles) => {
   return (req, res, next) => {
@@ -29,4 +46,4 @@ const requireRole = (...allowedRoles) => {
   };
 };
 
-module.exports = { authenticateToken, requireRole };
+module.exports = { authenticateToken, optionalAuthenticateToken, requireRole };

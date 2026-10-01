@@ -33,7 +33,7 @@ import CreateServiceModal from "./modals/CreateServiceModal";
 import CreateStaffModal from "./modals/CreateStaffModal";
 import ServiceStaffModal from "./modals/ServiceStaffModal";
 
-function Admin() {
+function AdminDashboard() {
   const navigate = useNavigate();
 
   // Navigation & Layout State
@@ -234,9 +234,12 @@ function Admin() {
   ]);
 
   const handleLogout = () => {
+    localStorage.removeItem("staff_auth_token");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("staff_role");
+    localStorage.removeItem("staff_id");
     localStorage.removeItem("auth_user_name");
+    localStorage.removeItem("auth_user_description");
     navigate("/staff-login");
   };
 
@@ -615,7 +618,7 @@ function Admin() {
           handleLogout={handleLogout}
         />
 
-        <div className="admin-tab-content">
+        <div className="admin-tab-content" key={activeTab}>
           {activeTab === "calendar" && (
             <CalendarTab
               selectedBrand={selectedBrand}
@@ -795,4 +798,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default AdminDashboard;

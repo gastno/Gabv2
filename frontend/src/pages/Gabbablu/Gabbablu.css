@@ -653,8 +653,30 @@
 }
 
 .gabbablu-page .calendar-header {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 12px;
+}
+
+.gabbablu-page .calendar-nav-btn {
+  background: #242020;
+  color: #eee;
+  border: 1px solid #3d3737;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.gabbablu-page .calendar-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .gabbablu-page .calendar-month-title {
@@ -691,6 +713,10 @@
   justify-content: center;
   cursor: not-allowed;
   transition: all 0.2s ease;
+}
+
+.gabbablu-page .calendar-day-cell-empty {
+  aspect-ratio: 1;
 }
 
 /* Available Dates Color Highlight */
