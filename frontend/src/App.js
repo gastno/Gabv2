@@ -5,6 +5,7 @@ import Admin from "./pages/Admin/Admin";
 import Staff from "./pages/Staff/Staff";
 import StaffLogin from "./pages/StaffLogin/StaffLogin";
 import Gabbablu from "./pages/Gabbablu/Gabbablu";
+import AmorTattoo from "./pages/AmorTattoo/AmorTattoo";
 
 // Protected Route Guard with Defensive Checks
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -46,6 +47,10 @@ function App() {
         <Route 
           path="/studios/gabbablu" 
           element={<Gabbablu />} 
+        />
+        <Route
+          path="/studios/amortattoo"
+          element={<AmorTattoo />}
         />
 
         {/* Staff & Admin Authentication */}

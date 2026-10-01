@@ -1,12 +1,52 @@
 import "./Gabbablu.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import UserAvatar from "../../components/UserAvatar/UserAvatar";
+import {
+  brandApi,
+  categoryApi,
+  getAssetUrl,
+  serviceApi,
+  staffServiceApi,
+} from "../../services/api";
 
-function Gabbablu() {
+const STUDIO_DEFAULTS = {
+  1: {
+    name: "Gabbablu",
+    location: "Placeholder Street 123, Reykjavík, Iceland",
+    about_description: "Studio information coming soon.",
+    logo: "/gabbablulogo.png",
+    portfolio: "gabbablu",
+  },
+  2: {
+    name: "Amor Tattoo",
+    location: "Placeholder Street 123, Reykjavík, Iceland",
+    about_description: "Studio information coming soon.",
+    logo: "/amortattoo.png",
+    portfolio: "amortattoo",
+  },
+};
+
+const toTeamMember = (person) => ({
+  id: person.id,
+  name: person.name || person.full_name || "Team member",
+  title: person.description || "Profile details coming soon.",
+  img: getAssetUrl(person.avatar_url) || "/placeholder-person-1.jpg",
+});
+
+export function StudioPage({ brandId }) {
+  const studioDefaults = STUDIO_DEFAULTS[brandId] || STUDIO_DEFAULTS[1];
   const [language, setLanguage] = useState("en");
   const [activeTab, setActiveTab] = useState("services");
+  const [brand, setBrand] = useState(studioDefaults);
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [contentError, setContentError] = useState("");
+  const [bookingEmployees, setBookingEmployees] = useState([]);
+  const [bookingEmployeesLoading, setBookingEmployeesLoading] = useState(false);
 
   // Accordion Expand/Collapse State
   const [expandedCategories, setExpandedCategories] = useState({
@@ -31,6 +71,110 @@ function Gabbablu() {
     healthInfo: "",
     consentKennitala: false,
   });
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    const loadStudio = async () => {
+      setIsLoading(true);
+      setContentError("");
+
+      const [brandsResult, categoriesResult, servicesResult] = await Promise.allSettled([
+        brandApi.getAll(),
+        categoryApi.getAll(),
+        serviceApi.getAll(),
+      ]);
+
+      if (!isCurrent) return;
+
+      const brands = brandsResult.status === "fulfilled" ? brandsResult.value : [];
+      const categories = categoriesResult.status === "fulfilled" ? categoriesResult.value : [];
+      const services = servicesResult.status === "fulfilled" ? servicesResult.value : [];
+      const brandRecord = Array.isArray(brands)
+        ? brands.find((item) => Number(item.id) === Number(brandId))
+        : null;
+      const categoryRecords = Array.isArray(categories)
+        ? categories.filter((item) => Number(item.brand_id) === Number(brandId))
+        : [];
+      const serviceRecords = Array.isArray(services)
+        ? services.filter((item) => Number(item.brand_id) === Number(brandId))
+        : [];
+
+      setBrand({
+        ...studioDefaults,
+        ...(brandRecord || {}),
+        name: brandRecord?.name || studioDefaults.name,
+        location: brandRecord?.location || studioDefaults.location,
+        about_description: brandRecord?.about_description || studioDefaults.about_description,
+      });
+      setCategoriesData(categoryRecords.map((category) => ({
+        id: category.id,
+        title: category.title || category.name || "Category details coming soon",
+        subtitle: category.subtitle || category.description || "Category description coming soon.",
+        services: serviceRecords
+          .filter((service) => Number(service.category_id) === Number(category.id))
+          .map((service) => ({
+            ...service,
+            name: service.name || "Service details coming soon",
+            duration: service.duration || (service.duration_minutes
+              ? `${service.duration_minutes} min`
+              : "Duration unavailable"),
+            price: service.price || (service.price_isk != null
+              ? `${service.price_isk} kr`
+              : "Price unavailable"),
+            image: getAssetUrl(service.image_url) || "/placeholder-service.jpg",
+          })),
+      })));
+
+      if ([brandsResult, categoriesResult, servicesResult].every((result) => result.status === "rejected")) {
+        setContentError("Studio information is unavailable. Placeholder content is shown.");
+      }
+      setIsLoading(false);
+    };
+
+    loadStudio();
+    return () => {
+      isCurrent = false;
+    };
+  }, [brandId, studioDefaults]);
+
+  useEffect(() => {
+    if (activeTab !== "team") return undefined;
+
+    let isCurrent = true;
+    const serviceIds = [...new Set(
+      categoriesData.flatMap((category) => category.services.map((service) => service.id))
+    )];
+
+    if (serviceIds.length === 0) {
+      setEmployees([]);
+      return undefined;
+    }
+
+    const loadTeam = async () => {
+      setTeamLoading(true);
+      const workerLists = await Promise.all(serviceIds.map((serviceId) =>
+        staffServiceApi.getByServiceId(serviceId).catch((error) => {
+          console.warn(`Could not load staff for service ${serviceId}:`, error);
+          return [];
+        })
+      ));
+
+      if (isCurrent) {
+        const uniqueWorkers = new Map();
+        workerLists.flat().forEach((worker) => {
+          if (worker?.id != null) uniqueWorkers.set(String(worker.id), worker);
+        });
+        setEmployees(Array.from(uniqueWorkers.values()).map(toTeamMember));
+        setTeamLoading(false);
+      }
+    };
+
+    loadTeam();
+    return () => {
+      isCurrent = false;
+    };
+  }, [activeTab, categoriesData]);
 
   // Full Month Calendar Matrix Mock Data
   const calendarDays = [
@@ -68,64 +212,6 @@ function Gabbablu() {
 
   const availableTimes = ["09:00", "10:30", "12:00", "14:00", "15:30", "17:00"];
 
-  // Categories & Provided Services Data with Durations
-  const categoriesData = [
-    {
-      id: "combos",
-      title: "Combos",
-      subtitle: "Combined treatments & packages",
-      services: [
-        { name: "Lash Lift & Brow Lamination Combo", duration: "90 min", price: "18,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Lash Extension & Eyebrow Styling Combo", duration: "105 min", price: "22,000 kr", image: "/placeholder-service.jpg" },
-      ],
-    },
-    {
-      id: "lashes",
-      title: "Lashes Extension",
-      subtitle: "Professional eyelash extension services",
-      services: [
-        { name: "Classic Lashes", duration: "90 min", price: "14,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Classic Lashes - Refill", duration: "60 min", price: "10,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Wet Lashes", duration: "90 min", price: "15,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Wet Lashes - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Closed Fans", duration: "90 min", price: "16,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Closed Fans - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Tec Volume", duration: "105 min", price: "15,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Tec Volume - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Hybrid / Manga / Kim", duration: "105 min", price: "16,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Hybrid / Manga / Kim - Refill", duration: "60 min", price: "12,000 kr", image: "/placeholder-service.jpg" },
-        { name: "American Volume", duration: "120 min", price: "17,000 kr", image: "/placeholder-service.jpg" },
-        { name: "American Volume - Refill", duration: "75 min", price: "13,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Mega Volume", duration: "120 min", price: "18,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Mega Volume - Refill", duration: "75 min", price: "14,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Removal", duration: "30 min", price: "3,000 kr", image: "/placeholder-service.jpg" },
-      ],
-    },
-    {
-      id: "eyebrows",
-      title: "Eyebrows",
-      subtitle: "Brow shaping, tinting & lamination",
-      services: [
-        { name: "Eyebrow Shape & Tint", duration: "30 min", price: "6,000 kr", image: "/placeholder-service.jpg" },
-        { name: "Brow Lamination", duration: "45 min", price: "11,000 kr", image: "/placeholder-service.jpg" },
-      ],
-    },
-    {
-      id: "products",
-      title: "Products",
-      subtitle: "Aftercare & beauty items",
-      services: [
-        { name: "Lash Cleanser Foam", duration: "15 min", price: "3,500 kr", image: "/placeholder-service.jpg" },
-        { name: "Eyelash Serum", duration: "15 min", price: "7,900 kr", image: "/placeholder-service.jpg" },
-      ],
-    },
-  ];
-
-  const employees = [
-    { id: 1, name: "Anna María", title: "Lash & Brow Specialist", img: "/placeholder-person-1.jpg" },
-    { id: 2, name: "Sólveig", title: "Master Lash Artist", img: "/placeholder-person-2.jpg" },
-  ];
-
   const toggleCategory = (title) => {
     setExpandedCategories((prev) => ({
       ...prev,
@@ -133,7 +219,7 @@ function Gabbablu() {
     }));
   };
 
-  const openBooking = (service) => {
+  const openBooking = async (service) => {
     setBookingModal({
       isOpen: true,
       step: 1,
@@ -142,6 +228,17 @@ function Gabbablu() {
       selectedDate: null,
       selectedTime: null,
     });
+    setBookingEmployees([]);
+    setBookingEmployeesLoading(true);
+
+    try {
+      const workers = await staffServiceApi.getByServiceId(service.id);
+      setBookingEmployees((workers || []).map(toTeamMember));
+    } catch (error) {
+      console.warn("Could not load service staff:", error);
+    } finally {
+      setBookingEmployeesLoading(false);
+    }
   };
 
   const closeModal = () => {
@@ -181,7 +278,7 @@ function Gabbablu() {
   };
 
   return (
-    <div className="gabbablu-page">
+    <div className="gabbablu-page studio-page">
       {/* HEADER */}
       <Header
         language={language}
@@ -194,13 +291,14 @@ function Gabbablu() {
         {/* PORTFOLIO GALLERY */}
         <section className="portfolio-gallery">
           <div className="portfolio-main-image">
-            <img src="/portfolio/gabbablu/1.jpg" alt="Gabbablu portfolio" />
+            <img src={`/portfolio/${studioDefaults.portfolio}/1.jpg`} alt={`${brand.name} portfolio`} />
           </div>
           <div className="portfolio-grid">
-            <div className="portfolio-image"><img src="/portfolio/gabbablu/2.jpg" alt="Portfolio 1" /></div>
-            <div className="portfolio-image"><img src="/portfolio/gabbablu/3.jpg" alt="Portfolio 2" /></div>
-            <div className="portfolio-image"><img src="/portfolio/gabbablu/4.jpg" alt="Portfolio 3" /></div>
-            <div className="portfolio-image"><img src="/portfolio/gabbablu/5.jpg" alt="Portfolio 4" /></div>
+            {[2, 3, 4, 5].map((imageNumber) => (
+              <div className="portfolio-image" key={imageNumber}>
+                <img src={`/portfolio/${studioDefaults.portfolio}/${imageNumber}.jpg`} alt={`${brand.name} portfolio ${imageNumber}`} />
+              </div>
+            ))}
           </div>
         </section>
 
@@ -208,11 +306,11 @@ function Gabbablu() {
         <section className="store-information">
           <div className="store-details">
             <div className="store-icon">
-              <img src="/gabbablulogo.png" alt="Gabbablu logo" />
+              <img src={studioDefaults.logo} alt={`${brand.name} logo`} />
             </div>
             <div className="store-text">
-              <h1 className="store-name">Gabbablu</h1>
-              <p className="store-address">📍 Placeholder Street 123, Reykjavík, Iceland</p>
+              <h1 className="store-name">{brand.name}</h1>
+              <p className="store-address">📍 {brand.location}</p>
             </div>
           </div>
         </section>
@@ -245,6 +343,12 @@ function Gabbablu() {
           {activeTab === "services" && (
             <div className="services-section">
               <h2 className="section-heading">Our Services</h2>
+              {contentError && <p className="placeholder-message">{contentError}</p>}
+              {isLoading ? (
+                <p className="placeholder-message">Loading studio services...</p>
+              ) : categoriesData.length === 0 ? (
+                <p className="placeholder-message">Services and categories coming soon.</p>
+              ) : null}
               <div className="services-accordion-list">
                 {categoriesData.map((category) => {
                   const isExpanded = !!expandedCategories[category.title];
@@ -272,7 +376,7 @@ function Gabbablu() {
                         <div className="accordion-content">
                           {category.services.map((item, idx) => (
                             <div
-                              key={idx}
+                              key={item.id || `${category.id}-${idx}`}
                               className="service-row-item"
                               onClick={() => openBooking(item)}
                             >
@@ -302,7 +406,11 @@ function Gabbablu() {
           {activeTab === "team" && (
             <div className="team-section">
               <h2 className="section-heading">The People</h2>
-              <div className="team-grid">
+              {teamLoading ? (
+                <p className="placeholder-message">Loading team profiles...</p>
+              ) : employees.length === 0 ? (
+                <p className="placeholder-message">Team profiles coming soon.</p>
+              ) : <div className="team-grid">
                 {employees.map((emp) => (
                   <div className="team-member" key={emp.id}>
                     <UserAvatar src={emp.img} alt={emp.name} className="team-profile-image" />
@@ -310,17 +418,17 @@ function Gabbablu() {
                     <p>{emp.title}</p>
                   </div>
                 ))}
-              </div>
+              </div>}
             </div>
           )}
 
           {/* ABOUT TAB */}
           {activeTab === "about" && (
             <div className="about-section">
-              <h2 className="section-heading">About Gabbablu</h2>
+              <h2 className="section-heading">About {brand.name}</h2>
               <div className="about-card">
                 <div className="about-description">
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                  <p>{brand.about_description}</p>
                 </div>
                 <div className="map-container">
                   <div className="map-placeholder">
@@ -328,7 +436,7 @@ function Gabbablu() {
                     <span className="map-pin">📍</span>
                   </div>
                   <div className="map-address">
-                    <span>Placeholder Street 123, Reykjavík</span>
+                    <span>{brand.location}</span>
                     <button>Directions ↗</button>
                   </div>
                 </div>
@@ -351,7 +459,11 @@ function Gabbablu() {
                 <p className="modal-subtitle">Service: {bookingModal.selectedService?.name} (⏱ {bookingModal.selectedService?.duration})</p>
 
                 <div className="employee-selection-list">
-                  {employees.map((emp) => (
+                  {bookingEmployeesLoading ? (
+                    <p className="placeholder-message">Loading available team members...</p>
+                  ) : bookingEmployees.length === 0 ? (
+                    <p className="placeholder-message">No team members are assigned to this service yet.</p>
+                  ) : bookingEmployees.map((emp) => (
                     <div
                       key={emp.id}
                       className="employee-option-card"
@@ -562,14 +674,14 @@ function Gabbablu() {
                       onChange={(e) => setGuestForm({ ...guestForm, consentKennitala: e.target.checked })}
                     />
                     <label htmlFor="consentKennitala">
-                      I consent to Gabbablu storing and processing my Kennitala, phone number, and related customer information for appointment management, customer identification, service records, and applicable cancellation or no-show policies.
+                      I consent to {brand.name} storing and processing my Kennitala, phone number, and related customer information for appointment management, customer identification, service records, and applicable cancellation or no-show policies.
                     </label>
                   </div>
 
                   <div className="cancellation-warning-box">
                     <strong>Cancellation & No-Show Policy</strong>
                     <p>
-                      Appointments cancelled less than 48 hours before the scheduled time, and appointments missed without notice, may result in a 5,000 ISK fee. Any applicable fee is handled manually by Gabbablu staff.
+                      Appointments cancelled less than 48 hours before the scheduled time, and appointments missed without notice, may result in a 5,000 ISK fee. Any applicable fee is handled manually by {brand.name} staff.
                     </p>
                   </div>
 
@@ -587,6 +699,10 @@ function Gabbablu() {
       <Footer />
     </div>
   );
+}
+
+function Gabbablu() {
+  return <StudioPage brandId={1} />;
 }
 
 export default Gabbablu;
