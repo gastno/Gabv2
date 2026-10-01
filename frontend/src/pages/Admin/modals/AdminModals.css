@@ -42,6 +42,39 @@
   margin-top: 16px;
 }
 
+.full-width-modal-form .form-group {
+  width: 100%;
+  min-width: 0;
+}
+
+.full-width-modal-form label {
+  display: block;
+}
+
+.full-width-modal-form input,
+.full-width-modal-form select,
+.full-width-modal-form textarea,
+.full-width-modal-form .read-only-field {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.full-width-modal-form > .save-submit-btn {
+  width: 100%;
+  box-sizing: border-box;
+  flex: none;
+}
+
+.service-modal-image-preview {
+  display: block;
+  width: 100%;
+  height: 100px;
+  margin-top: 8px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
 .form-row {
   display: flex;
   gap: 12px;

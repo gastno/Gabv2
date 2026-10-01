@@ -40,7 +40,7 @@ function Admin() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("calendar");
-  const [selectedBrand, setSelectedBrand] = useState("Gabbablu");
+  const [selectedBrand] = useState("Gabbablu");
 
   // Master Entity Lists
   const [brandsList, setBrandsList] = useState([]);

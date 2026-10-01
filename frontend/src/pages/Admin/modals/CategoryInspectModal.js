@@ -22,7 +22,7 @@ function CategoryInspectModal({
         </button>
         <h3>Category Details</h3>
 
-        <form onSubmit={handleSaveCategoryEdit} className="admin-form">
+        <form onSubmit={handleSaveCategoryEdit} className="admin-form full-width-modal-form">
           <div className="form-group">
             <label>Brand</label>
             {isEditMode ? (

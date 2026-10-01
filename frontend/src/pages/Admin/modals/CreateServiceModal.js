@@ -26,7 +26,10 @@ function CreateServiceModal({
       className="admin-modal-backdrop"
       onClick={() => setServiceModalOpen(false)}
     >
-      <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="admin-modal-box create-service-modal-box"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           className="modal-close"
@@ -36,39 +39,37 @@ function CreateServiceModal({
         </button>
         <h3>Create New Service</h3>
 
-        <form onSubmit={handleAddService} className="admin-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label>Target Brand</label>
-              <select
-                value={newService.brand}
-                onChange={(e) =>
-                  setNewService({ ...newService, brand: e.target.value })
-                }
-              >
-                {brandsList.map((b) => (
-                  <option key={b.id} value={b.name}>
-                    {b.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <form onSubmit={handleAddService} className="admin-form full-width-modal-form">
+          <div className="form-group">
+            <label>Target Brand</label>
+            <select
+              value={newService.brand}
+              onChange={(e) =>
+                setNewService({ ...newService, brand: e.target.value })
+              }
+            >
+              {brandsList.map((b) => (
+                <option key={b.id} value={b.name}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="form-group">
-              <label>Category</label>
-              <select
-                value={newService.category}
-                onChange={(e) =>
-                  setNewService({ ...newService, category: e.target.value })
-                }
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.title}>
-                    {c.title}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="form-group">
+            <label>Category</label>
+            <select
+              value={newService.category}
+              onChange={(e) =>
+                setNewService({ ...newService, category: e.target.value })
+              }
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.title}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group">
@@ -96,30 +97,28 @@ function CreateServiceModal({
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Duration</label>
-              <input
-                type="text"
-                placeholder="60 min"
-                value={newService.duration}
-                onChange={(e) =>
-                  setNewService({ ...newService, duration: e.target.value })
-                }
-              />
-            </div>
+          <div className="form-group">
+            <label>Duration</label>
+            <input
+              type="text"
+              placeholder="60 min"
+              value={newService.duration}
+              onChange={(e) =>
+                setNewService({ ...newService, duration: e.target.value })
+              }
+            />
+          </div>
 
-            <div className="form-group">
-              <label>Price</label>
-              <input
-                type="text"
-                placeholder="15,000 kr"
-                value={newService.price}
-                onChange={(e) =>
-                  setNewService({ ...newService, price: e.target.value })
-                }
-              />
-            </div>
+          <div className="form-group">
+            <label>Price</label>
+            <input
+              type="text"
+              placeholder="15,000 kr"
+              value={newService.price}
+              onChange={(e) =>
+                setNewService({ ...newService, price: e.target.value })
+              }
+            />
           </div>
 
           <div className="form-group">

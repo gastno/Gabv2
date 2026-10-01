@@ -53,7 +53,7 @@ function StaffInspectModal({
         </button>
         <h3>Staff Account Details</h3>
 
-        <form onSubmit={handleSaveStaffEdit} className="admin-form">
+        <form onSubmit={handleSaveStaffEdit} className="admin-form full-width-modal-form">
           <div className="form-group" style={{ textAlign: "center" }}>
             <UserAvatar
               src={editAvatarPreview || tempInspectStaff.photo}

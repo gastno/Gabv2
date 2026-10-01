@@ -23,7 +23,7 @@ function CreateCategoryModal({
         </button>
         <h3>Create New Category</h3>
 
-        <form onSubmit={handleAddCategory} className="admin-form">
+        <form onSubmit={handleAddCategory} className="admin-form full-width-modal-form">
           <div className="form-group">
             <label>Target Brand</label>
             <select

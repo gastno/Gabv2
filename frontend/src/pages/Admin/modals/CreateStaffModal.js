@@ -37,7 +37,7 @@ function CreateStaffModal({
         </button>
         <h3>Create Staff Account</h3>
 
-        <form onSubmit={handleAddStaff} className="admin-form">
+        <form onSubmit={handleAddStaff} className="admin-form full-width-modal-form">
           <div className="form-group">
             <label>Full Name</label>
             <input
@@ -51,32 +51,30 @@ function CreateStaffModal({
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>User ID / Login Username</label>
-              <input
-                type="text"
-                required
-                placeholder="solveig"
-                value={newStaff.userId}
-                onChange={(e) =>
-                  setNewStaff({ ...newStaff, userId: e.target.value })
-                }
-              />
-            </div>
+          <div className="form-group">
+            <label>User ID / Login Username</label>
+            <input
+              type="text"
+              required
+              placeholder="solveig"
+              value={newStaff.userId}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, userId: e.target.value })
+              }
+            />
+          </div>
 
-            <div className="form-group">
-              <label>Initial Password</label>
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={newStaff.password}
-                onChange={(e) =>
-                  setNewStaff({ ...newStaff, password: e.target.value })
-                }
-              />
-            </div>
+          <div className="form-group">
+            <label>Initial Password</label>
+            <input
+              type="password"
+              required
+              placeholder="••••••••"
+              value={newStaff.password}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, password: e.target.value })
+              }
+            />
           </div>
 
           <div className="form-group">
