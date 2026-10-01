@@ -1,5 +1,3 @@
-// src/pages/Admin/Admin.jsx
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,6 +5,7 @@ import {
   brandApi,
   categoryApi,
   serviceApi,
+  staffServiceApi,
   getAssetUrl,
 } from "../../services/api";
 import "./Admin.css";
@@ -22,6 +21,7 @@ import CategoriesTab from "./tabs/CategoriesTab";
 import ServicesTab from "./tabs/ServicesTab";
 import StaffTab from "./tabs/StaffTab";
 import LedgerTab from "./tabs/LedgerTab";
+import StaffServicesTab from "./tabs/StaffServicesTab";
 
 // Modals
 import BrandModal from "./modals/BrandModal";
@@ -31,6 +31,7 @@ import ServiceInspectModal from "./modals/ServiceInspectModal";
 import CreateCategoryModal from "./modals/CreateCategoryModal";
 import CreateServiceModal from "./modals/CreateServiceModal";
 import CreateStaffModal from "./modals/CreateStaffModal";
+import ServiceStaffModal from "./modals/ServiceStaffModal";
 
 function Admin() {
   const navigate = useNavigate();
@@ -54,19 +55,17 @@ function Admin() {
   const [services, setServices] = useState([]);
   const [loadingServices, setLoadingServices] = useState(false);
 
-  // File & Image States for Staff Avatars
+  // File & Image States
   const [createAvatarFile, setCreateAvatarFile] = useState(null);
   const [createAvatarPreview, setCreateAvatarPreview] = useState(null);
   const [editAvatarFile, setEditAvatarFile] = useState(null);
   const [editAvatarPreview, setEditAvatarPreview] = useState(null);
 
-  // File & Image States for Services
   const [createServiceImageFile, setCreateServiceImageFile] = useState(null);
   const [createServiceImagePreview, setCreateServiceImagePreview] = useState(null);
   const [editServiceImageFile, setEditServiceImageFile] = useState(null);
   const [editServiceImagePreview, setEditServiceImagePreview] = useState(null);
 
-  // Ledger State
   const [appointments, setAppointments] = useState([
     {
       id: 501,
@@ -96,6 +95,9 @@ function Admin() {
   const [inspectService, setInspectService] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
+  const [assignedServiceIds, setAssignedServiceIds] = useState([]);
+  const [selectedServiceForModal, setSelectedServiceForModal] = useState(null);
+
   // Creation Form Input States
   const [newCategory, setNewCategory] = useState({
     brand: "Gabbablu",
@@ -121,16 +123,12 @@ function Admin() {
     photo: "",
   });
 
-  // ================= API FETCHERS =================
-
   const fetchBrands = async () => {
     setLoadingBrands(true);
     try {
-      if (brandApi && brandApi.getAll) {
+      if (brandApi?.getAll) {
         const data = await brandApi.getAll();
-        if (Array.isArray(data) && data.length > 0) {
-          setBrandsList(data);
-        }
+        if (Array.isArray(data) && data.length > 0) setBrandsList(data);
       }
     } catch (err) {
       console.warn("Error fetching brands:", err);
@@ -142,7 +140,7 @@ function Admin() {
   const fetchStaffAccounts = async () => {
     setLoadingStaff(true);
     try {
-      if (staffApi && staffApi.getAll) {
+      if (staffApi?.getAll) {
         const data = await staffApi.getAll();
         const formattedStaff = (data || []).map((s) => ({
           id: s.id,
@@ -169,7 +167,7 @@ function Admin() {
   const fetchCategories = async () => {
     setLoadingCategories(true);
     try {
-      if (categoryApi && categoryApi.getAll) {
+      if (categoryApi?.getAll) {
         const data = await categoryApi.getAll();
         const formatted = (data || []).map((c) => ({
           id: c.id,
@@ -190,7 +188,7 @@ function Admin() {
   const fetchServices = async () => {
     setLoadingServices(true);
     try {
-      if (serviceApi && serviceApi.getAll) {
+      if (serviceApi?.getAll) {
         const data = await serviceApi.getAll();
         const formatted = (data || []).map((s) => ({
           id: s.id,
@@ -235,7 +233,6 @@ function Admin() {
     editServiceImagePreview,
   ]);
 
-  // Logout Handler
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("staff_role");
@@ -243,7 +240,6 @@ function Admin() {
     navigate("/staff-login");
   };
 
-  // Close Inspection Modals
   const closeInspectModal = () => {
     setInspectBrand(null);
     setTempInspectBrand(null);
@@ -251,6 +247,7 @@ function Admin() {
     setTempInspectStaff(null);
     setInspectCategory(null);
     setInspectService(null);
+    setSelectedServiceForModal(null);
     setIsEditMode(false);
 
     setEditAvatarFile(null);
@@ -266,21 +263,30 @@ function Admin() {
     }
   };
 
-  // ================= SERVICE HANDLERS =================
+  // ================= SAVE SERVICE WORKERS =================
+  const handleSaveServiceWorkers = async (serviceId, staffIds) => {
+    try {
+      if (staffServiceApi?.syncServiceWorkers) {
+        await staffServiceApi.syncServiceWorkers(serviceId, staffIds);
+      }
+      await fetchStaffAccounts(); 
+      setSelectedServiceForModal(null);
+    } catch (err) {
+      alert(err.message || "Failed to update service workers.");
+    }
+  };
 
+  // ================= SERVICE HANDLERS =================
   const handleAddService = async (e) => {
     e.preventDefault();
-
     const selectedBrandObj = brandsList.find((b) => b.name === newService.brand);
     const brandId = selectedBrandObj ? selectedBrandObj.id : 1;
-
     const selectedCatObj = categories.find((c) => c.title === newService.category);
     const categoryId = selectedCatObj ? selectedCatObj.id : 1;
 
     try {
       let createdServiceId = null;
-
-      if (serviceApi && serviceApi.create) {
+      if (serviceApi?.create) {
         const response = await serviceApi.create({
           brand_id: brandId,
           brand: newService.brand,
@@ -291,21 +297,16 @@ function Admin() {
           duration: newService.duration,
           price: newService.price,
         });
-
         createdServiceId = response?.service?.id || response?.id;
       }
 
-      if (createdServiceId && createServiceImageFile && serviceApi && serviceApi.uploadImage) {
+      if (createdServiceId && createServiceImageFile && serviceApi.uploadImage) {
         await serviceApi.uploadImage(createdServiceId, createServiceImageFile);
       }
 
       await fetchServices();
       setServiceModalOpen(false);
       setCreateServiceImageFile(null);
-      if (createServiceImagePreview) {
-        URL.revokeObjectURL(createServiceImagePreview);
-        setCreateServiceImagePreview(null);
-      }
       setNewService({
         brand: selectedBrand,
         category: categories[0]?.title || "General",
@@ -325,12 +326,11 @@ function Admin() {
 
     const selectedBrandObj = brandsList.find((b) => b.name === inspectService.brand);
     const brandId = selectedBrandObj ? selectedBrandObj.id : inspectService.brand_id;
-
     const selectedCatObj = categories.find((c) => c.title === inspectService.category);
     const categoryId = selectedCatObj ? selectedCatObj.id : inspectService.category_id;
 
     try {
-      if (serviceApi && serviceApi.update) {
+      if (serviceApi?.update) {
         await serviceApi.update(inspectService.id, {
           brand_id: brandId,
           brand: inspectService.brand,
@@ -343,7 +343,7 @@ function Admin() {
         });
       }
 
-      if (editServiceImageFile && serviceApi && serviceApi.uploadImage) {
+      if (editServiceImageFile && serviceApi.uploadImage) {
         await serviceApi.uploadImage(inspectService.id, editServiceImageFile);
       }
 
@@ -355,15 +355,13 @@ function Admin() {
   };
 
   // ================= CATEGORY HANDLERS =================
-
   const handleAddCategory = async (e) => {
     e.preventDefault();
-
     const selectedBrandObj = brandsList.find((b) => b.name === newCategory.brand);
     const brandId = selectedBrandObj ? selectedBrandObj.id : 1;
 
     try {
-      if (categoryApi && categoryApi.create) {
+      if (categoryApi?.create) {
         await categoryApi.create({
           brand_id: brandId,
           brand: newCategory.brand,
@@ -387,7 +385,7 @@ function Admin() {
     const brandId = selectedBrandObj ? selectedBrandObj.id : inspectCategory.brand_id;
 
     try {
-      if (categoryApi && categoryApi.update) {
+      if (categoryApi?.update) {
         await categoryApi.update(inspectCategory.id, {
           brand_id: brandId,
           brand: inspectCategory.brand,
@@ -403,7 +401,6 @@ function Admin() {
   };
 
   // ================= BRAND HANDLERS =================
-
   const handleOpenBrandModal = (brand) => {
     setInspectBrand({ ...brand });
     setTempInspectBrand({ ...brand });
@@ -420,7 +417,7 @@ function Admin() {
     if (!isEditMode || !tempInspectBrand) return;
 
     try {
-      if (brandApi && brandApi.update) {
+      if (brandApi?.update) {
         await brandApi.update(tempInspectBrand.id, {
           name: tempInspectBrand.name,
           location: tempInspectBrand.location,
@@ -440,13 +437,23 @@ function Admin() {
   };
 
   // ================= STAFF HANDLERS =================
-
-  const handleOpenStaffModal = (emp) => {
+  const handleOpenStaffModal = async (emp) => {
     setInspectStaff({ ...emp });
     setTempInspectStaff({ ...emp });
     setIsEditMode(false);
     setEditAvatarFile(null);
     setEditAvatarPreview(null);
+
+    try {
+      if (staffServiceApi?.getByStaffId) {
+        const data = await staffServiceApi.getByStaffId(emp.id);
+        const assignedIds = (data || []).map((item) => item.service_id);
+        setAssignedServiceIds(assignedIds);
+      }
+    } catch (err) {
+      console.warn("Could not fetch staff services:", err);
+      setAssignedServiceIds([]);
+    }
   };
 
   const handleDiscardStaffChanges = () => {
@@ -493,8 +500,7 @@ function Admin() {
 
     try {
       let createdStaffId = null;
-
-      if (staffApi && staffApi.create) {
+      if (staffApi?.create) {
         const response = await staffApi.create({
           username: newStaff.userId,
           userId: newStaff.userId,
@@ -505,21 +511,16 @@ function Admin() {
           brand_ids: brandIdsToSave,
           role_id: 3,
         });
-
         createdStaffId = response?.staff?.id || response?.id;
       }
 
-      if (createdStaffId && createAvatarFile && staffApi && staffApi.uploadAvatar) {
+      if (createdStaffId && createAvatarFile && staffApi.uploadAvatar) {
         await staffApi.uploadAvatar(createdStaffId, createAvatarFile);
       }
 
       await fetchStaffAccounts();
       setStaffModalOpen(false);
       setCreateAvatarFile(null);
-      if (createAvatarPreview) {
-        URL.revokeObjectURL(createAvatarPreview);
-        setCreateAvatarPreview(null);
-      }
       setNewStaff({
         userId: "",
         password: "",
@@ -547,7 +548,7 @@ function Admin() {
       .map((b) => b.id);
 
     try {
-      if (staffApi && staffApi.update) {
+      if (staffApi?.update) {
         await staffApi.update(tempInspectStaff.id, {
           name: tempInspectStaff.name,
           full_name: tempInspectStaff.name,
@@ -559,8 +560,12 @@ function Admin() {
         });
       }
 
-      if (editAvatarFile && staffApi && staffApi.uploadAvatar) {
+      if (editAvatarFile && staffApi.uploadAvatar) {
         await staffApi.uploadAvatar(tempInspectStaff.id, editAvatarFile);
+      }
+
+      if (staffServiceApi?.syncServices) {
+        await staffServiceApi.syncServices(tempInspectStaff.id, assignedServiceIds);
       }
 
       await fetchStaffAccounts();
@@ -644,6 +649,17 @@ function Admin() {
             />
           )}
 
+          {/* NEW STAFF SERVICES TAB RENDER */}
+          {activeTab === "staff_services" && (
+            <StaffServicesTab
+              brandsList={brandsList}
+              categories={categories}
+              services={services}
+              loadingServices={loadingServices}
+              onSelectService={(service) => setSelectedServiceForModal(service)}
+            />
+          )}
+
           {activeTab === "staff" && (
             <StaffTab
               loadingStaff={loadingStaff}
@@ -662,7 +678,17 @@ function Admin() {
         </div>
       </main>
 
-      {/* MODALS */}
+      {/* NEW SERVICE WORKERS SYNC MODAL OVERLAY */}
+      {selectedServiceForModal && (
+        <ServiceStaffModal
+          selectedService={selectedServiceForModal}
+          allStaff={staffList}
+          closeModal={closeInspectModal}
+          onSaveStaffServices={handleSaveServiceWorkers}
+        />
+      )}
+
+      {/* OTHER MODALS */}
       {tempInspectBrand && (
         <BrandModal
           tempInspectBrand={tempInspectBrand}
@@ -680,6 +706,9 @@ function Admin() {
           tempInspectStaff={tempInspectStaff}
           setTempInspectStaff={setTempInspectStaff}
           brandsList={brandsList}
+          services={services}
+          assignedServiceIds={assignedServiceIds}
+          setAssignedServiceIds={setAssignedServiceIds}
           isEditMode={isEditMode}
           setIsEditMode={setIsEditMode}
           editAvatarPreview={editAvatarPreview}

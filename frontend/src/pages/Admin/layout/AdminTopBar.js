@@ -1,11 +1,12 @@
 import React from "react";
+import "../Admin.css";
 
 function AdminTopBar({
+  setMobileSidebarOpen,
   selectedBrand,
   setSelectedBrand,
   brandsList,
   handleLogout,
-  setMobileSidebarOpen,
 }) {
   return (
     <header className="admin-top-bar">
@@ -18,6 +19,7 @@ function AdminTopBar({
         </button>
         <h2>Brand Dashboard</h2>
       </div>
+
       <div className="top-bar-right">
         <label className="brand-select-label">Brand:</label>
         <select
@@ -26,7 +28,7 @@ function AdminTopBar({
           onChange={(e) => setSelectedBrand(e.target.value)}
         >
           {brandsList.map((b) => (
-            <option key={b.id} value={b.name}>
+            <option key={b.id || b.name} value={b.name}>
               {b.name}
             </option>
           ))}

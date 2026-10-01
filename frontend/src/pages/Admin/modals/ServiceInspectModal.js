@@ -1,5 +1,3 @@
-// src/pages/Admin/modals/ServiceInspectModal.jsx
-
 import React from "react";
 
 function ServiceInspectModal({
@@ -18,38 +16,19 @@ function ServiceInspectModal({
   return (
     <div className="admin-modal-backdrop" onClick={closeInspectModal}>
       <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
-        <button
-          type="button"
-          className="modal-close"
-          onClick={closeInspectModal}
-        >
+        <button type="button" className="modal-close" onClick={closeInspectModal}>
           ✕
         </button>
         <h3>Service Details</h3>
         <form onSubmit={handleSaveServiceEdit} className="admin-form">
-          {/* SERVICE IMAGE VIEW & EDIT */}
           <div className="form-group">
             <label>Service Photo</label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "8px",
-              }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
               <img
                 src={editServiceImagePreview || inspectService.image}
                 alt={inspectService.name}
-                style={{
-                  width: "90px",
-                  height: "60px",
-                  borderRadius: "6px",
-                  objectFit: "cover",
-                }}
-                onError={(e) => {
-                  e.target.src = "/placeholder-service.jpg";
-                }}
+                style={{ width: "90px", height: "60px", borderRadius: "6px", objectFit: "cover" }}
+                onError={(e) => { e.target.src = "/placeholder-service.jpg"; }}
               />
               {isEditMode && (
                 <input
@@ -73,18 +52,9 @@ function ServiceInspectModal({
               {isEditMode ? (
                 <select
                   value={inspectService.brand}
-                  onChange={(e) =>
-                    setInspectService({
-                      ...inspectService,
-                      brand: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setInspectService({ ...inspectService, brand: e.target.value })}
                 >
-                  {brandsList.map((b) => (
-                    <option key={b.id} value={b.name}>
-                      {b.name}
-                    </option>
-                  ))}
+                  {brandsList.map((brand) => <option key={brand.id} value={brand.name}>{brand.name}</option>)}
                 </select>
               ) : (
                 <div className="read-only-field">{inspectService.brand}</div>
@@ -95,18 +65,9 @@ function ServiceInspectModal({
               {isEditMode ? (
                 <select
                   value={inspectService.category}
-                  onChange={(e) =>
-                    setInspectService({
-                      ...inspectService,
-                      category: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setInspectService({ ...inspectService, category: e.target.value })}
                 >
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.title}>
-                      {c.title}
-                    </option>
-                  ))}
+                  {categories.map((category) => <option key={category.id} value={category.title}>{category.title}</option>)}
                 </select>
               ) : (
                 <div className="read-only-field">{inspectService.category}</div>
@@ -121,12 +82,7 @@ function ServiceInspectModal({
                 type="text"
                 required
                 value={inspectService.name}
-                onChange={(e) =>
-                  setInspectService({
-                    ...inspectService,
-                    name: e.target.value,
-                  })
-                }
+                onChange={(e) => setInspectService({ ...inspectService, name: e.target.value })}
               />
             ) : (
               <div className="read-only-field">{inspectService.name}</div>
@@ -139,17 +95,10 @@ function ServiceInspectModal({
               <textarea
                 rows="3"
                 value={inspectService.description}
-                onChange={(e) =>
-                  setInspectService({
-                    ...inspectService,
-                    description: e.target.value,
-                  })
-                }
+                onChange={(e) => setInspectService({ ...inspectService, description: e.target.value })}
               />
             ) : (
-              <div className="read-only-field">
-                {inspectService.description}
-              </div>
+              <div className="read-only-field">{inspectService.description}</div>
             )}
           </div>
 
@@ -160,12 +109,7 @@ function ServiceInspectModal({
                 <input
                   type="text"
                   value={inspectService.duration}
-                  onChange={(e) =>
-                    setInspectService({
-                      ...inspectService,
-                      duration: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setInspectService({ ...inspectService, duration: e.target.value })}
                 />
               ) : (
                 <div className="read-only-field">{inspectService.duration}</div>
@@ -178,12 +122,7 @@ function ServiceInspectModal({
                   type="text"
                   required
                   value={inspectService.price}
-                  onChange={(e) =>
-                    setInspectService({
-                      ...inspectService,
-                      price: e.target.value,
-                    })
-                  }
+                  onChange={(e) => setInspectService({ ...inspectService, price: e.target.value })}
                 />
               ) : (
                 <div className="read-only-field">{inspectService.price}</div>
@@ -194,23 +133,18 @@ function ServiceInspectModal({
           <div className="modal-actions-row">
             {!isEditMode ? (
               <button
-                key="btn-service-edit-toggle"
                 type="button"
                 className="edit-toggle-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
                   setIsEditMode(true);
                 }}
               >
                 Edit
               </button>
             ) : (
-              <button
-                key="btn-service-save-submit"
-                type="submit"
-                className="save-submit-btn"
-              >
+              <button type="submit" className="save-submit-btn">
                 Save Changes
               </button>
             )}

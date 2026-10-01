@@ -1,19 +1,41 @@
 import React from "react";
+import "./AdminModals.css";
 
 function StaffInspectModal({
   tempInspectStaff,
   setTempInspectStaff,
   brandsList,
+  services,
+  assignedServiceIds,
+  setAssignedServiceIds,
   isEditMode,
   setIsEditMode,
   editAvatarPreview,
-  setEditAvatarFile,
   setEditAvatarPreview,
+  setEditAvatarFile,
+  handleToggleBrandForInspectStaff,
   closeInspectModal,
   handleSaveStaffEdit,
   handleDiscardStaffChanges,
-  handleToggleBrandForInspectStaff,
 }) {
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditAvatarFile(file);
+      if (editAvatarPreview) URL.revokeObjectURL(editAvatarPreview);
+      setEditAvatarPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleToggleService = (serviceId) => {
+    if (!isEditMode) return;
+    setAssignedServiceIds((prev) =>
+      prev.includes(serviceId)
+        ? prev.filter((id) => id !== serviceId)
+        : [...prev, serviceId]
+    );
+  };
+
   return (
     <div className="admin-modal-backdrop" onClick={closeInspectModal}>
       <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
@@ -27,67 +49,25 @@ function StaffInspectModal({
         <h3>Staff Account Details</h3>
 
         <form onSubmit={handleSaveStaffEdit} className="admin-form">
-          <div className="form-group">
-            <label>Profile Picture</label>
-            <div
-              className="avatar-preview-container"
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <img
+              src={editAvatarPreview || tempInspectStaff.photo}
+              alt={tempInspectStaff.name}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "8px",
+                width: 80,
+                height: 80,
+                borderRadius: "50%",
+                objectFit: "cover",
               }}
-            >
-              {editAvatarPreview || tempInspectStaff.photo ? (
-                <img
-                  src={editAvatarPreview || tempInspectStaff.photo}
-                  alt={tempInspectStaff.name}
-                  className="staff-table-avatar"
-                  style={{
-                    width: "56px",
-                    height: "56px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    if (e.target.nextSibling)
-                      e.target.nextSibling.style.display = "inline-flex";
-                  }}
-                />
-              ) : null}
-              <span
-                className="avatar-emoji-fallback"
-                style={{
-                  display:
-                    editAvatarPreview || tempInspectStaff.photo
-                      ? "none"
-                      : "inline-flex",
-                  width: "56px",
-                  height: "56px",
-                  borderRadius: "50%",
-                  backgroundColor: "#f0f0f0",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "28px",
-                }}
-              >
-                👤
-              </span>
-              {isEditMode && (
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      const file = e.target.files[0];
-                      setEditAvatarFile(file);
-                      setEditAvatarPreview(URL.createObjectURL(file));
-                    }
-                  }}
-                />
-              )}
-            </div>
+            />
+            {isEditMode && (
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                style={{ marginTop: 8 }}
+              />
+            )}
           </div>
 
           <div className="form-group">
@@ -110,7 +90,26 @@ function StaffInspectModal({
           </div>
 
           <div className="form-group">
-            <label>Role / Title Description</label>
+            <label>User ID / Username</label>
+            {isEditMode ? (
+              <input
+                type="text"
+                required
+                value={tempInspectStaff.userId}
+                onChange={(e) =>
+                  setTempInspectStaff({
+                    ...tempInspectStaff,
+                    userId: e.target.value,
+                  })
+                }
+              />
+            ) : (
+              <div className="read-only-field">{tempInspectStaff.userId}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Role / Title</label>
             {isEditMode ? (
               <input
                 type="text"
@@ -129,60 +128,20 @@ function StaffInspectModal({
             )}
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>User ID</label>
-              {isEditMode ? (
-                <input
-                  type="text"
-                  required
-                  value={tempInspectStaff.userId}
-                  onChange={(e) =>
-                    setTempInspectStaff({
-                      ...tempInspectStaff,
-                      userId: e.target.value,
-                    })
-                  }
-                />
-              ) : (
-                <div className="read-only-field">{tempInspectStaff.userId}</div>
-              )}
-            </div>
-            <div className="form-group">
-              <label>Password</label>
-              {isEditMode ? (
-                <input
-                  type="password"
-                  required
-                  value={tempInspectStaff.password}
-                  onChange={(e) =>
-                    setTempInspectStaff({
-                      ...tempInspectStaff,
-                      password: e.target.value,
-                    })
-                  }
-                />
-              ) : (
-                <div className="read-only-field">
-                  {tempInspectStaff.password}
-                </div>
-              )}
-            </div>
-          </div>
-
           <div className="form-group">
-            <label>Assigned Brands (Click to toggle)</label>
+            <label>Assigned Brands</label>
             <div className="brand-pills-selector">
               {brandsList.map((b) => {
                 const isSelected = tempInspectStaff.brands.includes(b.name);
                 return (
                   <button
-                    key={b.id}
                     type="button"
-                    className={`brand-select-pill ${isSelected ? "selected" : ""} ${!isEditMode ? "disabled" : ""}`}
+                    key={b.id}
+                    className={`brand-select-pill ${
+                      isSelected ? "selected" : ""
+                    } ${!isEditMode ? "disabled" : ""}`}
                     onClick={() => handleToggleBrandForInspectStaff(b.name)}
                   >
-                    {isSelected ? "✓ " : "+ "}
                     {b.name}
                   </button>
                 );
@@ -190,15 +149,36 @@ function StaffInspectModal({
             </div>
           </div>
 
+          {services && services.length > 0 && (
+            <div className="form-group">
+              <label>Assigned Services</label>
+              <div className="brand-pills-selector">
+                {services.map((srv) => {
+                  const isAssigned = assignedServiceIds.includes(srv.id);
+                  return (
+                    <button
+                      type="button"
+                      key={srv.id}
+                      className={`brand-select-pill ${
+                        isAssigned ? "selected" : ""
+                      } ${!isEditMode ? "disabled" : ""}`}
+                      onClick={() => handleToggleService(srv.id)}
+                    >
+                      {srv.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="modal-actions-row">
             {!isEditMode ? (
               <button
-                key="btn-staff-edit-toggle"
                 type="button"
                 className="edit-toggle-btn"
                 onClick={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   setIsEditMode(true);
                 }}
               >
@@ -206,20 +186,15 @@ function StaffInspectModal({
               </button>
             ) : (
               <>
-                <button
-                  key="btn-staff-save-submit"
-                  type="submit"
-                  className="save-submit-btn"
-                >
+                <button type="submit" className="save-submit-btn">
                   Save Changes
                 </button>
                 <button
-                  key="btn-staff-discard"
                   type="button"
                   className="discard-cancel-btn"
                   onClick={handleDiscardStaffChanges}
                 >
-                  Discard Changes
+                  Discard
                 </button>
               </>
             )}

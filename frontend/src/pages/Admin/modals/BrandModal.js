@@ -1,4 +1,5 @@
 import React from "react";
+import "./AdminModals.css";
 
 function BrandModal({
   tempInspectBrand,
@@ -90,12 +91,10 @@ function BrandModal({
           <div className="modal-actions-row">
             {!isEditMode ? (
               <button
-                key="btn-brand-edit-toggle"
                 type="button"
                 className="edit-toggle-btn"
                 onClick={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   setIsEditMode(true);
                 }}
               >
@@ -103,15 +102,10 @@ function BrandModal({
               </button>
             ) : (
               <>
-                <button
-                  key="btn-brand-save-submit"
-                  type="submit"
-                  className="save-submit-btn"
-                >
+                <button type="submit" className="save-submit-btn">
                   Save Changes
                 </button>
                 <button
-                  key="btn-brand-discard"
                   type="button"
                   className="discard-cancel-btn"
                   onClick={handleDiscardBrandChanges}

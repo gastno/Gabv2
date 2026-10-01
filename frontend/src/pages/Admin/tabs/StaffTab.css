@@ -1,0 +1,68 @@
+.staff-table-interactive {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.staff-table-interactive th,
+.staff-table-interactive td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #2e2828;
+  text-align: left;
+}
+
+.staff-table-interactive th {
+  color: #888;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.interactive-staff-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.interactive-staff-row:hover {
+  background-color: #2a2035 !important;
+  box-shadow: inset 4px 0 0 #9d4edd;
+}
+
+.staff-table-cell-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.staff-table-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #3d3535;
+}
+
+.role {
+  font-size: 0.78rem;
+  color: #aaa;
+}
+
+.password-mask {
+  font-family: monospace;
+  letter-spacing: 1.5px;
+  color: #aaa;
+}
+
+.brand-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.brand-tag-table {
+  background: rgba(157, 78, 221, 0.2);
+  color: #e0aaff;
+  border: 1px solid rgba(157, 78, 221, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}

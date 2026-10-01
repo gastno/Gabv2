@@ -1,0 +1,74 @@
+.brands-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.admin-brand-card {
+  background: #1e1919;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.brand-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #141010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.brand-slug-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #aaa;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.admin-brand-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.brand-location {
+  margin: 0 0 8px 0;
+  font-size: 0.82rem;
+  color: #e0aaff;
+}
+
+.brand-about {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+.admin-brand-card.clickable {
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s ease,
+              box-shadow 0.25s ease,
+              background-color 0.25s ease;
+}
+
+.admin-brand-card.clickable:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: #9d4edd !important;
+  box-shadow: 0 8px 24px rgba(157, 78, 221, 0.25);
+  background-color: #261f2f;
+}

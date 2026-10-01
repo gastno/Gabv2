@@ -1,4 +1,5 @@
 import React from "react";
+import "./StaffTab.css";
 
 function StaffTab({
   loadingStaff,
@@ -12,7 +13,7 @@ function StaffTab({
         <div>
           <h3>Staff Accounts & Credentials</h3>
           <p className="subtitle">
-            Manage employee portal logins, roles, and assigned brands
+            Manage system logins, roles, avatars, and assigned brand access
           </p>
         </div>
         <button
@@ -24,17 +25,15 @@ function StaffTab({
       </div>
 
       {loadingStaff ? (
-        <p>Loading staff accounts from database...</p>
+        <p>Loading staff list...</p>
       ) : (
         <div className="table-responsive-wrapper">
-          <table className="admin-ledger-table staff-table-interactive">
+          <table className="staff-table-interactive">
             <thead>
               <tr>
-                <th>Member</th>
-                <th>Full Name</th>
-                <th>Role / Title</th>
+                <th>Staff Member</th>
                 <th>User ID</th>
-                <th>Password</th>
+                <th>Password Mask</th>
                 <th>Assigned Brands</th>
               </tr>
             </thead>
@@ -45,56 +44,28 @@ function StaffTab({
                   className="interactive-staff-row"
                   onClick={() => handleOpenStaffModal(emp)}
                 >
-                  <td style={{ verticalAlign: "middle" }}>
-                    {emp.photo ? (
+                  <td>
+                    <div className="staff-table-cell-user">
                       <img
                         src={emp.photo}
                         alt={emp.name}
                         className="staff-table-avatar"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          if (e.target.nextSibling)
-                            e.target.nextSibling.style.display = "inline-flex";
-                        }}
                       />
-                    ) : null}
-                    <span
-                      className="avatar-emoji-fallback"
-                      style={{
-                        display: emp.photo ? "none" : "inline-flex",
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                        backgroundColor: "#f0f0f0",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "20px",
-                      }}
-                    >
-                      👤
-                    </span>
+                      <div>
+                        <strong>{emp.name}</strong>
+                        <div className="role">{emp.description}</div>
+                      </div>
+                    </div>
                   </td>
-                  <td>
-                    <strong>{emp.name}</strong>
-                  </td>
-                  <td>{emp.description}</td>
-                  <td>
-                    <code>{emp.userId}</code>
-                  </td>
+                  <td>{emp.userId}</td>
                   <td>
                     <span className="password-mask">{emp.password}</span>
                   </td>
                   <td>
                     <div className="brand-pills-row">
-                      {emp.brands.map((brandName) => (
-                        <span key={brandName} className="brand-tag-table">
-                          {brandName}
+                      {emp.brands.map((bName) => (
+                        <span className="brand-tag-table" key={bName}>
+                          {bName}
                         </span>
                       ))}
                     </div>

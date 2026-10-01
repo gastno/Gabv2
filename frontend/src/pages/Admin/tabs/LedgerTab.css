@@ -1,0 +1,35 @@
+.table-responsive-wrapper {
+  overflow-x: auto;
+  background: #1e1919;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+}
+
+.admin-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.88rem;
+  min-width: 600px;
+}
+
+.admin-ledger-table th,
+.admin-ledger-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #2e2828;
+}
+
+.admin-ledger-table th {
+  color: #888;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.status-select {
+  background: #141010;
+  color: #fff;
+  border: 1px solid #3d3535;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+}

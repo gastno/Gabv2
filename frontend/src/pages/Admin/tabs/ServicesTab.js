@@ -1,10 +1,11 @@
 import React from "react";
+import "./ServicesTab.css";
 
 function ServicesTab({
   services,
-  setServiceModalOpen,
   setInspectService,
   setIsEditMode,
+  setServiceModalOpen,
 }) {
   return (
     <section className="admin-section">

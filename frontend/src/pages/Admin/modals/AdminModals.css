@@ -1,0 +1,175 @@
+/* Shared Modal Backdrop & Container Overlay */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.admin-modal-box {
+  background: #1e1919;
+  border: 1px solid #3d3535;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.admin-form label {
+  font-size: 0.82rem;
+  color: #aaa;
+  margin-bottom: 4px;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  background: #141010;
+  border: 1px solid #3d3535;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.read-only-field {
+  background: #141010;
+  border: 1px solid #3d3535;
+  color: #eee;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.disabled-slug {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.edit-toggle-btn {
+  flex: 1;
+  background: #2e2828;
+  color: #fff;
+  border: 1px solid #3d3535;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.edit-toggle-btn:hover {
+  background: #3d3535;
+}
+
+.save-submit-btn {
+  flex: 1;
+  background: #9d4edd;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-submit-btn:hover {
+  background: #8338ec;
+}
+
+.discard-cancel-btn {
+  flex: 1;
+  background: #2e2828;
+  color: #aaa;
+  border: 1px solid #3d3535;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.discard-cancel-btn:hover {
+  background: #3d3535;
+  color: #fff;
+}
+
+.brand-pills-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.brand-select-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #3d3535;
+  background-color: #141010;
+  color: #aaa;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.brand-select-pill.selected {
+  background-color: #9d4edd;
+  color: #ffffff;
+  border-color: #9d4edd;
+}
+
+.brand-select-pill.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+}

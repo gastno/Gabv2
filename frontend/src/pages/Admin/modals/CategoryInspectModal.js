@@ -1,4 +1,5 @@
 import React from "react";
+import "./AdminModals.css";
 
 function CategoryInspectModal({
   inspectCategory,
@@ -20,6 +21,7 @@ function CategoryInspectModal({
           ✕
         </button>
         <h3>Category Details</h3>
+
         <form onSubmit={handleSaveCategoryEdit} className="admin-form">
           <div className="form-group">
             <label>Brand</label>
@@ -68,8 +70,7 @@ function CategoryInspectModal({
             {isEditMode ? (
               <input
                 type="text"
-                required
-                value={inspectCategory.subtitle}
+                value={inspectCategory.subtitle || ""}
                 onChange={(e) =>
                   setInspectCategory({
                     ...inspectCategory,
@@ -78,32 +79,37 @@ function CategoryInspectModal({
                 }
               />
             ) : (
-              <div className="read-only-field">{inspectCategory.subtitle}</div>
+              <div className="read-only-field">
+                {inspectCategory.subtitle || "N/A"}
+              </div>
             )}
           </div>
 
           <div className="modal-actions-row">
             {!isEditMode ? (
               <button
-                key="btn-category-edit-toggle"
                 type="button"
                 className="edit-toggle-btn"
                 onClick={(e) => {
                   e.preventDefault();
-                  e.stopPropagation();
                   setIsEditMode(true);
                 }}
               >
                 Edit
               </button>
             ) : (
-              <button
-                key="btn-category-save-submit"
-                type="submit"
-                className="save-submit-btn"
-              >
-                Save Changes
-              </button>
+              <>
+                <button type="submit" className="save-submit-btn">
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  className="discard-cancel-btn"
+                  onClick={closeInspectModal}
+                >
+                  Cancel
+                </button>
+              </>
             )}
           </div>
         </form>

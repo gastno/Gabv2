@@ -1,13 +1,14 @@
 import React from "react";
+import "./LedgerTab.css";
 
 function LedgerTab({ appointments, handleStatusChange }) {
   return (
     <section className="admin-section">
       <div className="section-header">
         <div>
-          <h3>Master Appointments Ledger</h3>
+          <h3>Appointments Ledger</h3>
           <p className="subtitle">
-            Track completed, pending, and cancelled bookings
+            Manage appointment statuses across all active bookings
           </p>
         </div>
       </div>
@@ -17,39 +18,37 @@ function LedgerTab({ appointments, handleStatusChange }) {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Date/Time</th>
-              <th>Client Info</th>
+              <th>Client</th>
+              <th>Phone</th>
+              <th>Staff Member</th>
               <th>Service</th>
-              <th>Specialist</th>
+              <th>Date / Time</th>
               <th>Price</th>
-              <th>Status Lifecycle</th>
+              <th>Status Action</th>
             </tr>
           </thead>
           <tbody>
-            {appointments.map((appt) => (
-              <tr key={appt.id}>
-                <td>#{appt.id}</td>
+            {appointments.map((item) => (
+              <tr key={item.id}>
+                <td>#{item.id}</td>
                 <td>
-                  {appt.date} - {appt.time}
+                  <strong>{item.clientName}</strong>
                 </td>
+                <td>{item.phone}</td>
+                <td>{item.staffName}</td>
+                <td>{item.service}</td>
                 <td>
-                  <strong>{appt.clientName}</strong>
-                  <br />
-                  <small>{appt.phone}</small>
+                  {item.date} @ {item.time}
                 </td>
-                <td>{appt.service}</td>
-                <td>{appt.staffName}</td>
-                <td>{appt.price}</td>
+                <td>{item.price}</td>
                 <td>
                   <select
-                    className={`status-select status-${appt.status.toLowerCase()}`}
-                    value={appt.status}
-                    onChange={(e) =>
-                      handleStatusChange(appt.id, e.target.value)
-                    }
+                    className="status-select"
+                    value={item.status}
+                    onChange={(e) => handleStatusChange(item.id, e.target.value)}
                   >
-                    <option value="Pending">Pending</option>
                     <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
                     <option value="Completed">Completed</option>
                     <option value="Cancelled">Cancelled</option>
                   </select>

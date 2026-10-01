@@ -1,0 +1,136 @@
+.service-staff-modal-box {
+  max-width: 580px;
+  width: 90%;
+}
+
+.workers-cards-container {
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.staff-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.staff-mini-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 14px 10px;
+  border-radius: 10px;
+  background-color: #1e1a1a;
+  border: 1px solid #302b2b;
+  position: relative;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.staff-mini-card.editable {
+  cursor: pointer;
+}
+
+.staff-mini-card.editable:hover {
+  border-color: #9d4edd;
+  transform: translateY(-2px);
+}
+
+.staff-mini-card.selected {
+  border-color: #9d4edd;
+  background-color: rgba(157, 78, 221, 0.12);
+}
+
+.staff-card-avatar-wrapper {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 8px;
+}
+
+.staff-card-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3a3232;
+  background-color: #2a2525;
+}
+
+.staff-mini-card.selected .staff-card-avatar {
+  border-color: #9d4edd;
+}
+
+.card-check-badge {
+  position: absolute;
+  bottom: 0;
+  right: -2px;
+  background-color: #9d4edd;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.staff-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.staff-card-name {
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.staff-card-title {
+  color: #aaa;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-status-tag {
+  margin-top: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.card-status-tag.active {
+  background-color: #9d4edd;
+  color: #fff;
+}
+
+.card-status-tag.inactive {
+  background-color: #302b2b;
+  color: #888;
+}
+
+.empty-text {
+  color: #888;
+  font-size: 0.88rem;
+  padding: 12px 0;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.loading-text {
+  color: #aaa;
+  text-align: center;
+  padding: 20px 0;
+}

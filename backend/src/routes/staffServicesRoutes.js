@@ -1,33 +1,23 @@
 // src/routes/staffServicesRoutes.js
 const express = require('express');
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 const staffServicesController = require('../controllers/staffServicesController');
 const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
 
-// Public/Authenticated reading endpoint
-router.get('/:staffId/services', staffServicesController.getStaffServices);
+// Public/Authenticated reading routes
+router.get('/by-staff/:staffId', staffServicesController.getStaffServices);
 router.get('/by-service/:serviceId', staffServicesController.getStaffByService);
 
-// Protected administrative endpoints (Admin / SuperAdmin only)
-router.put(
-  '/:staffId/services',
-  authenticateToken,
-  requireRole('admin', 'super_admin'),
-  staffServicesController.syncStaffServices
-);
+// Protected routes (Admin / SuperAdmin only)
+router.use(authenticateToken);
+router.use(requireRole('admin', 'super_admin'));
 
-router.post(
-  '/:staffId/services/:serviceId',
-  authenticateToken,
-  requireRole('admin', 'super_admin'),
-  staffServicesController.assignService
-);
+// Bulk Sync routes
+router.put('/by-staff/:staffId', staffServicesController.syncStaffServices);
+router.put('/by-service/:serviceId', staffServicesController.syncServiceWorkers);
 
-router.delete(
-  '/:staffId/services/:serviceId',
-  authenticateToken,
-  requireRole('admin', 'super_admin'),
-  staffServicesController.removeService
-);
+// Single item assignment routes
+router.post('/:staffId/:serviceId', staffServicesController.assignService);
+router.delete('/:staffId/:serviceId', staffServicesController.removeService);
 
 module.exports = router;

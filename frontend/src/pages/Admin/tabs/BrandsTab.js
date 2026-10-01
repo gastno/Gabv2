@@ -1,4 +1,5 @@
 import React from "react";
+import "./BrandsTab.css";
 
 function BrandsTab({ loadingBrands, brandsList, handleOpenBrandModal }) {
   return (

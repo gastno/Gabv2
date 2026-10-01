@@ -86,7 +86,7 @@ export const staffApi = {
     formData.append("avatar", file);
 
     const token = localStorage.getItem("auth_token");
-    
+
     const response = await fetch(`${API_BASE_URL}/staff/${staffId}/avatar`, {
       method: "POST",
       headers: {
@@ -117,11 +117,13 @@ export const brandApi = {
 
 export const categoryApi = {
   getAll: () => request("/categories"),
+
   create: (data) =>
     request("/categories", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
   update: (id, data) =>
     request(`/categories/${id}`, {
       method: "PUT",
@@ -131,16 +133,19 @@ export const categoryApi = {
 
 export const serviceApi = {
   getAll: () => request("/services"),
+
   create: (data) =>
     request("/services", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
   update: (id, data) =>
     request(`/services/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+
   uploadImage: async (serviceId, file) => {
     const formData = new FormData();
     formData.append("image", file);
@@ -162,4 +167,26 @@ export const serviceApi = {
 
     return await response.json();
   },
+};
+
+export const staffServiceApi = {
+  // GET /api/staffservices/by-staff/:staffId - Get services assigned to a specific staff member
+  getByStaffId: (staffId) => request(`/staffservices/by-staff/${staffId}`),
+
+  // GET /api/staffservices/by-service/:serviceId - Get workers assigned to a service
+  getByServiceId: (serviceId) => request(`/staffservices/by-service/${serviceId}`),
+  
+  // PUT /api/staffservices/by-staff/:staffId - Bulk sync service IDs for a staff member
+  syncServices: (staffId, serviceIds) =>
+    request(`/staffservices/by-staff/${staffId}`, {
+      method: "PUT",
+      body: JSON.stringify({ service_ids: (serviceIds || []).map(Number) }),
+    }),
+
+  // PUT /api/staffservices/by-service/:serviceId - Bulk sync worker IDs for a specific service
+  syncServiceWorkers: (serviceId, staffIds) =>
+    request(`/staffservices/by-service/${serviceId}`, {
+      method: "PUT",
+      body: JSON.stringify({ staff_ids: (staffIds || []).map(Number) }),
+    }),
 };

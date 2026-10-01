@@ -1,0 +1,96 @@
+.master-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.staff-calendar-column {
+  background: #1e1919;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.staff-column-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2e2828;
+  margin-bottom: 14px;
+}
+
+.staff-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.staff-column-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.staff-role {
+  font-size: 0.78rem;
+  color: #aaa;
+}
+
+.column-slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.no-appts-text {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 8px 0;
+}
+
+.admin-appt-card {
+  background: #141010;
+  border-left: 4px solid #777;
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.admin-appt-card.status-confirmed { border-left-color: #9d4edd; }
+.admin-appt-card.status-pending { border-left-color: #ffb703; }
+.admin-appt-card.status-completed { border-left-color: #52b788; }
+.admin-appt-card.status-cancelled { border-left-color: #e63946; }
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.card-time {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.card-client {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.card-service-info {
+  font-size: 0.78rem;
+  color: #aaa;
+}
+
+.status-pill {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.status-pill.confirmed { background: #352642; color: #e0aaff; }
+.status-pill.pending { background: #3d3119; color: #ffb703; }
+.status-pill.completed { background: #1a3328; color: #52b788; }
+.status-pill.cancelled { background: #3d1c1d; color: #e63946; }

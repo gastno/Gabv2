@@ -1,6 +1,5 @@
-// src/pages/Admin/modals/CreateServiceModal.jsx
-
 import React from "react";
+import "./AdminModals.css";
 
 function CreateServiceModal({
   newService,
@@ -13,6 +12,15 @@ function CreateServiceModal({
   setServiceModalOpen,
   handleAddService,
 }) {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setCreateServiceImageFile(file);
+      if (createServiceImagePreview) URL.revokeObjectURL(createServiceImagePreview);
+      setCreateServiceImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   return (
     <div
       className="admin-modal-backdrop"
@@ -20,16 +28,18 @@ function CreateServiceModal({
     >
       <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
         <button
+          type="button"
           className="modal-close"
           onClick={() => setServiceModalOpen(false)}
         >
           ✕
         </button>
         <h3>Create New Service</h3>
+
         <form onSubmit={handleAddService} className="admin-form">
           <div className="form-row">
             <div className="form-group">
-              <label>Brand</label>
+              <label>Target Brand</label>
               <select
                 value={newService.brand}
                 onChange={(e) =>
@@ -43,6 +53,7 @@ function CreateServiceModal({
                 ))}
               </select>
             </div>
+
             <div className="form-group">
               <label>Category</label>
               <select
@@ -51,13 +62,11 @@ function CreateServiceModal({
                   setNewService({ ...newService, category: e.target.value })
                 }
               >
-                {categories
-                  .filter((c) => c.brand === newService.brand)
-                  .map((cat) => (
-                    <option key={cat.id} value={cat.title}>
-                      {cat.title}
-                    </option>
-                  ))}
+                {categories.map((c) => (
+                  <option key={c.id} value={c.title}>
+                    {c.title}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -67,11 +76,11 @@ function CreateServiceModal({
             <input
               type="text"
               required
+              placeholder="e.g. Mega Volume Lashes"
               value={newService.name}
               onChange={(e) =>
                 setNewService({ ...newService, name: e.target.value })
               }
-              placeholder="e.g. Mega Volume Extensions"
             />
           </div>
 
@@ -79,96 +88,60 @@ function CreateServiceModal({
             <label>Description</label>
             <textarea
               rows="3"
+              placeholder="Detail what is included in the service..."
               value={newService.description}
               onChange={(e) =>
-                setNewService({
-                  ...newService,
-                  description: e.target.value,
-                })
+                setNewService({ ...newService, description: e.target.value })
               }
             />
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>Estimated Time (Minutes or formatted string)</label>
+              <label>Duration</label>
               <input
                 type="text"
+                placeholder="60 min"
                 value={newService.duration}
                 onChange={(e) =>
                   setNewService({ ...newService, duration: e.target.value })
                 }
-                placeholder="e.g. 60 min"
               />
             </div>
+
             <div className="form-group">
-              <label>Price (ISK)</label>
+              <label>Price</label>
               <input
                 type="text"
-                required
+                placeholder="15,000 kr"
                 value={newService.price}
                 onChange={(e) =>
                   setNewService({ ...newService, price: e.target.value })
                 }
-                placeholder="e.g. 15,000 kr"
               />
             </div>
           </div>
 
-          {/* SERVICE IMAGE UPLOAD */}
           <div className="form-group">
-            <label>Service Photo Upload</label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "8px",
-              }}
-            >
-              {createServiceImagePreview ? (
-                <img
-                  src={createServiceImagePreview}
-                  alt="Service Preview"
-                  style={{
-                    width: "80px",
-                    height: "56px",
-                    borderRadius: "6px",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: "80px",
-                    height: "56px",
-                    borderRadius: "6px",
-                    backgroundColor: "#f0f0f0",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "20px",
-                  }}
-                >
-                  ✨
-                </div>
-              )}
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  const file = e.target.files[0];
-                  setCreateServiceImageFile(file);
-                  setCreateServiceImagePreview(URL.createObjectURL(file));
-                }
-              }}
-            />
+            <label>Cover Image File</label>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+            {createServiceImagePreview && (
+              <img
+                src={createServiceImagePreview}
+                alt="Preview"
+                style={{
+                  width: "100%",
+                  height: 100,
+                  objectFit: "cover",
+                  marginTop: 8,
+                  borderRadius: 6,
+                }}
+              />
+            )}
           </div>
 
           <button type="submit" className="save-submit-btn">
-            Save Service
+            Create Service
           </button>
         </form>
       </div>
