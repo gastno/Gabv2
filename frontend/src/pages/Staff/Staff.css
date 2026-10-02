@@ -895,7 +895,8 @@ button.zoom-appt-card {
 
 .schedule-shift-fields input,
 .unavailability-form input,
-.appointment-status-form select {
+.appointment-status-form select,
+.appointment-status-form textarea {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -906,6 +907,11 @@ button.zoom-appt-card {
   background: #181313;
   color: #eee;
   font: inherit;
+}
+
+.appointment-status-form textarea {
+  min-height: 76px;
+  resize: vertical;
 }
 
 .remove-shift-btn {
@@ -1021,6 +1027,12 @@ button.zoom-appt-card {
 
 .appointment-detail-list > div > span {
   color: #999;
+}
+
+.appointment-detail-list > div > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .appointment-status-form {

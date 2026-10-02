@@ -9,7 +9,8 @@ const appointmentReadQuery = `
          a.start_time, a.end_time, a.duration_snapshot_minutes, a.price_snapshot_isk,
          a.custom_options, a.status, a.fee_status, a.cancellation_reason, a.created_at,
          service.name AS service_name, staff.full_name AS staff_name,
-         customer.full_name AS customer_name, customer.phone_number AS customer_phone
+         customer.full_name AS customer_name, customer.phone_number AS customer_phone,
+         customer.email AS customer_email, customer.kennitala AS customer_kennitala
   FROM appointments a
   JOIN services service ON service.id = a.service_id
   JOIN staff staff ON staff.id = a.staff_id
@@ -36,8 +37,8 @@ const authorizeAppointment = async (queryable, actor, appointment) => {
   return false;
 };
 
-// Create Appointment (Supports Guest & Registered, with Dynamic Pricing / Custom Options)
 exports.createAppointment = async (req, res) => {
+  // Create Appointment (Supports Guest & Registered, with Dynamic Pricing / Custom Options)
   if (req.user && req.user.type !== 'customer') {
     return res.status(403).json({ error: 'Only customer accounts may use authenticated customer booking.' });
   }
@@ -158,6 +159,42 @@ exports.updateAppointmentStatus = async (req, res) => {
       return res.status(409).json({ error: 'The appointment conflicts with an existing booking.' });
     }
     return res.status(500).json({ error: 'Failed to update appointment status.' });
+  }
+};
+
+exports.updateAppointmentFeeStatus = async (req, res) => {
+  const appointmentId = parsePositiveId(req.params.id);
+  const feeStatus = req.body?.fee_status;
+  const validFeeStatuses = ['none', 'awaiting_fee', 'fee_charged', 'fee_waived'];
+  if (!appointmentId) return res.status(400).json({ error: 'Invalid appointment ID.' });
+  if (!validFeeStatuses.includes(feeStatus)) {
+    return res.status(400).json({ error: 'fee_status must be none, awaiting_fee, fee_charged, or fee_waived.' });
+  }
+  if (req.user?.type !== 'staff' || !['staff', 'admin', 'super_admin'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only staff and admins may change appointment fee status.' });
+  }
+
+  try {
+    const appointment = await db.withTransaction(async client => {
+      const result = await client.query(
+        'SELECT id, brand_id, staff_id, customer_id FROM appointments WHERE id = $1 FOR UPDATE',
+        [appointmentId]
+      );
+      const current = result.rows[0];
+      if (!current) throw new BookingError('Appointment not found.', 404);
+      if (!(await authorizeAppointment(client, req.user, current))) {
+        throw new BookingError('Forbidden.', 403);
+      }
+      const updated = await client.query(
+        'UPDATE appointments SET fee_status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+        [feeStatus, appointmentId]
+      );
+      return updated.rows[0];
+    });
+    return res.json({ appointment });
+  } catch (error) {
+    if (error instanceof BookingError) return res.status(error.status).json({ error: error.message });
+    return res.status(500).json({ error: 'Failed to update appointment fee status.' });
   }
 };
 

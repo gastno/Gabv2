@@ -164,6 +164,8 @@ export function normalizeAppointment(appointment) {
     displayEndTime: formatStudioTime(appointment.end_time),
     clientName: appointment.customer_name || "Customer",
     phone: appointment.customer_phone || "Not provided",
+    email: appointment.customer_email || appointment.email || appointment.customer?.email || "",
+    kennitala: appointment.customer_kennitala || appointment.kennitala || appointment.customer?.kennitala || "",
     service: appointment.service_name || "Service",
     price: formatPrice(appointment.price_snapshot_isk),
     status: String(appointment.status || "pending").toLowerCase(),

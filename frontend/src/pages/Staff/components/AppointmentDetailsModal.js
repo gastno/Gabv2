@@ -4,18 +4,29 @@ import { STATUS_TRANSITIONS } from "../staffCalendarUtils";
 function AppointmentDetailsModal({
   appointment,
   onClose,
-  onCancel,
   onSaveStatus,
   statusEditMode,
   setStatusEditMode,
   statusDraft,
   setStatusDraft,
+  feeStatusDraft,
+  setFeeStatusDraft,
+  cancellationReason,
+  setCancellationReason,
   error,
   saving,
   formatDate,
 }) {
   if (!appointment) return null;
-  const allowedStatuses = STATUS_TRANSITIONS[appointment.status] || [];
+  const feeStatuses = ["none", "awaiting_fee", "fee_charged", "fee_waived"];
+  const transitions = STATUS_TRANSITIONS[appointment.status] || [];
+  const allowedStatuses = [...new Set([
+    appointment.status,
+    ...transitions,
+    ...(["pending", "confirmed"].includes(appointment.status) ? ["cancelled"] : []),
+  ])];
+  const canEditStatus = transitions.length > 0 || ["pending", "confirmed"].includes(appointment.status);
+  const formatStatus = (status) => status.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 
   return (
     <div className="staff-modal-backdrop" onClick={onClose}>
@@ -30,13 +41,17 @@ function AppointmentDetailsModal({
         </p>
 
         <div className="appointment-detail-list">
-          <div><span>Service</span><strong>{appointment.service}</strong></div>
-          <div><span>Phone</span><strong>{appointment.phone}</strong></div>
-          <div><span>Price</span><strong>{appointment.price}</strong></div>
+          <div><span>👤 Customer</span><strong>{appointment.clientName}</strong></div>
+          <div><span>✂️ Service</span><strong>{appointment.service}</strong></div>
+          <div><span>📞 Phone</span><strong>{appointment.phone}</strong></div>
+          <div><span>✉️ Email</span><strong>{appointment.email || "Unavailable"}</strong></div>
+          <div><span>🪪 Kennitala</span><strong>{appointment.kennitala || "Unavailable"}</strong></div>
+          <div><span>💰 Price</span><strong>{appointment.price}</strong></div>
+          <div><span>💳 Fee status</span><strong>{formatStatus(appointment.fee_status || "unknown")}</strong></div>
           <div>
-            <span>Status</span>
+            <span>📋 Status</span>
             <strong className={`status-text status-${appointment.status}`}>
-              {appointment.status.replace("_", " ")}
+              {formatStatus(appointment.status)}
             </strong>
           </div>
         </div>
@@ -45,12 +60,39 @@ function AppointmentDetailsModal({
           <form className="appointment-status-form" onSubmit={onSaveStatus}>
             <label htmlFor="appointment-status">Appointment status</label>
             <select id="appointment-status" value={statusDraft} onChange={(event) => setStatusDraft(event.target.value)}>
-              {allowedStatuses.map((status) => <option key={status} value={status}>{status.replace("_", " ")}</option>)}
+              {allowedStatuses.map((status) => <option key={status} value={status}>{formatStatus(status)}</option>)}
             </select>
+            <label htmlFor="appointment-fee-status">💳 Fee status</label>
+            <select
+              id="appointment-fee-status"
+              value={feeStatusDraft}
+              onChange={(event) => setFeeStatusDraft(event.target.value)}
+            >
+              {feeStatuses.map((status) => <option key={status} value={status}>{formatStatus(status)}</option>)}
+            </select>
+            {statusDraft === "cancelled" && (
+              <label htmlFor="cancellation-reason">
+                Cancellation reason
+                <textarea
+                  id="cancellation-reason"
+                  value={cancellationReason}
+                  onChange={(event) => setCancellationReason(event.target.value)}
+                  maxLength={500}
+                  rows={3}
+                />
+              </label>
+            )}
             {error && <p className="staff-error-message" role="alert">{error}</p>}
             <div className="modal-actions-row">
-              <button type="submit" className="save-btn" disabled={saving}>
-                {saving ? "Saving..." : "Save status"}
+              <button
+                type="submit"
+                className="save-btn"
+                disabled={saving || (
+                  statusDraft === appointment.status
+                  && feeStatusDraft === (appointment.fee_status || "none")
+                )}
+              >
+                {saving ? "Saving..." : "Save changes"}
               </button>
               <button type="button" className="secondary-modal-btn" onClick={() => setStatusEditMode(false)}>
                 Back
@@ -59,21 +101,16 @@ function AppointmentDetailsModal({
           </form>
         ) : (
           <div className="modal-actions-row appointment-modal-actions">
-            {allowedStatuses.length > 0 && (
+            {canEditStatus && (
               <button
                 type="button"
                 className="edit-toggle-btn"
                 onClick={() => {
-                  setStatusDraft(allowedStatuses[0]);
+                  setStatusDraft(appointment.status);
                   setStatusEditMode(true);
                 }}
               >
                 Edit status
-              </button>
-            )}
-            {["pending", "confirmed"].includes(appointment.status) && (
-              <button type="button" className="cancel-appt-btn" onClick={onCancel} disabled={saving}>
-                Cancel appointment
               </button>
             )}
           </div>

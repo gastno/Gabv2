@@ -12,6 +12,7 @@ router.post('/', optionalAuthenticateToken, apptController.createAppointment);
 router.get('/', authenticateToken, apptController.listAppointments);
 router.get('/:id', authenticateToken, apptController.getAppointment);
 router.patch('/:id/status', authenticateToken, requireRole('staff', 'admin', 'super_admin'), apptController.updateAppointmentStatus);
+router.patch('/:id/fee-status', authenticateToken, requireRole('staff', 'admin', 'super_admin'), apptController.updateAppointmentFeeStatus);
 router.post('/:id/cancel', authenticateToken, apptController.cancelAppointment);
 
 module.exports = router;

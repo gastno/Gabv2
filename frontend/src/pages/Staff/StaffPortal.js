@@ -61,6 +61,8 @@ function StaffPortal() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [statusEditMode, setStatusEditMode] = useState(false);
   const [statusDraft, setStatusDraft] = useState("");
+  const [feeStatusDraft, setFeeStatusDraft] = useState("none");
+  const [cancellationReason, setCancellationReason] = useState("");
   const [appointmentError, setAppointmentError] = useState("");
   const [appointmentSaving, setAppointmentSaving] = useState(false);
   const [calendarBlockModal, setCalendarBlockModal] = useState(null);
@@ -196,12 +198,16 @@ function StaffPortal() {
     setSelectedAppointment(appointment);
     setStatusEditMode(false);
     setStatusDraft(appointment.status);
+    setFeeStatusDraft(appointment.fee_status || "none");
+    setCancellationReason("");
     setAppointmentError("");
   };
 
   const handleCloseAppointment = () => {
     setSelectedAppointment(null);
     setStatusEditMode(false);
+    setFeeStatusDraft("none");
+    setCancellationReason("");
     setAppointmentError("");
   };
 
@@ -211,37 +217,40 @@ function StaffPortal() {
     setAppointmentSaving(true);
     setAppointmentError("");
     try {
-      const result = await apptApi.updateStatus(selectedAppointment.id, statusDraft);
-      const status = result?.appointment?.status || statusDraft;
-      setAppointments((previous) => previous.map((appointment) =>
-        String(appointment.id) === String(selectedAppointment.id)
-          ? { ...appointment, status }
-          : appointment
-      ));
-      setSelectedAppointment((appointment) => ({ ...appointment, status }));
+      if (feeStatusDraft !== (selectedAppointment.fee_status || "none")) {
+        const result = await apptApi.updateFeeStatus(selectedAppointment.id, feeStatusDraft);
+        const feeStatus = result?.appointment?.fee_status || feeStatusDraft;
+        setAppointments((previous) => previous.map((appointment) =>
+          String(appointment.id) === String(selectedAppointment.id)
+            ? { ...appointment, fee_status: feeStatus }
+            : appointment
+        ));
+        setSelectedAppointment((appointment) => ({ ...appointment, fee_status: feeStatus }));
+      }
+      if (statusDraft === "cancelled") {
+        await apptApi.cancelAppointment(selectedAppointment.id, cancellationReason.trim() || undefined);
+        setAppointments((previous) => previous.map((appointment) =>
+          String(appointment.id) === String(selectedAppointment.id)
+            ? { ...appointment, status: "cancelled" }
+            : appointment
+        ));
+        setSelectedAppointment((appointment) => ({ ...appointment, status: "cancelled" }));
+        setStatusEditMode(false);
+        return;
+      }
+      if (statusDraft !== selectedAppointment.status) {
+        const result = await apptApi.updateStatus(selectedAppointment.id, statusDraft);
+        const status = result?.appointment?.status || statusDraft;
+        setAppointments((previous) => previous.map((appointment) =>
+          String(appointment.id) === String(selectedAppointment.id)
+            ? { ...appointment, status }
+            : appointment
+        ));
+        setSelectedAppointment((appointment) => ({ ...appointment, status }));
+      }
       setStatusEditMode(false);
     } catch (error) {
       setAppointmentError(error.message || "Could not update appointment status.");
-    } finally {
-      setAppointmentSaving(false);
-    }
-  };
-
-  const handleCancelAppointment = async () => {
-    if (!selectedAppointment || !window.confirm("Cancel this appointment?")) return;
-    setAppointmentSaving(true);
-    setAppointmentError("");
-    try {
-      await apptApi.cancelAppointment(selectedAppointment.id);
-      setAppointments((previous) => previous.map((appointment) =>
-        String(appointment.id) === String(selectedAppointment.id)
-          ? { ...appointment, status: "cancelled" }
-          : appointment
-      ));
-      setSelectedAppointment((appointment) => ({ ...appointment, status: "cancelled" }));
-      setStatusEditMode(false);
-    } catch (error) {
-      setAppointmentError(error.message || "Could not cancel appointment.");
     } finally {
       setAppointmentSaving(false);
     }
@@ -655,12 +664,15 @@ function StaffPortal() {
       <AppointmentDetailsModal
         appointment={selectedAppointment}
         onClose={handleCloseAppointment}
-        onCancel={handleCancelAppointment}
         onSaveStatus={handleSaveAppointmentStatus}
         statusEditMode={statusEditMode}
         setStatusEditMode={setStatusEditMode}
         statusDraft={statusDraft}
         setStatusDraft={setStatusDraft}
+        feeStatusDraft={feeStatusDraft}
+        setFeeStatusDraft={setFeeStatusDraft}
+        cancellationReason={cancellationReason}
+        setCancellationReason={setCancellationReason}
         error={appointmentError}
         saving={appointmentSaving}
         formatDate={formatStudioDate}

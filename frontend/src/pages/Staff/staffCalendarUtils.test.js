@@ -1,4 +1,20 @@
-import { getCalendarBlocks } from "./staffCalendarUtils";
+import { getCalendarBlocks, normalizeAppointment } from "./staffCalendarUtils";
+
+describe("normalizeAppointment", () => {
+  test.each([
+    [{ customer_kennitala: "010190-1239" }, "010190-1239"],
+    [{ customer: { kennitala: "010190-1239" } }, "010190-1239"],
+    [{ kennitala: "010190-1239" }, "010190-1239"],
+  ])("normalizes kennitala from supported response shapes", (customerFields, kennitala) => {
+    const appointment = normalizeAppointment({
+      start_time: "2026-10-02T09:00:00.000Z",
+      end_time: "2026-10-02T10:00:00.000Z",
+      ...customerFields,
+    });
+
+    expect(appointment.kennitala).toBe(kennitala);
+  });
+});
 
 describe("getCalendarBlocks", () => {
   test("splits working hours around unavailable time and an appointment", () => {
