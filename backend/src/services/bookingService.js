@@ -39,9 +39,9 @@ const createBooking = (database, booking) => database.withTransaction(async clie
   const availabilityResult = await client.query(`
     WITH requested AS (
       SELECT $1::timestamptz AS start_time,
-             $1::timestamptz + make_interval(mins => $4) AS end_time,
+              $1::timestamptz + make_interval(mins => $3) AS end_time,
              $1::timestamptz AT TIME ZONE 'Atlantic/Reykjavik' AS local_start,
-             ($1::timestamptz + make_interval(mins => $4)) AT TIME ZONE 'Atlantic/Reykjavik' AS local_end
+              ($1::timestamptz + make_interval(mins => $3)) AT TIME ZONE 'Atlantic/Reykjavik' AS local_end
     )
     SELECT EXISTS (
       SELECT 1
@@ -69,7 +69,7 @@ const createBooking = (database, booking) => database.withTransaction(async clie
             AND existing.end_time > booking_window.start_time
         )
     ) AS available
-  `, [booking.startTime, booking.staffId, booking.brandId, durationMinutes]);
+  `, [booking.startTime, booking.staffId, durationMinutes]);
 
   if (!availabilityResult.rows[0]?.available) {
     throw new BookingError('The selected time is not available in the staff schedule.', 409);

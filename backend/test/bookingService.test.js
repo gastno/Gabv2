@@ -18,6 +18,7 @@ const booking = validateBookingRequest({
 const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk: '12000' }, existingCustomer = null } = {}) => {
   const customers = existingCustomer ? [existingCustomer] : [];
   const appointments = [];
+  const availabilityParameters = [];
   let nextCustomerId = customers.length ? Math.max(...customers.map(customer => customer.id)) + 1 : 1;
   const lockTails = new Map();
 
@@ -40,7 +41,10 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
           return { rows: [] };
         }
         if (text.includes('FROM services s')) return { rows: service ? [service] : [] };
-        if (text.includes('FROM staff_availabilities availability')) return { rows: [{ available: true }] };
+        if (text.includes('FROM staff_availabilities availability')) {
+          availabilityParameters.push(params);
+          return { rows: [{ available: true }] };
+        }
         if (text.includes('FROM customers')) {
           if (text.includes('WHERE id = $1')) {
             return { rows: customers.filter(customer => customer.id === params[0] && customer.is_registered) };
@@ -67,6 +71,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
   return {
     customers,
     appointments,
+    availabilityParameters,
     database: {
       async withTransaction(callback) {
         const client = createClient();
@@ -81,7 +86,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
 };
 
 test('creates appointments with database-owned duration and price snapshots', async () => {
-  const { database, appointments } = makeDatabase();
+  const { database, appointments, availabilityParameters } = makeDatabase();
 
   const result = await createBooking(database, { ...booking, duration_minutes: 1, price_isk: 1 });
 
@@ -89,6 +94,7 @@ test('creates appointments with database-owned duration and price snapshots', as
   assert.equal(appointments[0][6], 45);
   assert.equal(appointments[0][7], 12000);
   assert.equal(appointments[0][5].getTime() - appointments[0][4].getTime(), 45 * 60_000);
+  assert.deepEqual(availabilityParameters, [[booking.startTime, booking.staffId, 45]]);
   assert.equal(result.id, 1);
 });
 

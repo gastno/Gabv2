@@ -349,9 +349,38 @@ function BookingModal({ service, brandName, onClose }) {
   const selectedDateLabel = selectedDateKey ? formatStudioDate(selectedDateKey) : "";
   const selectedTimeLabel = selectedSlot ? formatStudioTime(selectedSlot.start_time) : "";
 
-  const handleGuestSubmit = () => {
-    window.alert(`Appointment confirmed for ${service.name} with ${selectedEmployee.name} on ${selectedDateLabel} at ${selectedTimeLabel}!`);
-    onClose();
+  const handleGuestSubmit = async (submittedGuestForm) => {
+    try {
+      // PostgreSQL TIMESTAMPTZ requires a combined ISO-8601 datetime string[cite: 3]
+      const finalStartTime = selectedSlot.start_time.includes("T") 
+        ? selectedSlot.start_time 
+        : `${selectedDateKey}T${selectedSlot.start_time.length === 5 ? selectedSlot.start_time + ':00' : selectedSlot.start_time}Z`;
+
+      // Strip non-numeric characters for DB storage (e.g., "60 min" -> 60, "14,000 kr" -> 14000)
+      const parsedDuration = parseInt(String(service.duration).replace(/\D/g, "")) || 60;
+      const parsedPrice = parseFloat(String(service.price).replace(/[^\d.-]/g, "")) || 0;
+
+      const payload = {
+        brand_id: service.brand_id || 1, // Must match an existing brand ID in the DB
+        service_id: service.id,
+        staff_id: selectedEmployee.id,
+        full_name: submittedGuestForm.fullName,
+        phone_number: submittedGuestForm.phone,
+        kennitala: submittedGuestForm.kennitala,
+        start_time: finalStartTime,
+        duration_minutes: parsedDuration,
+        price_isk: parsedPrice,
+        health_info: submittedGuestForm.healthInfo,
+        consent_privacy: submittedGuestForm.consentPrivacy,
+      };
+
+      await apptApi.createAppointment(payload);
+      window.alert(`Appointment confirmed for ${service.name} with ${selectedEmployee.name} on ${selectedDateLabel} at ${selectedTimeLabel}!`);
+      onClose();
+    } catch (error) {
+      console.error("Booking API Error:", error);
+      window.alert(`Booking failed: ${error.message || "Internal Server Error"}`);
+    }
   };
 
   return (

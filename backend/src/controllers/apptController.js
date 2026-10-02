@@ -53,13 +53,22 @@ exports.createAppointment = async (req, res) => {
     });
 
   } catch (error) {
+    // 1. Log the full error to your Node.js terminal
+    console.error("\n=== DB BOOKING REJECTION ===");
+    console.error(error);
+    console.error("============================\n");
+
     if (error instanceof BookingError) {
       return res.status(error.status).json({ error: error.message });
     }
     if (error.code === '23P01' || error.code === '23505') {
       return res.status(409).json({ error: 'The booking conflicts with an existing record.' });
     }
-    res.status(500).json({ error: 'Failed to create appointment' });
+    
+    // 2. Send the exact database error message back to the frontend
+    res.status(500).json({ 
+      error: `Failed to create appointment: ${error.message || error.detail || "Unknown constraint violation"}` 
+    });
   }
 };
 
