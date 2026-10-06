@@ -10,7 +10,7 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 0.88rem;
-  min-width: 600px;
+  min-width: 1250px;
 }
 
 .admin-ledger-table th,
@@ -23,13 +23,90 @@
   color: #888;
   font-size: 0.78rem;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.status-select {
+.ledger-brand-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.ledger-brand-filter select {
+  padding: 8px 10px;
+  border: 1px solid #3d3535;
+  border-radius: 6px;
   background: #141010;
   color: #fff;
-  border: 1px solid #3d3535;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 0.82rem;
+}
+
+.ledger-sort-button {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.ledger-sort-button:hover,
+.ledger-sort-button:focus-visible {
+  color: #fff;
+}
+
+.admin-ledger-table td {
+  vertical-align: top;
+}
+
+.ledger-detail {
+  display: block;
+  margin-top: 4px;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.ledger-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #342b35;
+  color: #e5c4ff;
+  font-size: 0.78rem;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.ledger-status.status-completed {
+  background: #20372d;
+  color: #a4e4bd;
+}
+
+.ledger-status.status-cancelled,
+.ledger-status.status-no_show {
+  background: #3d2929;
+  color: #f1b5b5;
+}
+
+.ledger-message {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+  background: #1e1919;
+  color: #aaa;
+}
+
+.ledger-error {
+  color: #f1b5b5;
+}
+
+@media (max-width: 600px) {
+  .ledger-brand-filter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

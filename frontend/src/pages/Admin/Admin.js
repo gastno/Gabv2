@@ -66,21 +66,6 @@ function AdminDashboard() {
   const [editServiceImageFile, setEditServiceImageFile] = useState(null);
   const [editServiceImagePreview, setEditServiceImagePreview] = useState(null);
 
-  const [appointments, setAppointments] = useState([
-    {
-      id: 501,
-      brand: "Gabbablu",
-      staffName: "Anna María",
-      clientName: "Guðrún Jónsdóttir",
-      phone: "+354 892 1234",
-      service: "Classic Lashes",
-      price: "14,000 kr",
-      date: "Sep 15, 2026",
-      time: "10:00",
-      status: "Confirmed",
-    },
-  ]);
-
   // Modal Control States
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
@@ -586,12 +571,6 @@ function AdminDashboard() {
     }
   };
 
-  const handleStatusChange = (id, newStatus) => {
-    setAppointments((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
-    );
-  };
-
   const handleTabSelect = (tab) => {
     setActiveTab(tab);
     setMobileSidebarOpen(false);
@@ -681,8 +660,8 @@ function AdminDashboard() {
 
           {activeTab === "ledger" && (
             <LedgerTab
-              appointments={appointments}
-              handleStatusChange={handleStatusChange}
+              brands={brandsList}
+              loadingBrand={loadingBrands}
             />
           )}
         </div>
