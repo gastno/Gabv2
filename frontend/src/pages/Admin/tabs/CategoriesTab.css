@@ -4,6 +4,37 @@
   gap: 20px;
 }
 
+.categories-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.categories-brand-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #aaa;
+  font-size: 0.85rem;
+}
+
+.categories-brand-filter select {
+  padding: 8px 10px;
+  border: 1px solid #3d3535;
+  border-radius: 6px;
+  background: #141010;
+  color: #fff;
+}
+
+.categories-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+  background: #1e1919;
+  color: #aaa;
+}
+
 .admin-category-card {
   background: #1e1919;
   border: 1px solid #2e2828;
@@ -74,4 +105,16 @@
   border-radius: 4px;
   font-size: 0.72rem;
   font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .categories-header-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .categories-brand-filter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

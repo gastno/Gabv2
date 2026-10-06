@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import "./CategoriesTab.css";
 
 function CategoriesTab({
-  selectedBrand,
+  brands,
   categories,
   services,
   loadingCategories,
@@ -10,8 +10,12 @@ function CategoriesTab({
   setInspectCategory,
   setIsEditMode,
 }) {
+  const [selectedBrandId, setSelectedBrandId] = useState("all");
   const filteredCategories = categories.filter(
-    (c) => !selectedBrand || c.brand === selectedBrand
+    (category) => selectedBrandId === "all"
+      || (category.brand_id != null
+        ? String(category.brand_id) === selectedBrandId
+        : brands.find((brand) => String(brand.id) === selectedBrandId)?.name === category.brand)
   );
 
   return (
@@ -21,20 +25,44 @@ function CategoriesTab({
           <h3>Category Management</h3>
           <p className="subtitle">Organize services into group categories</p>
         </div>
-        <button
-          className="primary-action-btn"
-          onClick={() => setCategoryModalOpen(true)}
-        >
-          + Add Category
-        </button>
+        <div className="categories-header-actions">
+          <label className="categories-brand-filter">
+            Show categories for
+            <select
+              aria-label="Filter categories by brand"
+              value={selectedBrandId}
+              onChange={(event) => setSelectedBrandId(event.target.value)}
+            >
+              <option value="all">All brands</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={String(brand.id)}>{brand.name}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="primary-action-btn"
+            onClick={() => setCategoryModalOpen(true)}
+          >
+            + Add Category
+          </button>
+        </div>
       </div>
 
       {loadingCategories ? (
         <p>Loading categories...</p>
+      ) : filteredCategories.length === 0 ? (
+        <p className="categories-empty">No categories found for this brand.</p>
       ) : (
         <div className="categories-admin-grid">
           {filteredCategories.map((cat) => {
-            const count = services.filter((s) => s.category === cat.title).length;
+            const count = services.filter((service) => (
+              service.category_id != null
+                ? String(service.category_id) === String(cat.id)
+                : service.category === cat.title && (
+                  cat.brand_id == null
+                    || String(service.brand_id) === String(cat.brand_id)
+                )
+            )).length;
 
             return (
               <div

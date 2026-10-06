@@ -618,7 +618,7 @@ function AdminDashboard() {
 
           {activeTab === "categories" && (
             <CategoriesTab
-              selectedBrand={selectedBrand}
+              brands={brandsList}
               categories={categories}
               services={services}
               loadingCategories={loadingCategories}
@@ -630,6 +630,7 @@ function AdminDashboard() {
 
           {activeTab === "services" && (
             <ServicesTab
+              brands={brandsList}
               services={services}
               loadingServices={loadingServices}
               setServiceModalOpen={setServiceModalOpen}
