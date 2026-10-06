@@ -622,8 +622,10 @@ function AdminDashboard() {
           {activeTab === "calendar" && (
             <CalendarTab
               selectedBrand={selectedBrand}
+              brandId={brandsList.find((brand) => brand.name === selectedBrand)?.id}
+              loadingBrand={loadingBrands}
               staffList={staffList}
-              appointments={appointments}
+              loadingStaff={loadingStaff}
             />
           )}
 

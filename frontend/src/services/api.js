@@ -87,7 +87,10 @@ export const apptApi = {
     return request(`/appointments/availability?${params.toString()}`, { method: "GET" }, null);
   },
 
-  listAppointments: () => request("/appointments"),
+  listAppointments: (brandId) => {
+    const query = brandId ? `?${new URLSearchParams({ brand_id: brandId })}` : "";
+    return request(`/appointments${query}`);
+  },
 
   updateStatus: (appointmentId, status) =>
     request(`/appointments/${appointmentId}/status`, {
@@ -113,6 +116,11 @@ export const apptApi = {
 export const staffAvailabilityApi = {
   getForDate: (date) =>
     request(`/staff-availability/me/availability/${encodeURIComponent(date)}`),
+
+  getForStaff: (staffId, brandId, date) => {
+    const query = new URLSearchParams({ brand_id: brandId, date });
+    return request(`/staff-availability/${encodeURIComponent(staffId)}?${query}`);
+  },
 
   replaceForDate: (date, shifts) =>
     request(`/staff-availability/me/availability/${encodeURIComponent(date)}`, {
