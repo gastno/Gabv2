@@ -5,6 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "btree_gist";
 -- Define Custom Enumerated Types
 CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'completed', 'cancelled', 'no_show');
 CREATE TYPE fee_status AS ENUM ('none', 'awaiting_fee', 'fee_charged', 'fee_waived');
+CREATE TYPE payment_status AS ENUM ('pending', 'accepted');
 CREATE TYPE system_role AS ENUM ('admin', 'staff', 'super_admin');
 
 -- --------------------------------------------------------------------------
@@ -125,6 +126,7 @@ CREATE TABLE appointments (
     custom_options JSONB,
     status appointment_status NOT NULL DEFAULT 'pending',
     fee_status fee_status NOT NULL DEFAULT 'none',
+    payment_status payment_status NOT NULL DEFAULT 'pending',
     row_version INT NOT NULL DEFAULT 1,
     cancellation_reason TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

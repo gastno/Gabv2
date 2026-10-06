@@ -94,7 +94,8 @@ function CalendarBlockDetailsModal({ block, dateKey, onClose }) {
       ["Email", appointment.email || "Unavailable"],
       ["Price", appointment.price],
       ["Appointment status", appointment.status.replace(/_/g, " ")],
-      ["Fee status", (appointment.fee_status || "unknown").replace(/_/g, " ")]
+      ["Fee status", (appointment.fee_status || "unknown").replace(/_/g, " ")],
+      ["Payment status", (appointment.payment_status || "unknown").replace(/_/g, " ")]
     );
   } else if (isUnavailable) {
     details.push(["Reason", period.reason || "Not specified"]);

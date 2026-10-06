@@ -104,6 +104,12 @@ export const apptApi = {
       body: JSON.stringify({ fee_status: feeStatus }),
     }),
 
+  updatePaymentStatus: (appointmentId, paymentStatus) =>
+    request(`/appointments/${appointmentId}/payment-status`, {
+      method: "PATCH",
+      body: JSON.stringify({ payment_status: paymentStatus }),
+    }),
+
   cancelAppointment: (appointmentId, reason) =>
     request(`/appointments/${appointmentId}/cancel`, {
       method: "POST",

@@ -36,6 +36,7 @@ describe("CalendarTab", () => {
           service_name: "Lash Service",
           price_snapshot_isk: 14000,
           fee_status: "fee_waived",
+          payment_status: "accepted",
           status: "confirmed",
         },
         {
@@ -121,6 +122,7 @@ describe("CalendarTab", () => {
     expect(screen.getByText("alex@example.com")).toBeInTheDocument();
     expect(screen.getByText("Lash Service")).toBeInTheDocument();
     expect(screen.getByText("fee waived")).toBeInTheDocument();
+    expect(screen.getByText("accepted")).toBeInTheDocument();
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 

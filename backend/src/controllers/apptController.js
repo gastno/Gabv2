@@ -7,7 +7,7 @@ const { canTransitionAppointment, isAppointmentAccessible } = require('../servic
 const appointmentReadQuery = `
   SELECT a.id, a.brand_id, a.service_id, a.staff_id, a.customer_id,
          a.start_time, a.end_time, a.duration_snapshot_minutes, a.price_snapshot_isk,
-         a.custom_options, a.status, a.fee_status, a.cancellation_reason, a.created_at,
+         a.custom_options, a.status, a.fee_status, a.payment_status, a.cancellation_reason, a.created_at,
          service.name AS service_name, staff.full_name AS staff_name,
          customer.full_name AS customer_name, customer.phone_number AS customer_phone,
          customer.email AS customer_email, customer.kennitala AS customer_kennitala
@@ -195,6 +195,42 @@ exports.updateAppointmentFeeStatus = async (req, res) => {
   } catch (error) {
     if (error instanceof BookingError) return res.status(error.status).json({ error: error.message });
     return res.status(500).json({ error: 'Failed to update appointment fee status.' });
+  }
+};
+
+exports.updateAppointmentPaymentStatus = async (req, res) => {
+  const appointmentId = parsePositiveId(req.params.id);
+  const paymentStatus = req.body?.payment_status;
+  const validPaymentStatuses = ['pending', 'accepted'];
+  if (!appointmentId) return res.status(400).json({ error: 'Invalid appointment ID.' });
+  if (!validPaymentStatuses.includes(paymentStatus)) {
+    return res.status(400).json({ error: 'payment_status must be pending or accepted.' });
+  }
+  if (req.user?.type !== 'staff' || !['staff', 'admin', 'super_admin'].includes(req.user.role)) {
+    return res.status(403).json({ error: 'Only staff and admins may change appointment payment status.' });
+  }
+
+  try {
+    const appointment = await db.withTransaction(async client => {
+      const result = await client.query(
+        'SELECT id, brand_id, staff_id, customer_id FROM appointments WHERE id = $1 FOR UPDATE',
+        [appointmentId]
+      );
+      const current = result.rows[0];
+      if (!current) throw new BookingError('Appointment not found.', 404);
+      if (!(await authorizeAppointment(client, req.user, current))) {
+        throw new BookingError('Forbidden.', 403);
+      }
+      const updated = await client.query(
+        'UPDATE appointments SET payment_status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+        [paymentStatus, appointmentId]
+      );
+      return updated.rows[0];
+    });
+    return res.json({ appointment });
+  } catch (error) {
+    if (error instanceof BookingError) return res.status(error.status).json({ error: error.message });
+    return res.status(500).json({ error: 'Failed to update appointment payment status.' });
   }
 };
 

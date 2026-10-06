@@ -62,6 +62,7 @@ function StaffPortal() {
   const [statusEditMode, setStatusEditMode] = useState(false);
   const [statusDraft, setStatusDraft] = useState("");
   const [feeStatusDraft, setFeeStatusDraft] = useState("none");
+  const [paymentStatusDraft, setPaymentStatusDraft] = useState("pending");
   const [cancellationReason, setCancellationReason] = useState("");
   const [appointmentError, setAppointmentError] = useState("");
   const [appointmentSaving, setAppointmentSaving] = useState(false);
@@ -199,6 +200,7 @@ function StaffPortal() {
     setStatusEditMode(false);
     setStatusDraft(appointment.status);
     setFeeStatusDraft(appointment.fee_status || "none");
+    setPaymentStatusDraft(appointment.payment_status || "pending");
     setCancellationReason("");
     setAppointmentError("");
   };
@@ -207,6 +209,7 @@ function StaffPortal() {
     setSelectedAppointment(null);
     setStatusEditMode(false);
     setFeeStatusDraft("none");
+    setPaymentStatusDraft("pending");
     setCancellationReason("");
     setAppointmentError("");
   };
@@ -226,6 +229,16 @@ function StaffPortal() {
             : appointment
         ));
         setSelectedAppointment((appointment) => ({ ...appointment, fee_status: feeStatus }));
+      }
+      if (paymentStatusDraft !== (selectedAppointment.payment_status || "pending")) {
+        const result = await apptApi.updatePaymentStatus(selectedAppointment.id, paymentStatusDraft);
+        const paymentStatus = result?.appointment?.payment_status || paymentStatusDraft;
+        setAppointments((previous) => previous.map((appointment) =>
+          String(appointment.id) === String(selectedAppointment.id)
+            ? { ...appointment, payment_status: paymentStatus }
+            : appointment
+        ));
+        setSelectedAppointment((appointment) => ({ ...appointment, payment_status: paymentStatus }));
       }
       if (statusDraft === "cancelled") {
         await apptApi.cancelAppointment(selectedAppointment.id, cancellationReason.trim() || undefined);
@@ -671,6 +684,8 @@ function StaffPortal() {
         setStatusDraft={setStatusDraft}
         feeStatusDraft={feeStatusDraft}
         setFeeStatusDraft={setFeeStatusDraft}
+        paymentStatusDraft={paymentStatusDraft}
+        setPaymentStatusDraft={setPaymentStatusDraft}
         cancellationReason={cancellationReason}
         setCancellationReason={setCancellationReason}
         error={appointmentError}

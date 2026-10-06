@@ -11,6 +11,8 @@ function AppointmentDetailsModal({
   setStatusDraft,
   feeStatusDraft,
   setFeeStatusDraft,
+  paymentStatusDraft,
+  setPaymentStatusDraft,
   cancellationReason,
   setCancellationReason,
   error,
@@ -19,6 +21,7 @@ function AppointmentDetailsModal({
 }) {
   if (!appointment) return null;
   const feeStatuses = ["none", "awaiting_fee", "fee_charged", "fee_waived"];
+  const paymentStatuses = ["pending", "accepted"];
   const transitions = STATUS_TRANSITIONS[appointment.status] || [];
   const allowedStatuses = [...new Set([
     appointment.status,
@@ -48,6 +51,7 @@ function AppointmentDetailsModal({
           <div><span>🪪 Kennitala</span><strong>{appointment.kennitala || "Unavailable"}</strong></div>
           <div><span>💰 Price</span><strong>{appointment.price}</strong></div>
           <div><span>💳 Fee status</span><strong>{formatStatus(appointment.fee_status || "unknown")}</strong></div>
+          <div><span>💵 Payment status</span><strong>{formatStatus(appointment.payment_status || "unknown")}</strong></div>
           <div>
             <span>📋 Status</span>
             <strong className={`status-text status-${appointment.status}`}>
@@ -70,6 +74,14 @@ function AppointmentDetailsModal({
             >
               {feeStatuses.map((status) => <option key={status} value={status}>{formatStatus(status)}</option>)}
             </select>
+            <label htmlFor="appointment-payment-status">💵 Payment status</label>
+            <select
+              id="appointment-payment-status"
+              value={paymentStatusDraft}
+              onChange={(event) => setPaymentStatusDraft(event.target.value)}
+            >
+              {paymentStatuses.map((status) => <option key={status} value={status}>{formatStatus(status)}</option>)}
+            </select>
             {statusDraft === "cancelled" && (
               <label htmlFor="cancellation-reason">
                 Cancellation reason
@@ -90,6 +102,7 @@ function AppointmentDetailsModal({
                 disabled={saving || (
                   statusDraft === appointment.status
                   && feeStatusDraft === (appointment.fee_status || "none")
+                  && paymentStatusDraft === (appointment.payment_status || "pending")
                 )}
               >
                 {saving ? "Saving..." : "Save changes"}
@@ -107,6 +120,7 @@ function AppointmentDetailsModal({
                 className="edit-toggle-btn"
                 onClick={() => {
                   setStatusDraft(appointment.status);
+                  setPaymentStatusDraft(appointment.payment_status || "pending");
                   setStatusEditMode(true);
                 }}
               >

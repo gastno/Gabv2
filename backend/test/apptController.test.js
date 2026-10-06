@@ -13,6 +13,7 @@ const appointment = {
   customer_id: 8,
   status: 'confirmed',
   fee_status: 'none',
+  payment_status: 'pending',
   customer_name: 'Customer Name',
   customer_phone: '+3540000000',
   customer_email: 'customer@example.com',
@@ -58,12 +59,15 @@ test('appointment list and detail responses include customer email and Kennitala
 
   assert.equal(listResponse.body.appointments[0].customer_email, 'customer@example.com');
   assert.equal(listResponse.body.appointments[0].customer_kennitala, '0000000000');
+  assert.equal(listResponse.body.appointments[0].payment_status, 'pending');
   assert.equal(detailResponse.body.appointment.customer_email, 'customer@example.com');
   assert.equal(detailResponse.body.appointment.customer_kennitala, '0000000000');
+  assert.equal(detailResponse.body.appointment.payment_status, 'pending');
   assert.equal(queries.length, 2);
   for (const { sql } of queries) {
     assert.match(sql, /customer\.email AS customer_email/);
     assert.match(sql, /customer\.kennitala AS customer_kennitala/);
+    assert.match(sql, /a\.payment_status/);
   }
   assert.deepEqual(queries[0].params, [3]);
   assert.deepEqual(queries[1].params, [41]);
@@ -108,6 +112,60 @@ test('fee-status updates accept each enum value and return the saved row without
     assert.match(update.sql, /SET fee_status = \$1, updated_at = NOW\(\)/);
     assert.doesNotMatch(update.sql, /(?:SET\s+|,\s*)status\s*=/);
   }
+});
+
+test('payment-status updates accept pending and accepted and return the saved row', async () => {
+  const validStatuses = ['pending', 'accepted'];
+  const statements = [];
+  const client = {
+    async query(sql, params) {
+      statements.push({ sql, params });
+      if (sql.startsWith('SELECT')) return { rows: [{ ...appointment }] };
+      return { rows: [{ ...appointment, payment_status: params[0] }] };
+    },
+  };
+  db.withTransaction = async callback => callback(client);
+
+  for (const paymentStatus of validStatuses) {
+    const res = response();
+    await controller.updateAppointmentPaymentStatus({
+      params: { id: '41' },
+      body: { payment_status: paymentStatus },
+      user: { id: 3, type: 'staff', role: 'staff' },
+    }, res);
+
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.appointment.payment_status, paymentStatus);
+    assert.equal(res.body.appointment.status, 'confirmed');
+  }
+
+  const updates = statements.filter(({ sql }) => sql.startsWith('UPDATE'));
+  assert.equal(updates.length, validStatuses.length);
+  for (const update of updates) {
+    assert.match(update.sql, /SET payment_status = \$1, updated_at = NOW\(\)/);
+    assert.doesNotMatch(update.sql, /(?:SET\s+|,\s*)status\s*=/);
+  }
+});
+
+test('payment-status updates reject invalid input and non-staff principals', async () => {
+  let transactionCount = 0;
+  db.withTransaction = async callback => {
+    transactionCount += 1;
+    return callback({ query: async () => ({ rows: [] }) });
+  };
+
+  for (const request of [
+    { params: { id: '0' }, body: { payment_status: 'pending' }, user: { id: 3, type: 'staff', role: 'staff' } },
+    { params: { id: '41' }, body: { payment_status: 'declined' }, user: { id: 3, type: 'staff', role: 'staff' } },
+    { params: { id: '41' }, body: {}, user: { id: 3, type: 'staff', role: 'staff' } },
+    { params: { id: '41' }, body: { payment_status: 'accepted' }, user: { id: 8, type: 'customer', role: 'customer' } },
+  ]) {
+    const res = response();
+    await controller.updateAppointmentPaymentStatus(request, res);
+    assert.ok([400, 403].includes(res.statusCode));
+    assert.ok(res.body.error);
+  }
+  assert.equal(transactionCount, 0);
 });
 
 test('fee-status updates reject invalid IDs and fee statuses before opening a transaction', async () => {
