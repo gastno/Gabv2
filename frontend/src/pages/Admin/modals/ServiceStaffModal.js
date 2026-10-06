@@ -86,13 +86,17 @@ function ServiceStaffModal({
     );
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (onSaveStaffServices) {
-      await onSaveStaffServices(
-        selectedService.id,
-        tempAssignedStaffIds.map((id) => Number(id))
-      );
+  const handleSave = async () => {
+    try {
+      if (onSaveStaffServices) {
+        await onSaveStaffServices(
+          selectedService.id,
+          tempAssignedStaffIds.map((id) => Number(id))
+        );
+      }
+    } catch (err) {
+      alert(err.message || "Failed to update service workers.");
+      return;
     }
     setAssignedStaffIds(tempAssignedStaffIds);
     setIsEditMode(false);
@@ -126,7 +130,7 @@ function ServiceStaffModal({
         ) : loadError ? (
           <p className="empty-text" role="alert">{loadError}</p>
         ) : (
-          <form onSubmit={handleSave} className="admin-form">
+          <form onSubmit={(e) => e.preventDefault()} className="admin-form">
             <div className="workers-cards-container">
               {brandStaff.length === 0 ? (
                 <p className="empty-text">No staff accounts found for this brand.</p>
@@ -192,6 +196,7 @@ function ServiceStaffModal({
             <div className="modal-actions-row" style={{ marginTop: "24px" }}>
               {!isEditMode ? (
                 <button
+                  key="edit"
                   type="button"
                   className="edit-toggle-btn"
                   onClick={() => setIsEditMode(true)}
@@ -200,10 +205,17 @@ function ServiceStaffModal({
                 </button>
               ) : (
                 <>
-                  <button type="submit" className="save-submit-btn">
+                  {/* Plain button: a submit button here would be activated by the same click that enters edit mode */}
+                  <button
+                    key="save"
+                    type="button"
+                    className="save-submit-btn"
+                    onClick={handleSave}
+                  >
                     Save Changes
                   </button>
                   <button
+                    key="discard"
                     type="button"
                     className="discard-cancel-btn"
                     onClick={handleDiscard}

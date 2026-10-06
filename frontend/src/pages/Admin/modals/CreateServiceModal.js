@@ -12,6 +12,13 @@ function CreateServiceModal({
   setServiceModalOpen,
   handleAddService,
 }) {
+  const selectedBrand = brandsList.find((brand) => brand.name === newService.brand);
+  const brandCategories = categories.filter((category) => (
+    category.brand_id != null && selectedBrand
+      ? String(category.brand_id) === String(selectedBrand.id)
+      : category.brand === newService.brand
+  ));
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -43,10 +50,22 @@ function CreateServiceModal({
           <div className="form-group">
             <label>Target Brand</label>
             <select
+              aria-label="Target Brand"
               value={newService.brand}
-              onChange={(e) =>
-                setNewService({ ...newService, brand: e.target.value })
-              }
+              onChange={(e) => {
+                const brand = e.target.value;
+                const targetBrand = brandsList.find((item) => item.name === brand);
+                const nextCategories = categories.filter((category) => (
+                  category.brand_id != null && targetBrand
+                    ? String(category.brand_id) === String(targetBrand.id)
+                    : category.brand === brand
+                ));
+                setNewService({
+                  ...newService,
+                  brand,
+                  category: nextCategories[0]?.title || "",
+                });
+              }}
             >
               {brandsList.map((b) => (
                 <option key={b.id} value={b.name}>
@@ -59,12 +78,18 @@ function CreateServiceModal({
           <div className="form-group">
             <label>Category</label>
             <select
+              aria-label="Category"
+              required
+              disabled={brandCategories.length === 0}
               value={newService.category}
               onChange={(e) =>
                 setNewService({ ...newService, category: e.target.value })
               }
             >
-              {categories.map((c) => (
+              {brandCategories.length === 0 && (
+                <option value="">No categories available for this brand</option>
+              )}
+              {brandCategories.map((c) => (
                 <option key={c.id} value={c.title}>
                   {c.title}
                 </option>
@@ -139,7 +164,11 @@ function CreateServiceModal({
             )}
           </div>
 
-          <button type="submit" className="save-submit-btn">
+          <button
+            type="submit"
+            className="save-submit-btn"
+            disabled={brandCategories.length === 0}
+          >
             Create Service
           </button>
         </form>

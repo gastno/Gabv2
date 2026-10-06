@@ -253,24 +253,29 @@ function AdminDashboard() {
 
   // ================= SAVE SERVICE WORKERS =================
   const handleSaveServiceWorkers = async (serviceId, staffIds) => {
-    try {
-      if (staffServiceApi?.syncServiceWorkers) {
-        await staffServiceApi.syncServiceWorkers(serviceId, staffIds);
-      }
-      await fetchStaffAccounts(); 
-      setSelectedServiceForModal(null);
-    } catch (err) {
-      alert(err.message || "Failed to update service workers.");
+    if (staffServiceApi?.syncServiceWorkers) {
+      await staffServiceApi.syncServiceWorkers(serviceId, staffIds);
     }
+    await fetchStaffAccounts();
   };
 
   // ================= SERVICE HANDLERS =================
   const handleAddService = async (e) => {
     e.preventDefault();
     const selectedBrandObj = brandsList.find((b) => b.name === newService.brand);
-    const brandId = selectedBrandObj ? selectedBrandObj.id : 1;
-    const selectedCatObj = categories.find((c) => c.title === newService.category);
-    const categoryId = selectedCatObj ? selectedCatObj.id : 1;
+    const brandId = selectedBrandObj?.id;
+    const selectedCatObj = categories.find((category) => (
+      category.title === newService.category && (
+        category.brand_id != null && selectedBrandObj
+          ? String(category.brand_id) === String(selectedBrandObj.id)
+          : category.brand === newService.brand
+      )
+    ));
+    if (!brandId || !selectedCatObj) {
+      alert("Select a valid brand and category before creating the service.");
+      return;
+    }
+    const categoryId = selectedCatObj.id;
 
     try {
       let createdServiceId = null;
@@ -295,9 +300,14 @@ function AdminDashboard() {
       await fetchServices();
       setServiceModalOpen(false);
       setCreateServiceImageFile(null);
+      const resetBrandCategories = categories.filter((category) => (
+        category.brand_id != null
+          ? String(category.brand_id) === String(brandsList.find((brand) => brand.name === selectedBrand)?.id)
+          : category.brand === selectedBrand
+      ));
       setNewService({
         brand: selectedBrand,
-        category: categories[0]?.title || "General",
+        category: resetBrandCategories[0]?.title || "",
         name: "",
         description: "",
         duration: "60 min",

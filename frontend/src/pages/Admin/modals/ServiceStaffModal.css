@@ -6,7 +6,8 @@
 .workers-cards-container {
   max-height: 380px;
   overflow-y: auto;
-  padding-right: 4px;
+  padding: 4px;
+  box-sizing: border-box;
 }
 
 .staff-cards-grid {
@@ -36,6 +37,15 @@
 .staff-mini-card.editable:hover {
   border-color: #9d4edd;
   transform: translateY(-2px);
+}
+
+.service-staff-modal-box .modal-actions-row > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  margin-top: 0;
+  box-sizing: border-box;
 }
 
 .staff-mini-card.selected {
