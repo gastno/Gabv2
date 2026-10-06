@@ -31,7 +31,11 @@ describe("CalendarTab", () => {
           start_time: studioTimestamp(today, 10),
           end_time: studioTimestamp(today, 11),
           customer_name: "Alex Client",
+          customer_phone: "+354 555 0100",
+          customer_email: "alex@example.com",
           service_name: "Lash Service",
+          price_snapshot_isk: 14000,
+          fee_status: "fee_waived",
           status: "confirmed",
         },
         {
@@ -49,7 +53,14 @@ describe("CalendarTab", () => {
       availability: date === today
         ? [{ id: staffId, availability_date: date, start_time: "09:00", end_time: "17:00" }]
         : [],
-      unavailabilities: [],
+      unavailabilities: date === today
+        ? [{
+          id: staffId,
+          block_start: studioTimestamp(date, 14),
+          block_end: studioTimestamp(date, 15),
+          reason: "Personal time",
+        }]
+        : [],
     }));
   });
 
@@ -89,5 +100,39 @@ describe("CalendarTab", () => {
     expect(screen.queryByText("Alex Client · Lash Service")).not.toBeInTheDocument();
     expect(screen.getByText("Sam Client · Nail Service")).toBeInTheDocument();
     await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
+  });
+
+  it("opens detailed modals for appointment, availability, and unavailable blocks", async () => {
+    render(
+      <CalendarTab
+        selectedBrand="Gabbablu"
+        brandId={1}
+        loadingBrand={false}
+        staffList={staffList}
+        loadingStaff={false}
+      />
+    );
+
+    await screen.findByText("Alex Client · Lash Service");
+    await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole("button", { name: /View Alex's appointment block/ }));
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Alex Client");
+    expect(screen.getByText("alex@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Lash Service")).toBeInTheDocument();
+    expect(screen.getByText("fee waived")).toBeInTheDocument();
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole("button", { name: /View Alex's available block/ })[0]);
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Available hours");
+    expect(screen.getByText("Scheduled working hours")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close block details" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /View Alex's unavailable block/ }));
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Personal time");
+    expect(screen.getByText("Unavailable time")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

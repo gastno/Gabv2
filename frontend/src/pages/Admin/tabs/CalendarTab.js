@@ -6,6 +6,7 @@ import {
   getCalendarBlocks,
   getMonthCells,
   getStudioDateKey,
+  formatStudioTime,
   normalizeAppointment,
   shiftDateKey,
 } from "../../Staff/staffCalendarUtils";
@@ -31,7 +32,7 @@ function getInitialMonth() {
   return { year, month: month - 1 };
 }
 
-function CalendarEvent({ block, compact = false }) {
+function CalendarEvent({ block, dateKey, compact = false, onClick }) {
   const title = block.type === "appointment"
     ? `${block.appointment.clientName} · ${block.appointment.service}`
     : block.type === "unavailable"
@@ -39,10 +40,13 @@ function CalendarEvent({ block, compact = false }) {
       : "Available";
 
   return (
-    <div
+    <button
+      type="button"
       className={`admin-calendar-event event-${block.type}${compact ? " is-compact" : ""}`}
       style={{ "--staff-calendar-color": block.staffColor }}
       title={`${block.staffName}: ${title}`}
+      aria-label={`View ${block.staffName}'s ${block.type} block on ${formatStudioDate(dateKey)} from ${block.startLabel} to ${block.endLabel}`}
+      onClick={() => onClick(block, dateKey)}
     >
       <span className="admin-calendar-event-time">
         {block.startLabel}–{block.endLabel}
@@ -54,6 +58,89 @@ function CalendarEvent({ block, compact = false }) {
           {block.appointment.status.replace(/_/g, " ")}
         </span>
       )}
+    </button>
+  );
+}
+
+function CalendarBlockDetailsModal({ block, dateKey, onClose }) {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  const isAppointment = block.type === "appointment";
+  const isUnavailable = block.type === "unavailable";
+  const appointment = block.appointment;
+  const period = block.period;
+  const title = isAppointment
+    ? appointment.clientName
+    : isUnavailable
+      ? period.reason || "Unavailable time"
+      : "Available hours";
+  const details = [
+    ["Staff member", block.staffName],
+    ["Date", formatStudioDate(dateKey)],
+    ["Time", `${block.startLabel}–${block.endLabel}`],
+  ];
+
+  if (isAppointment) {
+    details.push(
+      ["Customer", appointment.clientName],
+      ["Service", appointment.service],
+      ["Phone", appointment.phone],
+      ["Email", appointment.email || "Unavailable"],
+      ["Price", appointment.price],
+      ["Appointment status", appointment.status.replace(/_/g, " ")],
+      ["Fee status", (appointment.fee_status || "unknown").replace(/_/g, " ")]
+    );
+  } else if (isUnavailable) {
+    details.push(["Reason", period.reason || "Not specified"]);
+    if (period.block_start && period.block_end) {
+      details.push([
+        "Unavailable period",
+        `${formatStudioDate(getStudioDateKey(period.block_start))} ${formatStudioTime(period.block_start)}–${formatStudioDate(getStudioDateKey(period.block_end))} ${formatStudioTime(period.block_end)}`,
+      ]);
+    }
+  } else if (block.availability) {
+    details.push(["Availability", "Scheduled working hours"]);
+  }
+
+  return (
+    <div className="admin-calendar-modal-backdrop" onClick={onClose}>
+      <section
+        className="admin-calendar-details-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-calendar-modal-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="admin-calendar-modal-close"
+          onClick={onClose}
+          aria-label="Close block details"
+        >
+          ×
+        </button>
+        <p className="admin-calendar-modal-eyebrow">
+          {isAppointment ? "Appointment" : isUnavailable ? "Unavailable time" : "Staff availability"}
+        </p>
+        <h2 id="admin-calendar-modal-title">{title}</h2>
+        <dl className="admin-calendar-details-list">
+          {details.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <button type="button" className="admin-calendar-modal-done" onClick={onClose}>
+          Close
+        </button>
+      </section>
     </div>
   );
 }
@@ -69,6 +156,7 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
   const [availabilityByStaffDate, setAvailabilityByStaffDate] = useState({});
   const [availabilityLoading, setAvailabilityLoading] = useState(true);
   const [availabilityError, setAvailabilityError] = useState("");
+  const [selectedBlock, setSelectedBlock] = useState(null);
 
   const filteredStaff = useMemo(
     () => staffList.filter((staff) => (staff.brands || []).includes(selectedBrand)),
@@ -191,6 +279,7 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
       staffName: staff.name,
       staffColor: STAFF_COLORS[staffIndex % STAFF_COLORS.length],
       staffIndex,
+      dateKey,
     }));
   }).sort((left, right) => left.start - right.start || left.staffIndex - right.staffIndex);
 
@@ -311,6 +400,8 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
                         <CalendarEvent
                           key={`${block.staffIndex}-${block.type}-${block.appointment?.id || block.period?.id || block.availability?.id || blockIndex}-${block.start}`}
                           block={block}
+                          dateKey={cell.dateKey}
+                          onClick={(selectedBlock, selectedDate) => setSelectedBlock({ block: selectedBlock, dateKey: selectedDate })}
                           compact
                         />
                       ))}
@@ -345,6 +436,8 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
                 <CalendarEvent
                   key={`${block.staffIndex}-${block.type}-${block.appointment?.id || block.period?.id || block.availability?.id || index}-${block.start}`}
                   block={block}
+                  dateKey={selectedDateKey}
+                  onClick={(selectedBlock, dateKey) => setSelectedBlock({ block: selectedBlock, dateKey })}
                 />
               ))}
             </div>
@@ -375,6 +468,13 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
           );
         })}
       </div>
+      {selectedBlock && (
+        <CalendarBlockDetailsModal
+          block={selectedBlock.block}
+          dateKey={selectedBlock.dateKey}
+          onClose={() => setSelectedBlock(null)}
+        />
+      )}
     </section>
   );
 }
