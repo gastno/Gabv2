@@ -146,10 +146,11 @@ function CalendarBlockDetailsModal({ block, dateKey, onClose }) {
   );
 }
 
-function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingStaff }) {
+function CalendarTab({ brands, loadingBrand, staffList, loadingStaff }) {
   const [monthCursor, setMonthCursor] = useState(getInitialMonth);
   const [view, setView] = useState("month");
   const [selectedDateKey, setSelectedDateKey] = useState(getStudioDateKey(new Date()));
+  const [selectedBrandId, setSelectedBrandId] = useState("all");
   const [selectedStaffId, setSelectedStaffId] = useState("all");
   const [appointments, setAppointments] = useState([]);
   const [appointmentsLoading, setAppointmentsLoading] = useState(true);
@@ -159,10 +160,16 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
   const [availabilityError, setAvailabilityError] = useState("");
   const [selectedBlock, setSelectedBlock] = useState(null);
 
-  const filteredStaff = useMemo(
-    () => staffList.filter((staff) => (staff.brands || []).includes(selectedBrand)),
-    [staffList, selectedBrand]
+  const selectedBrands = useMemo(
+    () => selectedBrandId === "all"
+      ? brands
+      : brands.filter((brand) => String(brand.id) === selectedBrandId),
+    [brands, selectedBrandId]
   );
+  const filteredStaff = useMemo(() => staffList.filter((staff) => (
+    selectedBrandId === "all"
+      || (staff.brands || []).includes(selectedBrands[0]?.name)
+  )), [selectedBrandId, selectedBrands, staffList]);
   const visibleStaff = useMemo(
     () => selectedStaffId === "all"
       ? filteredStaff
@@ -178,38 +185,49 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
   const todayDateKey = getStudioDateKey(new Date());
 
   useEffect(() => {
-    if (!brandId) {
+    if (loadingBrand) {
+      setAppointmentsLoading(true);
+      setAppointmentsError("");
+      return undefined;
+    }
+    if (selectedBrands.length === 0) {
       setAppointments([]);
-      setAppointmentsLoading(Boolean(loadingBrand));
-      setAppointmentsError(loadingBrand ? "" : "Could not resolve the selected brand.");
+      setAppointmentsLoading(false);
+      setAppointmentsError("Could not resolve the selected brand selection.");
       return undefined;
     }
 
     let isMounted = true;
     setAppointmentsLoading(true);
     setAppointmentsError("");
-    apptApi.listAppointments(brandId)
-      .then((result) => {
+    setAppointments([]);
+    Promise.all(selectedBrands.map(async (brand) => {
+      const result = await apptApi.listAppointments(brand.id);
+      if (!Array.isArray(result?.appointments)) {
+        throw new Error(`The appointments response for ${brand.name} was not in the expected format.`);
+      }
+      return result.appointments;
+    }))
+      .then((brandAppointments) => {
         if (!isMounted) return;
-        if (!Array.isArray(result?.appointments)) {
-          setAppointmentsError("The appointments response was not in the expected format.");
-          return;
-        }
-        setAppointments(result.appointments.map(normalizeAppointment));
+        setAppointments(brandAppointments.flat().map(normalizeAppointment));
       })
       .catch((error) => {
-        if (isMounted) setAppointmentsError(error.message || "Could not load appointments.");
+        if (isMounted) {
+          setAppointments([]);
+          setAppointmentsError(error.message || "Could not load appointments.");
+        }
       })
       .finally(() => {
         if (isMounted) setAppointmentsLoading(false);
       });
     return () => { isMounted = false; };
-  }, [brandId, loadingBrand]);
+  }, [loadingBrand, selectedBrands]);
 
   useEffect(() => {
-    if (!brandId || !staffFilterKey) {
+    if (loadingBrand || loadingStaff || !staffFilterKey) {
       setAvailabilityByStaffDate({});
-      setAvailabilityLoading(Boolean(loadingBrand || loadingStaff) && !staffFilterKey);
+      setAvailabilityLoading(Boolean(loadingBrand || loadingStaff));
       setAvailabilityError("");
       return undefined;
     }
@@ -217,14 +235,16 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
     const dateKeys = getMonthCells(monthCursor.year, monthCursor.month)
       .filter(Boolean)
       .map((cell) => cell.dateKey);
-    const staffIds = new Set(staffFilterKey.split(","));
-    const calendarStaff = filteredStaff.filter((staff) => staffIds.has(String(staff.id)));
-    const requests = calendarStaff.flatMap((staff) => dateKeys.map((date) => ({
-      staff,
-      date,
-      key: `${staff.id}:${date}`,
-      request: staffAvailabilityApi.getForStaff(staff.id, brandId, date),
-    })));
+    const requests = visibleStaff.flatMap((staff) => {
+      const staffBrand = selectedBrands.find((brand) => (staff.brands || []).includes(brand.name));
+      if (!staffBrand) return [];
+      return dateKeys.map((date) => ({
+        staff,
+        date,
+        key: `${staff.id}:${date}`,
+        request: staffAvailabilityApi.getForStaff(staff.id, staffBrand.id, date),
+      }));
+    });
     let isMounted = true;
     setAvailabilityLoading(true);
     setAvailabilityError("");
@@ -262,7 +282,7 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
         if (isMounted) setAvailabilityLoading(false);
       });
     return () => { isMounted = false; };
-  }, [brandId, filteredStaff, loadingBrand, loadingStaff, monthCursor.month, monthCursor.year, staffFilterKey]);
+  }, [filteredStaff, loadingBrand, loadingStaff, monthCursor.month, monthCursor.year, selectedBrands, staffFilterKey, visibleStaff]);
 
   const getEventsForDate = (dateKey) => visibleStaff.flatMap((staff) => {
     const staffIndex = filteredStaff.findIndex((item) => String(item.id) === String(staff.id));
@@ -309,25 +329,45 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
         <div>
           <h3>Global Calendar</h3>
           <p className="subtitle">
-            Appointments and working hours for {selectedBrand} staff
+            Appointments and working hours for {selectedBrandId === "all"
+              ? "all staff across all brands"
+              : `${selectedBrands[0]?.name || "selected brand"} staff`}
           </p>
         </div>
       </div>
 
       <div className="admin-calendar-toolbar">
-        <label className="admin-calendar-filter">
-          <span>Filter by staff</span>
-          <select
-            aria-label="Filter calendar by staff"
-            value={selectedStaffId}
-            onChange={(event) => setSelectedStaffId(event.target.value)}
-          >
-            <option value="all">All staff</option>
-            {filteredStaff.map((staff) => (
-              <option key={staff.id} value={staff.id}>{staff.name}</option>
-            ))}
-          </select>
-        </label>
+        <div className="admin-calendar-filter-group">
+          <label className="admin-calendar-filter">
+            <span>Filter by brand</span>
+            <select
+              aria-label="Filter calendar by brand"
+              value={selectedBrandId}
+              onChange={(event) => {
+                setSelectedBrandId(event.target.value);
+                setSelectedStaffId("all");
+              }}
+            >
+              <option value="all">All brands</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={String(brand.id)}>{brand.name}</option>
+              ))}
+            </select>
+          </label>
+          <label className="admin-calendar-filter">
+            <span>Filter by staff</span>
+            <select
+              aria-label="Filter calendar by staff"
+              value={selectedStaffId}
+              onChange={(event) => setSelectedStaffId(event.target.value)}
+            >
+              <option value="all">All staff</option>
+              {filteredStaff.map((staff) => (
+                <option key={staff.id} value={staff.id}>{staff.name}</option>
+              ))}
+            </select>
+          </label>
+        </div>
         <div className="admin-calendar-view-toggle" role="group" aria-label="Calendar view">
           <button type="button" className={view === "month" ? "active" : ""} onClick={() => setView("month")}>
             Month
@@ -355,17 +395,16 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
       </div>
 
       {brandLoading && <p className="admin-calendar-message">Loading staff and brand details…</p>}
-      {!brandLoading && !brandId && (
-        <p className="admin-calendar-message is-error" role="alert">
-          Could not load the calendar because the selected brand could not be identified.
-        </p>
-      )}
       {appointmentsError && <p className="admin-calendar-message is-error" role="alert">{appointmentsError}</p>}
       {availabilityError && <p className="admin-calendar-message is-error" role="alert">{availabilityError}</p>}
       {dataLoading && <p className="admin-calendar-message" role="status">Loading calendar appointments and staff availability…</p>}
 
       {view === "month" ? (
-        <section className="admin-global-calendar" aria-label="Monthly staff calendar">
+        <section
+          className="admin-global-calendar admin-calendar-transition"
+          aria-label="Monthly staff calendar"
+          key={`${view}-${selectedBrandId}-${selectedStaffId}`}
+        >
           <div className="calendar-month-bar">
             <button type="button" className="month-nav-btn" onClick={() => changeMonth(-1)} aria-label="Previous month">
               ‹
@@ -414,7 +453,11 @@ function CalendarTab({ selectedBrand, brandId, loadingBrand, staffList, loadingS
           </div>
         </section>
       ) : (
-        <section className="admin-global-day-view" aria-label="Daily staff calendar">
+        <section
+          className="admin-global-day-view admin-calendar-transition"
+          aria-label="Daily staff calendar"
+          key={`${view}-${selectedBrandId}-${selectedStaffId}`}
+        >
           <div className="admin-calendar-day-nav">
             <button type="button" className="day-nav-btn" onClick={() => updateSelectedDate(shiftDateKey(selectedDateKey, -1))} aria-label="Previous day">
               ‹

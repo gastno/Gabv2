@@ -7,6 +7,13 @@
   margin-bottom: 14px;
 }
 
+.admin-calendar-filter-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .admin-calendar-filter {
   display: flex;
   flex-direction: column;
@@ -84,6 +91,20 @@
 
 .admin-calendar-message.is-error {
   color: #ff9a9a;
+}
+
+.admin-calendar-transition {
+  animation: admin-calendar-fade-in 220ms ease both;
+}
+
+@keyframes admin-calendar-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .admin-global-calendar,
@@ -411,14 +432,25 @@
 }
 
 @media (max-width: 640px) {
+  .admin-calendar-filter-group {
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .admin-calendar-filter-group .admin-calendar-filter {
+    width: 50%;
+    min-width: 0;
+  }
+
+  .admin-calendar-filter-group .admin-calendar-filter select {
+    width: 100%;
+    min-width: 0;
+  }
+
   .admin-global-calendar,
   .admin-global-day-view {
     padding: 10px;
-  }
-
-  .admin-calendar-filter,
-  .admin-calendar-filter select {
-    width: 100%;
   }
 
   .admin-calendar-day-nav input {
@@ -437,5 +469,11 @@
 
   .admin-calendar-details-list dd {
     text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-calendar-transition {
+    animation-duration: 1ms;
   }
 }

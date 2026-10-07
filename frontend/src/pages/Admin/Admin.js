@@ -610,8 +610,7 @@ function AdminDashboard() {
         <div className="admin-tab-content" key={activeTab}>
           {activeTab === "calendar" && (
             <CalendarTab
-              selectedBrand={selectedBrand}
-              brandId={brandsList.find((brand) => brand.name === selectedBrand)?.id}
+              brands={brandsList}
               loadingBrand={loadingBrands}
               staffList={staffList}
               loadingStaff={loadingStaff}
