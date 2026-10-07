@@ -102,12 +102,16 @@ const createBooking = (database, booking) => database.withTransaction(async clie
         throw new BookingError('Booking could not be completed for this identity.', 409);
       }
       customerId = customerResult.rows[0].id;
+      await client.query(
+        'UPDATE customers SET email = $1 WHERE id = $2',
+        [booking.email, customerId]
+      );
     } else {
       const customerInsert = await client.query(`
-        INSERT INTO customers (full_name, phone_number, kennitala, health_info, consent_privacy, is_registered)
-        VALUES ($1, $2, $3, $4, TRUE, FALSE)
+        INSERT INTO customers (full_name, phone_number, kennitala, email, health_info, consent_privacy, is_registered)
+        VALUES ($1, $2, $3, $4, $5, TRUE, FALSE)
         RETURNING id
-      `, [booking.fullName, booking.phoneNumber, booking.kennitala, booking.healthInfo]);
+      `, [booking.fullName, booking.phoneNumber, booking.kennitala, booking.email, booking.healthInfo]);
       customerId = customerInsert.rows[0].id;
     }
   }

@@ -49,6 +49,7 @@ function AppointmentDetailsModal({
           <div><span>📞 Phone</span><strong>{appointment.phone}</strong></div>
           <div><span>✉️ Email</span><strong>{appointment.email || "Unavailable"}</strong></div>
           <div><span>🪪 Kennitala</span><strong>{appointment.kennitala || "Unavailable"}</strong></div>
+          <div><span>🩺 Health, Allergy &amp; Safety</span><strong>{appointment.health_info || "Unavailable"}</strong></div>
           <div><span>💰 Price</span><strong>{appointment.price}</strong></div>
           <div><span>💳 Fee status</span><strong>{formatStatus(appointment.fee_status || "unknown")}</strong></div>
           <div><span>💵 Payment status</span><strong>{formatStatus(appointment.payment_status || "unknown")}</strong></div>

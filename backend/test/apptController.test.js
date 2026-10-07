@@ -18,6 +18,7 @@ const appointment = {
   customer_phone: '+3540000000',
   customer_email: 'customer@example.com',
   customer_kennitala: '0000000000',
+  health_info: 'Allergic to fragrance',
 };
 
 const response = () => ({
@@ -38,7 +39,7 @@ test.afterEach(() => {
   db.withTransaction = savedWithTransaction;
 });
 
-test('appointment list and detail responses include customer email and Kennitala while preserving access scope', async () => {
+test('appointment list and detail responses include customer contact and health details while preserving access scope', async () => {
   const queries = [];
   db.query = async (sql, params) => {
     queries.push({ sql, params });
@@ -59,14 +60,17 @@ test('appointment list and detail responses include customer email and Kennitala
 
   assert.equal(listResponse.body.appointments[0].customer_email, 'customer@example.com');
   assert.equal(listResponse.body.appointments[0].customer_kennitala, '0000000000');
+  assert.equal(listResponse.body.appointments[0].health_info, 'Allergic to fragrance');
   assert.equal(listResponse.body.appointments[0].payment_status, 'pending');
   assert.equal(detailResponse.body.appointment.customer_email, 'customer@example.com');
   assert.equal(detailResponse.body.appointment.customer_kennitala, '0000000000');
+  assert.equal(detailResponse.body.appointment.health_info, 'Allergic to fragrance');
   assert.equal(detailResponse.body.appointment.payment_status, 'pending');
   assert.equal(queries.length, 2);
   for (const { sql } of queries) {
     assert.match(sql, /customer\.email AS customer_email/);
     assert.match(sql, /customer\.kennitala AS customer_kennitala/);
+    assert.match(sql, /customer\.health_info AS health_info/);
     assert.match(sql, /a\.payment_status/);
   }
   assert.deepEqual(queries[0].params, [3]);

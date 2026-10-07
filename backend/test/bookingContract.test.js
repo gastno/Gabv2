@@ -7,6 +7,7 @@ const validRequest = () => ({
   service_id: 2,
   staff_id: 3,
   full_name: 'Test Customer',
+  email: ' customer@example.com ',
   phone_number: '+354 555 1234',
   kennitala: '010190-1234',
   start_time: '2026-10-01T10:00:00Z',
@@ -22,7 +23,14 @@ test('accepts a well-formed guest request and normalizes identity', () => {
 
   assert.equal(result.error, undefined);
   assert.equal(result.value.kennitala, '010190-1234');
+  assert.equal(result.value.email, 'customer@example.com');
   assert.equal(result.value.startTime.toISOString(), '2026-10-01T10:00:00.000Z');
+});
+
+test('rejects missing or invalid guest email addresses', () => {
+  for (const email of [undefined, '', 'not-an-email', 'x'.repeat(250) + '@example.com']) {
+    assert.match(validateBookingRequest({ ...validRequest(), email }).error, /email/i);
+  }
 });
 
 test('rejects missing or non-positive IDs', () => {
@@ -65,6 +73,7 @@ test('accepts a registered customer identity without trusting guest profile fiel
   assert.equal(result.value.customerId, 7);
   assert.equal(result.value.kennitala, null);
   assert.equal(result.value.fullName, null);
+  assert.equal(result.value.email, null);
 });
 
 test('rejects customer values longer than their database columns', () => {

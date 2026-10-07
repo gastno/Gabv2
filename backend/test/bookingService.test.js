@@ -9,6 +9,7 @@ const booking = validateBookingRequest({
   service_id: 2,
   staff_id: 3,
   full_name: 'Test Customer',
+  email: 'customer@example.com',
   phone_number: '+354 555 1234',
   kennitala: '010190-1234',
   start_time: '2026-10-01T10:00:00Z',
@@ -51,8 +52,13 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
           }
           return { rows: customers.filter(customer => customer.kennitala.replace(/\D/g, '') === params[0]).slice(0, 1) };
         }
+        if (text.includes('UPDATE customers SET email')) {
+          const customer = customers.find(candidate => candidate.id === params[1]);
+          customer.email = params[0];
+          return { rows: [] };
+        }
         if (text.includes('INSERT INTO customers')) {
-          const customer = { id: nextCustomerId++, kennitala: params[2], is_registered: false };
+          const customer = { id: nextCustomerId++, kennitala: params[2], email: params[3], is_registered: false };
           customers.push(customer);
           return { rows: [{ id: customer.id }] };
         }
@@ -86,11 +92,12 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
 };
 
 test('creates appointments with database-owned duration and price snapshots', async () => {
-  const { database, appointments, availabilityParameters } = makeDatabase();
+  const { database, customers, appointments, availabilityParameters } = makeDatabase();
 
   const result = await createBooking(database, { ...booking, duration_minutes: 1, price_isk: 1 });
 
   assert.equal(appointments.length, 1);
+  assert.equal(customers[0].email, booking.email);
   assert.equal(appointments[0][6], 45);
   assert.equal(appointments[0][7], 12000);
   assert.equal(appointments[0][5].getTime() - appointments[0][4].getTime(), 45 * 60_000);
@@ -122,6 +129,20 @@ test('serializes concurrent guest resolution so one Kennitala creates one custom
 
   assert.equal(customers.length, 1);
   assert.equal(appointments.length, 2);
+});
+
+test('updates the email on an existing guest customer record', async () => {
+  const existingCustomer = {
+    id: 7,
+    kennitala: '010190-1234',
+    email: 'old@example.com',
+    is_registered: false,
+  };
+  const { database, customers } = makeDatabase({ existingCustomer });
+
+  await createBooking(database, { ...booking, email: 'updated@example.com' });
+
+  assert.equal(customers[0].email, 'updated@example.com');
 });
 
 test('checks out one client and rolls back failed transactions', async () => {

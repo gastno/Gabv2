@@ -12,6 +12,7 @@ describe("AppointmentDetailsModal payment status", () => {
     service: "Haircut",
     phone: "+354 555 0100",
     email: "taylor@example.com",
+    health_info: "Allergic to fragrance",
     price: "10,000 kr",
     status: "pending",
     fee_status: "none",
@@ -52,5 +53,33 @@ describe("AppointmentDetailsModal payment status", () => {
 
     fireEvent.change(paymentStatus, { target: { value: "accepted" } });
     expect(setPaymentStatusDraft).toHaveBeenCalledWith("accepted");
+  });
+
+  it("shows customer health and safety information in appointment details", () => {
+    render(
+      <AppointmentDetailsModal
+        appointment={appointment}
+        onClose={jest.fn()}
+        onSaveStatus={jest.fn()}
+        statusEditMode={false}
+        setStatusEditMode={jest.fn()}
+        statusDraft="pending"
+        setStatusDraft={jest.fn()}
+        feeStatusDraft="none"
+        setFeeStatusDraft={jest.fn()}
+        paymentStatusDraft="pending"
+        setPaymentStatusDraft={jest.fn()}
+        cancellationReason=""
+        setCancellationReason={jest.fn()}
+        error=""
+        saving={false}
+        formatDate={() => "Tuesday, October 6"}
+      />
+    );
+
+    const healthInfoRow = screen.getByText("🩺 Health, Allergy & Safety", {
+      selector: ".appointment-detail-list span",
+    }).closest("div");
+    expect(within(healthInfoRow).getByText("Allergic to fragrance")).toBeInTheDocument();
   });
 });

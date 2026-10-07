@@ -10,7 +10,8 @@ const appointmentReadQuery = `
          a.custom_options, a.status, a.fee_status, a.payment_status, a.cancellation_reason, a.created_at,
          service.name AS service_name, staff.full_name AS staff_name,
          customer.full_name AS customer_name, customer.phone_number AS customer_phone,
-         customer.email AS customer_email, customer.kennitala AS customer_kennitala
+         customer.email AS customer_email, customer.kennitala AS customer_kennitala,
+         customer.health_info AS health_info
   FROM appointments a
   JOIN services service ON service.id = a.service_id
   JOIN staff staff ON staff.id = a.staff_id

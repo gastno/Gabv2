@@ -51,6 +51,10 @@ const validateBookingRequest = (body, identity = null) => {
       || body.phone_number.trim().length > 50)) {
     return { error: 'Guest bookings require customer full_name and phone_number.' };
   }
+  const email = customerId ? null : typeof body.email === 'string' ? body.email.trim() : '';
+  if (!customerId && (!email || email.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+    return { error: 'Guest bookings require a valid customer email address.' };
+  }
   if (!customerId && !kennitala) {
     return { error: 'Guest kennitala must contain 10 digits, optionally separated by a hyphen.' };
   }
@@ -79,6 +83,7 @@ const validateBookingRequest = (body, identity = null) => {
       staffId,
       customerId,
       fullName: customerId ? null : body.full_name.trim(),
+      email,
       phoneNumber: customerId ? null : body.phone_number.trim(),
       kennitala,
       startTime: new Date(body.start_time),

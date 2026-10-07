@@ -194,6 +194,10 @@ function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, 
           <input id="booking-full-name" type="text" required value={guestForm.fullName} onChange={(event) => onFieldChange("fullName", event.target.value)} placeholder="e.g. Guðrún Jónsdóttir" />
         </div>
         <div className="form-group">
+          <label htmlFor="booking-email">Email *</label>
+          <input id="booking-email" type="email" required autoComplete="email" value={guestForm.email} onChange={(event) => onFieldChange("email", event.target.value)} placeholder="e.g. name@example.com" />
+        </div>
+        <div className="form-group">
           <label htmlFor="booking-phone">Phone Number *</label>
           <input id="booking-phone" type="tel" required value={guestForm.phone} onChange={(event) => onFieldChange("phone", event.target.value)} placeholder="e.g. 123 4567" />
         </div>
@@ -230,6 +234,7 @@ function BookingModal({ service, brandName, onClose }) {
   const [step, setStep] = useState(1);
   const [guestForm, setGuestForm] = useState({
     fullName: "",
+    email: "",
     phone: "",
     kennitala: "",
     healthInfo: "",
@@ -365,6 +370,7 @@ function BookingModal({ service, brandName, onClose }) {
         service_id: service.id,
         staff_id: selectedEmployee.id,
         full_name: submittedGuestForm.fullName,
+        email: submittedGuestForm.email,
         phone_number: submittedGuestForm.phone,
         kennitala: submittedGuestForm.kennitala,
         start_time: finalStartTime,
