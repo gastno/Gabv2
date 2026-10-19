@@ -200,6 +200,55 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
 
+.admin-container .accordion-category {
+  border-color: var(--hud-border-subtle);
+  background: var(--hud-bg-surface);
+}
+
+.admin-container .accordion-category:hover {
+  border-color: rgba(117, 187, 193, 0.55);
+}
+
+.admin-container .accordion-header:hover {
+  background: var(--hud-bg-surface-hover);
+}
+
+.admin-container .service-row-item.clickable-assign-row:hover {
+  background: var(--hud-bg-surface-hover);
+  box-shadow: inset 2px 0 0 var(--hud-accent-cyan);
+}
+
+.admin-container .assign-btn-pill {
+  border: 1px solid var(--hud-accent-cyan);
+  border-radius: 4px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+}
+
+.admin-container .staff-mini-card {
+  border-color: var(--hud-border-subtle);
+  background: var(--hud-bg-surface);
+}
+
+.admin-container .staff-mini-card.editable:hover {
+  border-color: var(--hud-accent-cyan);
+}
+
+.admin-container .staff-mini-card.selected {
+  border-color: var(--hud-accent-cyan);
+  background: rgba(117, 187, 193, 0.08);
+}
+
+.admin-container .staff-mini-card.selected .staff-card-avatar {
+  border-color: var(--hud-accent-cyan);
+}
+
+.admin-container .card-check-badge,
+.admin-container .card-status-tag.active {
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+}
+
 .admin-container .admin-brand-card h4,
 .admin-container .admin-category-card h4,
 .admin-container .service-card-body h4 {
@@ -563,6 +612,88 @@
   border-color: var(--hud-accent-cyan);
   background: rgba(117, 187, 193, 0.12);
   color: var(--hud-accent-cyan);
+}
+
+.admin-container .admin-calendar-view-toggle button:hover:not(.active),
+.admin-container .admin-calendar-day-number:hover:not(.is-today) {
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-text-primary);
+}
+
+.admin-container .admin-calendar-modal-done {
+  border: 1px solid var(--hud-accent-cyan);
+  border-radius: 4px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  font-family: var(--hud-font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.admin-container .admin-calendar-modal-done:hover {
+  border-color: #8acbd0;
+  background: #8acbd0;
+  transform: translateY(-1px);
+}
+
+.admin-container .portfolio-upload-button {
+  border-color: var(--hud-border-active);
+  border-radius: 4px;
+  background: var(--hud-bg-surface);
+  color: var(--hud-accent-cyan);
+  font-family: var(--hud-font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.admin-container .portfolio-upload-button:hover {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-text-primary);
+}
+
+.admin-container .portfolio-layout-option {
+  border-color: var(--hud-border-subtle);
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-secondary);
+}
+
+.admin-container .portfolio-layout-option:hover,
+.admin-container .portfolio-layout-option.selected {
+  border-color: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 1px var(--hud-accent-cyan);
+  color: var(--hud-text-primary);
+}
+
+.admin-container .portfolio-layout-preview i {
+  background: var(--hud-accent-cyan);
+}
+
+.admin-container .portfolio-image-actions button {
+  border-color: var(--hud-border-subtle);
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.admin-container .portfolio-image-actions button:hover:not(:disabled) {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-accent-cyan);
+}
+
+.admin-container .portfolio-image-actions .portfolio-delete-button {
+  border-color: rgba(242, 174, 181, 0.3);
+  color: var(--hud-rose-dusk);
+}
+
+.admin-container .portfolio-image-actions .portfolio-delete-button:hover:not(:disabled) {
+  border-color: var(--hud-rose-dusk);
+  color: var(--hud-text-primary);
 }
 
 .admin-container .admin-logout-btn {
