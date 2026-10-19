@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { authApi } from "../../../services/api";
 import "./Header.css";
 
@@ -156,10 +157,9 @@ function Header({ language, onLanguageChange }) {
   return (
     <>
       <header className="main-header">
-        <div className="logo-space">
-          <img src="/gbbco.svg" alt="" aria-hidden="true" />
+        <Link to="/" className="logo-space">
           <span>gbb &amp; co</span>
-        </div>
+        </Link>
 
         <div className="spacer" />
 

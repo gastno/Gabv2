@@ -11,6 +11,31 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+.studio-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.studio-page::before {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background-color: #181313;
+  content: "";
+  pointer-events: none;
+  animation: studio-page-reveal 320ms ease-out both;
+}
+
+@keyframes studio-page-reveal {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 .brand-content {
   max-width: 1100px;
   width: 100%;
@@ -2067,6 +2092,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .studio-page::before {
+    animation: none;
+    display: none;
+  }
+
   .brand-page .portfolio-image img,
   .brand-page .portfolio-main-image img,
   .brand-page .team-member,

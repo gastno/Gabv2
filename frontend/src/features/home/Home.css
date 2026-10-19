@@ -42,19 +42,10 @@
   margin: 0;
   color: var(--hud-text-primary);
   font-family: var(--hud-font-heading);
-  display: flex;
-  align-items: center;
-  gap: clamp(16px, 3vw, 34px);
+  display: block;
   font-size: clamp(2rem, 5vw, 4.2rem);
   font-weight: 400;
   line-height: 1.12;
-}
-
-.home-page .gradient-space h1 > img {
-  width: clamp(62px, 10vw, 104px);
-  height: clamp(62px, 10vw, 104px);
-  object-fit: contain;
-  flex: 0 0 auto;
 }
 
 .home-brand-copy {
@@ -171,11 +162,6 @@
 
   .home-page .gradient-space h1 {
     font-size: clamp(1.8rem, 9vw, 2.8rem);
-  }
-
-  .home-page .gradient-space h1 > img {
-    width: 56px;
-    height: 56px;
   }
 
   .home-brand-tagline {
