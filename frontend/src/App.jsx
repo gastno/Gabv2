@@ -6,6 +6,8 @@ import StaffPage from "./pages/StaffPage";
 import StaffLoginPage from "./pages/StaffLoginPage";
 import GabbabluPage from "./pages/GabbabluPage";
 import AmorTattooPage from "./pages/AmorTattooPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import CookieSettingsPage from "./pages/CookieSettingsPage";
 
 // Protected Route Guard with Defensive Checks
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -51,6 +53,8 @@ function App() {
           path="/studios/amortattoo"
           element={<AmorTattooPage />}
         />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/cookie-settings" element={<CookieSettingsPage />} />
 
         {/* Staff & Admin Authentication */}
         <Route 

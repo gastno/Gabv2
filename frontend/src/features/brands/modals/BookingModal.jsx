@@ -168,6 +168,10 @@ function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, 
       window.alert("Please check the consent box regarding Kennitala processing to continue.");
       return;
     }
+    if (!guestForm.consentCancellation) {
+      window.alert("Please accept the cancellation and no-show policy to continue.");
+      return;
+    }
     onSubmit(guestForm);
   };
 
@@ -221,6 +225,18 @@ function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, 
             Appointments cancelled less than 48 hours before the scheduled time, and appointments missed without notice, may result in a 5,000 ISK fee. Any applicable fee is handled manually by {brandName} staff.
           </p>
         </div>
+        <div className="form-checkbox-group">
+          <input
+            id="consentCancellation"
+            type="checkbox"
+            required
+            checked={guestForm.consentCancellation}
+            onChange={(event) => onFieldChange("consentCancellation", event.target.checked)}
+          />
+          <label htmlFor="consentCancellation">
+            I have read and accept the cancellation and no-show policy above. I understand that staff may waive any applicable fee.
+          </label>
+        </div>
         <button type="submit" className="submit-booking-btn">Confirm &amp; Book Appointment</button>
       </form>
     </div>
@@ -239,6 +255,7 @@ function BookingModal({ service, brandName, onClose }) {
     kennitala: "",
     healthInfo: "",
     consentPrivacy: false,
+    consentCancellation: false,
   });
   const [employees, setEmployees] = useState([]);
   const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
@@ -378,6 +395,10 @@ function BookingModal({ service, brandName, onClose }) {
         price_isk: parsedPrice,
         health_info: submittedGuestForm.healthInfo,
         consent_privacy: submittedGuestForm.consentPrivacy,
+        custom_options: {
+          cancellation_policy_accepted: submittedGuestForm.consentCancellation,
+          cancellation_policy_version: "2026-10-19",
+        },
       };
 
       await apptApi.createAppointment(payload);

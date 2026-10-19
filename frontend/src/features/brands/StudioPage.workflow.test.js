@@ -9,8 +9,16 @@ import {
   staffServiceApi,
 } from '../../services/api';
 
+jest.mock("react-router-dom", () => {
+  const React = require("react");
+  return {
+    Link: ({ to, children, ...props }) =>
+      React.createElement("a", { href: to, ...props }, children),
+  };
+});
+
 jest.mock('../../services/api', () => ({
-  apptApi: { getAvailability: jest.fn() },
+  apptApi: { createAppointment: jest.fn(), getAvailability: jest.fn() },
   brandApi: { getAll: jest.fn() },
   brandPortfolioApi: { get: jest.fn() },
   categoryApi: { getAll: jest.fn() },
@@ -20,6 +28,7 @@ jest.mock('../../services/api', () => ({
 }));
 
 beforeEach(() => {
+  apptApi.createAppointment.mockResolvedValue({ appointment: { id: 1 } });
   brandPortfolioApi.get.mockResolvedValue(null);
   brandApi.getAll.mockResolvedValue([
     { id: 1, name: 'Gabbablu', location: 'Gabbablu address', about_description: 'Gabbablu about' },
@@ -101,4 +110,52 @@ test('booking progress supports forward and backward navigation', async () => {
   expect(screen.getByRole('heading', { name: 'Select Date & Time' })).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Back' }));
   expect(screen.getByRole('heading', { name: 'Choose an employee' })).toBeInTheDocument();
+});
+
+test("requires cancellation policy acceptance and stores it with the appointment", async () => {
+  jest.spyOn(window, "alert").mockImplementation(() => {});
+  render(<StudioPage brandId={1} />);
+
+  fireEvent.click((await screen.findByText("Classic Lashes")).closest(".service-row-item"));
+  fireEvent.click(await screen.findByText("Artist One"));
+  await screen.findByRole("heading", { name: "Select Date & Time" });
+
+  const availableDay = await waitFor(() => {
+    const day = document.querySelector(".calendar-day-cell.available");
+    expect(day).toBeTruthy();
+    return day;
+  });
+  fireEvent.click(availableDay);
+  const timeChip = await waitFor(() => {
+    const chip = document.querySelector(".time-chip");
+    expect(chip).toBeTruthy();
+    return chip;
+  });
+  fireEvent.click(timeChip);
+  fireEvent.click(screen.getByRole("button", { name: "Next" }));
+  fireEvent.click(screen.getByRole("button", { name: "Continue as Guest" }));
+
+  fireEvent.change(screen.getByLabelText("Full Name *"), { target: { value: "Birta Helgadóttir" } });
+  fireEvent.change(screen.getByLabelText("Email *"), { target: { value: "birta@example.com" } });
+  fireEvent.change(screen.getByLabelText("Phone Number *"), { target: { value: "1234567" } });
+  fireEvent.change(screen.getByLabelText("Kennitala *"), { target: { value: "1234567890" } });
+  fireEvent.click(screen.getByLabelText(/I consent to Gabbablu storing and processing/));
+
+  fireEvent.click(screen.getByRole("button", { name: "Confirm & Book Appointment" }));
+  expect(apptApi.createAppointment).not.toHaveBeenCalled();
+
+  fireEvent.click(screen.getByLabelText(/I have read and accept the cancellation and no-show policy/));
+  fireEvent.click(screen.getByRole("button", { name: "Confirm & Book Appointment" }));
+
+  await waitFor(() => {
+    expect(apptApi.createAppointment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        consent_privacy: true,
+        custom_options: {
+          cancellation_policy_accepted: true,
+          cancellation_policy_version: "2026-10-19",
+        },
+      })
+    );
+  });
 });
