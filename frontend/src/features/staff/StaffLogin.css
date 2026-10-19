@@ -31,8 +31,17 @@
   margin: 0 0 27px;
   color: var(--hud-accent-cyan);
   font-family: var(--hud-font-heading);
-  font-size: 0.86rem;
-  letter-spacing: 0.16em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.staff-login-brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
 }
 
 .staff-login-card h2 {

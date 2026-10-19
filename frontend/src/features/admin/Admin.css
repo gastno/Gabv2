@@ -37,15 +37,37 @@
   border-bottom: 1px solid #2e2828;
 }
 
+.brand-logo-lockup {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.brand-logo-lockup img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
 .brand-logo-text {
+  font-family: var(--hud-font-heading, Georgia, serif);
   font-weight: 700;
   font-size: 1.05rem;
+  letter-spacing: 0.08em;
   color: #fff;
   white-space: nowrap;
 }
 
 .admin-container.sidebar-collapsed .brand-logo-text {
   display: none;
+}
+
+.admin-container.sidebar-collapsed .sidebar-header {
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 8px;
 }
 
 .collapse-toggle-btn {

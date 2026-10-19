@@ -6,8 +6,11 @@ function Footer() {
       <div className="site-footer-content">
         <div className="site-footer-top">
           <div className="site-footer-logo">
-            <span className="site-footer-wordmark">HÚÐ &amp; BLEK</span>
-            <span className="site-footer-tagline">Dermo-tattoo care &amp; artistry</span>
+            <img src="/gbbco.svg" alt="" aria-hidden="true" />
+            <div className="site-footer-brand-copy">
+              <span className="site-footer-wordmark">gbb &amp; co</span>
+              <span className="site-footer-tagline">Beauty &amp; tattoo studios</span>
+            </div>
           </div>
         </div>
         <div className="site-footer-divider" />

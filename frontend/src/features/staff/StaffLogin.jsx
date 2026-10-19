@@ -56,7 +56,10 @@ function StaffLogin() {
   return (
     <div className="staff-login-page">
       <div className="staff-login-card">
-        <p className="staff-login-brand">HÚÐ &amp; BLEK</p>
+        <p className="staff-login-brand">
+          <img src="/gbbco.svg" alt="" aria-hidden="true" />
+          <span>gbb &amp; co</span>
+        </p>
         <h2>Staff Portal Login</h2>
         <p className="login-subtitle">Access your schedule & appointment management</p>
 

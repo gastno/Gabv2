@@ -1369,7 +1369,7 @@ button.zoom-appt-card {
   }
 }
 
-/* HÚÐ & BLEK staff workspace */
+/* gbb & co staff workspace */
 .staff-page {
   background:
     radial-gradient(ellipse at 90% 0%, rgba(117, 187, 193, 0.045), transparent 34%),
@@ -1423,9 +1423,18 @@ button.zoom-appt-card {
   padding: 4px 16px;
   color: var(--hud-text-muted);
   font-family: var(--hud-font-heading);
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  letter-spacing: 0.1em;
   white-space: nowrap;
+}
+
+.staff-brand-mark img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .staff-page .staff-admin-logout-btn {

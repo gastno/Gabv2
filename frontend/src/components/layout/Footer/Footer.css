@@ -19,14 +19,26 @@
 
 .site-footer-logo {
   display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-footer-logo img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.site-footer-brand-copy {
+  display: flex;
   flex-direction: column;
   gap: 7px;
 }
 
 .site-footer-wordmark {
   font-family: var(--hud-font-heading, Georgia, serif);
-  font-size: 1.15rem;
-  letter-spacing: 0.14em;
+  font-size: 1.25rem;
+  letter-spacing: 0.1em;
 }
 
 .site-footer-tagline {

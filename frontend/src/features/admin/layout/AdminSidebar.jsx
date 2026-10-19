@@ -19,7 +19,10 @@ function AdminSidebar({
       )}
       <aside className="admin-sidebar">
         <div className="sidebar-header">
-          <div className="brand-logo-text">HÚÐ &amp; BLEK</div>
+          <div className="brand-logo-lockup">
+            <img src="/gbbco.svg" alt="" aria-hidden="true" />
+            <span className="brand-logo-text">gbb &amp; co</span>
+          </div>
           <button
             type="button"
             className="collapse-toggle-btn"
