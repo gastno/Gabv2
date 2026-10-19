@@ -195,6 +195,66 @@ export const brandApi = {
     }),
 };
 
+const uploadBrandImage = async (brandId, imageType, file) => {
+  const formData = new FormData();
+  formData.append("image", file);
+  const token = getStaffToken();
+  const response = await fetch(`${API_BASE_URL}/brands/${brandId}/${imageType}`, {
+    method: "POST",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to upload brand image.");
+  }
+
+  return data;
+};
+
+export const brandPortfolioApi = {
+  get: (brandId) => request(`/brands/${brandId}/portfolio`, { method: "GET" }, null),
+
+  uploadLogo: (brandId, file) => uploadBrandImage(brandId, "logo", file),
+
+  uploadCover: (brandId, file) => uploadBrandImage(brandId, "cover", file),
+
+  uploadImage: async (brandId, file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    const token = getStaffToken();
+    const response = await fetch(`${API_BASE_URL}/brands/${brandId}/portfolio/images`, {
+      method: "POST",
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to upload portfolio image.");
+    }
+
+    return data;
+  },
+
+  deleteImage: (brandId, imageId) =>
+    request(`/brands/${brandId}/portfolio/images/${imageId}`, { method: "DELETE" }),
+
+  save: (brandId, portfolio) =>
+    request(`/brands/${brandId}/portfolio`, {
+      method: "PUT",
+      body: JSON.stringify({
+        layout: portfolio.layout,
+        image_ids: portfolio.imageIds,
+      }),
+    }),
+};
+
 export const categoryApi = {
   getAll: () => request("/categories"),
 

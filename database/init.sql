@@ -18,8 +18,24 @@ CREATE TABLE brands (
     slug VARCHAR(100) NOT NULL UNIQUE,
     location TEXT NOT NULL,
     about_description TEXT,
+    logo_url VARCHAR(512),
+    cover_image_url VARCHAR(512),
+    gallery_layout VARCHAR(50) NOT NULL DEFAULT 'grid'
+        CHECK (gallery_layout IN ('grid', 'masonry', 'mosaic', 'feature', 'carousel')),
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE brand_portfolio_images (
+    id BIGSERIAL PRIMARY KEY,
+    brand_id BIGINT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+    image_url VARCHAR(512) NOT NULL,
+    display_order INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_brand_portfolio_display_order
+        UNIQUE (brand_id, display_order) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE INDEX idx_brand_portfolio_images_order
+    ON brand_portfolio_images(brand_id, display_order, id);
 
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,

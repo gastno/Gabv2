@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CustomerLayout from "../../components/CustomerLayout/CustomerLayout";
 import {
   brandApi,
+  brandPortfolioApi,
   categoryApi,
   getAssetUrl,
   serviceApi,
@@ -22,6 +23,8 @@ function StudioPage({ brandId }) {
   const [employees, setEmployees] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [portfolio, setPortfolio] = useState(null);
+  const [portfolioError, setPortfolioError] = useState("");
   const [teamLoading, setTeamLoading] = useState(false);
   const [contentError, setContentError] = useState("");
 
@@ -92,6 +95,26 @@ function StudioPage({ brandId }) {
   }, [brandId, studioDefaults]);
 
   useEffect(() => {
+    let isCurrent = true;
+    setPortfolio(null);
+    setPortfolioError("");
+
+    brandPortfolioApi.get(brandId)
+      .then((data) => {
+        if (isCurrent) setPortfolio(data);
+      })
+      .catch((error) => {
+        if (isCurrent) {
+          setPortfolioError(error.message || "Portfolio images are temporarily unavailable.");
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [brandId]);
+
+  useEffect(() => {
     if (activeTab !== "team") return undefined;
 
     let isCurrent = true;
@@ -130,32 +153,43 @@ function StudioPage({ brandId }) {
     };
   }, [activeTab, categories]);
 
+  const legacyPortfolioImages = useMemo(() => (
+    [1, 2, 3, 4, 5].map((imageNumber) => ({
+      id: `legacy-${imageNumber}`,
+      image_url: `/portfolio/${studioDefaults.portfolio}/${imageNumber}.jpg`,
+    }))
+  ), [studioDefaults]);
+  const portfolioImages = portfolio
+    ? portfolio.images
+    : legacyPortfolioImages;
+  const logoUrl = getAssetUrl(brand.logo_url) || studioDefaults.logo;
+
   return (
     <CustomerLayout pageClassName="gabbablu-page studio-page">
       <main className="gabbablu-content">
-        <section className="portfolio-gallery">
-          <div className="portfolio-main-image">
-            <img
-              src={`/portfolio/${studioDefaults.portfolio}/1.jpg`}
-              alt={`${brand.name} portfolio`}
-            />
-          </div>
-          <div className="portfolio-grid">
-            {[2, 3, 4, 5].map((imageNumber) => (
-              <div className="portfolio-image" key={imageNumber}>
-                <img
-                  src={`/portfolio/${studioDefaults.portfolio}/${imageNumber}.jpg`}
-                  alt={`${brand.name} portfolio ${imageNumber}`}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        {brand.cover_image_url && (
+          <section className="studio-cover-image">
+            <img src={getAssetUrl(brand.cover_image_url)} alt={`${brand.name} studio`} />
+          </section>
+        )}
+
+        {portfolioImages.length > 0 ? (
+          <PortfolioGallery
+            images={portfolioImages}
+            layout={portfolio?.layout || "feature"}
+            brandName={brand.name}
+            error={portfolioError}
+          />
+        ) : (
+          <section className="portfolio-empty-state" aria-live="polite">
+            {portfolioError || "This studio has not added portfolio images yet."}
+          </section>
+        )}
 
         <section className="store-information">
           <div className="store-details">
             <div className="store-icon">
-              <img src={studioDefaults.logo} alt={`${brand.name} logo`} />
+              <img src={logoUrl} alt={`${brand.name} logo`} />
             </div>
             <div className="store-text">
               <h1 className="store-name">{brand.name}</h1>
@@ -212,4 +246,77 @@ function StudioPage({ brandId }) {
   );
 }
 
+function PortfolioGallery({ images, layout, brandName, error }) {
+  const [activeImage, setActiveImage] = useState(0);
+  const safeLayout = ["grid", "masonry", "mosaic", "feature", "carousel"].includes(layout)
+    ? layout
+    : "grid";
+
+  useEffect(() => {
+    setActiveImage(0);
+  }, [images, safeLayout]);
+
+  const imageUrl = (image) => (
+    image.image_url?.startsWith("/portfolio/")
+      ? image.image_url
+      : getAssetUrl(image.image_url)
+  );
+  const renderImage = (image, index, className = "portfolio-image") => (
+    <div className={className} key={image.id}>
+      <img src={imageUrl(image)} alt={`${brandName} portfolio ${index + 1}`} />
+    </div>
+  );
+
+  if (safeLayout === "carousel") {
+    const activeIndex = activeImage % images.length;
+    const image = images[activeIndex];
+    return (
+      <section className="portfolio-carousel" aria-label={`${brandName} portfolio`}>
+        {renderImage(image, activeImage, "portfolio-carousel-image")}
+        {images.length > 1 && (
+          <div className="portfolio-carousel-controls">
+            <button
+              type="button"
+              aria-label="Previous portfolio image"
+              onClick={() => setActiveImage((index) => (index - 1 + images.length) % images.length)}
+            >←</button>
+            <span>{activeIndex + 1} / {images.length}</span>
+            <button
+              type="button"
+              aria-label="Next portfolio image"
+              onClick={() => setActiveImage((index) => (index + 1) % images.length)}
+            >→</button>
+          </div>
+        )}
+        {error && <p className="portfolio-error-message" role="status">{error}</p>}
+      </section>
+    );
+  }
+
+  if (safeLayout === "feature") {
+    return (
+      <section className="portfolio-gallery portfolio-layout-feature" aria-label={`${brandName} portfolio`}>
+        {renderImage(images[0], 0, "portfolio-main-image")}
+        {images.length > 1 && (
+          <div className="portfolio-grid">
+            {images.slice(1).map((image, index) => renderImage(image, index + 1))}
+          </div>
+        )}
+        {error && <p className="portfolio-error-message" role="status">{error}</p>}
+      </section>
+    );
+  }
+
+  return (
+    <section
+      className={`portfolio-gallery portfolio-layout-${safeLayout}`}
+      aria-label={`${brandName} portfolio`}
+    >
+      {images.map((image, index) => renderImage(image, index))}
+      {error && <p className="portfolio-error-message" role="status">{error}</p>}
+    </section>
+  );
+}
+
 export default StudioPage;
+export { PortfolioGallery };

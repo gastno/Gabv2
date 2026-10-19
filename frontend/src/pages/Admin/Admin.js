@@ -22,6 +22,7 @@ import ServicesTab from "./tabs/ServicesTab";
 import StaffTab from "./tabs/StaffTab";
 import LedgerTab from "./tabs/LedgerTab";
 import StaffServicesTab from "./tabs/StaffServicesTab";
+import PortfolioTab from "./tabs/PortfolioTab";
 
 // Modals
 import BrandModal from "./modals/BrandModal";
@@ -138,6 +139,9 @@ function AdminDashboard() {
             Array.isArray(s.assigned_brands) && s.assigned_brands.length > 0
               ? s.assigned_brands.map((b) => b.name)
               : ["Gabbablu"],
+          brandIds: Array.isArray(s.assigned_brands)
+            ? s.assigned_brands.map((brand) => String(brand.id))
+            : [],
           photo: getAssetUrl(s.avatar_url),
           rawAvatarUrl: s.avatar_url,
         }));
@@ -587,6 +591,15 @@ function AdminDashboard() {
     setMobileSidebarOpen(false);
   };
 
+  const currentStaffId = localStorage.getItem("staff_id");
+  const staffRole = localStorage.getItem("staff_role");
+  const currentAdmin = staffList.find((staff) => String(staff.id) === String(currentStaffId));
+  const manageableBrands = staffRole === "super_admin"
+    ? brandsList
+    : staffRole === "admin"
+      ? brandsList.filter((brand) => currentAdmin?.brandIds.includes(String(brand.id)))
+      : [];
+
   return (
     <div
       className={`admin-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${
@@ -623,6 +636,18 @@ function AdminDashboard() {
               loadingBrands={loadingBrands}
               brandsList={brandsList}
               handleOpenBrandModal={handleOpenBrandModal}
+            />
+          )}
+
+          {activeTab === "portfolio" && (
+            <PortfolioTab
+              brands={manageableBrands}
+              loadingBrands={loadingBrands || (staffRole === "admin" && loadingStaff)}
+              onBrandUpdate={(brandId, changes) => {
+                setBrandsList((currentBrands) => currentBrands.map((brand) => (
+                  String(brand.id) === String(brandId) ? { ...brand, ...changes } : brand
+                )));
+              }}
             />
           )}
 

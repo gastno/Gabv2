@@ -1,0 +1,364 @@
+.portfolio-admin {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.portfolio-brand-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #aaa;
+  font-size: 0.82rem;
+}
+
+.portfolio-brand-field {
+  max-width: 340px;
+  margin-bottom: 22px;
+}
+
+.portfolio-brand-field select {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #3d3535;
+  border-radius: 7px;
+  background: #141010;
+  color: #eee;
+  font: inherit;
+}
+
+.portfolio-brand-images {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.portfolio-brand-image-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 14px;
+  background: #1e1919;
+  border: 1px solid #2e2828;
+  border-radius: 10px;
+}
+
+.portfolio-brand-image-preview {
+  width: 92px;
+  height: 92px;
+  flex: 0 0 92px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #141010;
+  color: #888;
+  font-size: 0.75rem;
+}
+
+.portfolio-brand-image-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.portfolio-brand-image-copy {
+  min-width: 0;
+}
+
+.portfolio-brand-image-copy h4,
+.portfolio-layout-heading h4,
+.portfolio-image-heading h4 {
+  margin: 0 0 5px;
+  color: #eee;
+  font-size: 0.98rem;
+}
+
+.portfolio-brand-image-copy p {
+  margin: 0 0 12px;
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.portfolio-upload-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #684094;
+  border-radius: 7px;
+  background: #352642;
+  color: #e0aaff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.portfolio-upload-button:hover {
+  background: #463057;
+}
+
+.portfolio-upload-button:focus-within,
+.portfolio-layout-option:focus-visible,
+.portfolio-image-actions button:focus-visible,
+.portfolio-save-row button:focus-visible {
+  outline: 2px solid #e0aaff;
+  outline-offset: 3px;
+}
+
+.portfolio-upload-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.portfolio-layout-heading,
+.portfolio-image-heading,
+.portfolio-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.portfolio-layout-heading {
+  padding-top: 24px;
+  border-top: 1px solid #2e2828;
+}
+
+.portfolio-layout-heading .subtitle,
+.portfolio-image-heading .subtitle {
+  margin-top: 5px;
+}
+
+.portfolio-studio-content {
+  animation: portfolio-studio-fade 260ms ease-out both;
+}
+
+@keyframes portfolio-studio-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.portfolio-layout-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 12px;
+  margin: 18px 0 30px;
+}
+
+.portfolio-layout-option {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  align-items: stretch;
+  padding: 10px;
+  border: 1px solid #3d3535;
+  border-radius: 9px;
+  background: #1e1919;
+  color: #ccc;
+  text-align: left;
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.portfolio-layout-option:hover {
+  border-color: #765091;
+}
+
+.portfolio-layout-option.selected {
+  border-color: #c77dff;
+  box-shadow: 0 0 0 1px #c77dff;
+  color: #fff;
+}
+
+.portfolio-layout-preview {
+  display: grid;
+  width: 100%;
+  height: 60px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 3px;
+}
+
+.portfolio-layout-preview i {
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 2px;
+  background: #715482;
+}
+
+.portfolio-layout-preview.preview-masonry i:nth-child(2) {
+  grid-row: span 2;
+}
+
+.portfolio-layout-preview.preview-mosaic i:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.portfolio-layout-preview.preview-feature i:first-child {
+  grid-row: span 2;
+}
+
+.portfolio-layout-preview.preview-carousel {
+  grid-template-columns: 1fr;
+}
+
+.portfolio-layout-preview.preview-carousel i:not(:first-child) {
+  display: none;
+}
+
+.portfolio-image-heading {
+  margin-bottom: 16px;
+}
+
+.portfolio-image-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portfolio-image-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #2e2828;
+  border-radius: 9px;
+  background: #1e1919;
+}
+
+.portfolio-image-card > img {
+  display: block;
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  background: #141010;
+}
+
+.portfolio-image-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  color: #ddd;
+  font-size: 0.8rem;
+}
+
+.portfolio-image-actions > div {
+  display: flex;
+  gap: 5px;
+}
+
+.portfolio-image-actions button {
+  min-width: 32px;
+  min-height: 30px;
+  padding: 4px 7px;
+  border: 1px solid #3d3535;
+  border-radius: 5px;
+  background: #282222;
+  color: #eee;
+  cursor: pointer;
+}
+
+.portfolio-image-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.portfolio-image-actions .portfolio-delete-button {
+  border-color: #633637;
+  color: #ffb3b8;
+  font-size: 0.72rem;
+}
+
+.portfolio-save-row {
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #2e2828;
+}
+
+.portfolio-save-row > span {
+  margin-right: auto;
+  color: #ffcf75;
+  font-size: 0.82rem;
+}
+
+.portfolio-save-row button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.portfolio-empty,
+.portfolio-state {
+  padding: 18px;
+  border: 1px dashed #4a4141;
+  border-radius: 8px;
+  color: #aaa;
+}
+
+.portfolio-feedback {
+  margin: 12px 0;
+  color: #8de0aa;
+  font-size: 0.86rem;
+}
+
+.portfolio-feedback-error {
+  color: #ff9b9b;
+}
+
+@media (max-width: 700px) {
+  .portfolio-brand-images {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-layout-heading,
+  .portfolio-image-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .portfolio-image-list {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portfolio-studio-content {
+      animation: none;
+    }
+  }
+
+  .portfolio-image-card > img {
+    height: 140px;
+  }
+}
+
+@media (max-width: 420px) {
+  .portfolio-brand-image-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .portfolio-image-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

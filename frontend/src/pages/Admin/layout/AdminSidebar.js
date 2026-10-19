@@ -56,6 +56,14 @@ function AdminSidebar({
           </button>
 
           <button
+            className={`nav-item ${activeTab === "portfolio" ? "active" : ""}`}
+            onClick={() => handleTabSelect("portfolio")}
+          >
+            <span className="nav-icon">🖼️</span>
+            <span className="nav-label">Studio Portfolio</span>
+          </button>
+
+          <button
             className={`nav-item ${activeTab === "staff" ? "active" : ""}`}
             onClick={() => handleTabSelect("staff")}
           >
