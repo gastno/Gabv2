@@ -11,6 +11,7 @@ function StaffProfileHeader({ name, description, avatar, onLogout }) {
           <span className="staff-profile-caption">{description || "Staff Member"}</span>
         </div>
       </div>
+      <span className="staff-brand-mark">HÚÐ &amp; BLEK</span>
       <button type="button" className="staff-admin-logout-btn" onClick={onLogout}>
         Log Out
       </button>

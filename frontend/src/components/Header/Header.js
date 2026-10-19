@@ -156,7 +156,7 @@ function Header({ language, onLanguageChange }) {
   return (
     <>
       <header className="main-header">
-        <div className="logo-space">LOGO</div>
+        <div className="logo-space">HÚÐ &amp; BLEK</div>
 
         <div className="spacer" />
 

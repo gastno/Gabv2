@@ -1368,3 +1368,613 @@ button.zoom-appt-card {
     align-items: flex-start;
   }
 }
+
+/* HÚÐ & BLEK staff workspace */
+.staff-page {
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(117, 187, 193, 0.045), transparent 34%),
+    var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-body);
+}
+
+.staff-page h1,
+.staff-page h2,
+.staff-page h3,
+.staff-page h4 {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  letter-spacing: 0.06em;
+}
+
+.staff-page .staff-top-bar {
+  min-height: 68px;
+  padding: 12px clamp(16px, 4vw, 48px);
+  border-bottom: 1px solid var(--hud-border-subtle);
+  background: rgba(18, 19, 22, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.staff-page .staff-bar-left {
+  gap: 13px;
+}
+
+.staff-page .staff-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-color: var(--hud-border-subtle);
+}
+
+.staff-page .user-badge {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.staff-page .staff-profile-caption {
+  color: var(--hud-text-muted);
+  font-size: 0.72rem;
+}
+
+.staff-brand-mark {
+  margin-left: auto;
+  padding: 4px 16px;
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-heading);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+.staff-page .staff-admin-logout-btn {
+  border: 1px solid rgba(242, 174, 181, 0.3);
+  border-radius: 4px;
+  background: rgba(242, 174, 181, 0.07);
+  color: var(--hud-rose-dusk);
+  font-family: var(--hud-font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.staff-page .staff-admin-logout-btn:hover {
+  background: rgba(242, 174, 181, 0.16);
+  color: var(--hud-text-primary);
+}
+
+.staff-page .staff-content {
+  max-width: 1380px;
+  padding: clamp(22px, 4vw, 46px) clamp(16px, 4vw, 40px) 68px;
+}
+
+.staff-page .schedule-header-controls {
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--hud-border-subtle);
+}
+
+.staff-page .schedule-header-controls h1 {
+  margin: 0 0 7px;
+  font-size: clamp(1.55rem, 3vw, 2rem);
+  font-weight: 400;
+  letter-spacing: 0.09em;
+}
+
+.staff-page .schedule-subtitle {
+  color: var(--hud-text-muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.025em;
+}
+
+.staff-page .view-toggle-buttons {
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 5px;
+  background: var(--hud-bg-surface);
+}
+
+.staff-page .toggle-btn {
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.staff-page .toggle-btn:hover {
+  color: var(--hud-text-primary);
+}
+
+.staff-page .toggle-btn.active {
+  border-color: rgba(117, 187, 193, 0.2);
+  background: rgba(117, 187, 193, 0.1);
+  color: var(--hud-accent-cyan);
+}
+
+.staff-page .calendar-month-bar,
+.staff-page .staff-calendar-container,
+.staff-page .staff-day-zoom-container,
+.staff-page .availability-editor,
+.staff-page .unavailability-editor {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 7px;
+  background: var(--hud-bg-surface);
+}
+
+.staff-page .calendar-month-bar {
+  min-height: 54px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  background: var(--hud-bg-main);
+}
+
+.staff-page .calendar-month-bar h2 {
+  color: var(--hud-text-primary);
+  font-size: 1.08rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.staff-page .month-nav-btn,
+.staff-page .day-nav-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-secondary);
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.staff-page .month-nav-btn:hover,
+.staff-page .day-nav-btn:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+.staff-page .staff-calendar-container,
+.staff-page .staff-day-zoom-container {
+  padding: 16px;
+}
+
+.staff-page .calendar-weekdays-header {
+  color: var(--hud-text-muted);
+  font-size: 0.67rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.staff-page .staff-month-grid {
+  gap: 5px;
+}
+
+.staff-page .staff-day-cell {
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.staff-page .calendar-day-cell:hover {
+  border-color: rgba(117, 187, 193, 0.36);
+  background: rgba(117, 187, 193, 0.035);
+}
+
+.staff-page button.cell-day-number {
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+}
+
+.staff-page button.cell-day-number:hover,
+.staff-page button.cell-day-number.is-today {
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+}
+
+.staff-page .calendar-time-block {
+  border-radius: 3px;
+  font-family: var(--hud-font-body);
+}
+
+.staff-page .calendar-time-block-available {
+  border-color: rgba(156, 165, 119, 0.32);
+  background: rgba(156, 165, 119, 0.12);
+  color: #c3cc9e;
+}
+
+.staff-page .calendar-time-block-unavailable {
+  border-color: rgba(217, 119, 6, 0.32);
+  background: rgba(217, 119, 6, 0.1);
+  color: #e7b776;
+}
+
+.staff-page .calendar-time-block-appointment {
+  border-color: rgba(117, 187, 193, 0.3);
+  background: rgba(117, 187, 193, 0.12);
+  color: #a2d5d8;
+}
+
+.staff-page .calendar-time-range {
+  color: var(--hud-text-primary);
+}
+
+.staff-page .calendar-add-hours,
+.staff-page .day-empty-add,
+.staff-page .empty-slot-btn {
+  border: 1px dashed var(--hud-border-subtle);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--hud-text-muted);
+}
+
+.staff-page .calendar-add-hours:hover,
+.staff-page .day-empty-add:hover,
+.staff-page .empty-slot-btn:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+.staff-page .zoom-date-picker-row label,
+.staff-page .availability-date-picker,
+.staff-page .schedule-shift-fields label,
+.staff-page .unavailability-form label,
+.staff-page .appointment-status-form label,
+.staff-page .calendar-modal-field {
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-body);
+}
+
+.staff-page .zoom-date-picker-row input,
+.staff-page .zoom-date-picker-row select,
+.staff-page .availability-date-picker input,
+.staff-page .schedule-shift-fields input,
+.staff-page .unavailability-form input,
+.staff-page .appointment-status-form select,
+.staff-page .appointment-status-form textarea,
+.staff-page .calendar-modal-field input {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-body);
+}
+
+.staff-page input:focus,
+.staff-page select:focus,
+.staff-page textarea:focus {
+  border-color: var(--hud-accent-cyan);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(117, 187, 193, 0.1);
+}
+
+.staff-page .day-schedule-summary {
+  border-bottom-color: var(--hud-border-subtle);
+}
+
+.staff-page .day-schedule-summary h2 {
+  font-size: 1.16rem;
+  font-weight: 400;
+}
+
+.staff-page .day-summary-shifts {
+  color: var(--hud-text-muted);
+}
+
+.staff-page .day-summary-shifts strong {
+  color: var(--hud-text-secondary);
+}
+
+.staff-page .day-summary-shifts span {
+  border-color: var(--hud-border-subtle);
+  border-radius: 3px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+}
+
+.staff-page .day-unavailability {
+  border-left-color: var(--hud-warning-amber);
+  background: rgba(217, 119, 6, 0.08);
+  color: #e7b776;
+}
+
+.staff-page .day-appointments-heading h3 {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.staff-page .day-appointments-heading > span,
+.staff-page .calendar-overflow {
+  color: var(--hud-text-muted);
+}
+
+.staff-page .zoom-appt-time {
+  color: var(--hud-accent-cyan);
+}
+
+.staff-page .zoom-appt-card {
+  border: 1px solid rgba(117, 187, 193, 0.28);
+  border-radius: 5px;
+  background: rgba(117, 187, 193, 0.1);
+}
+
+.staff-page .zoom-appt-title {
+  color: var(--hud-text-primary);
+}
+
+.staff-page .zoom-appt-details {
+  color: var(--hud-text-secondary);
+}
+
+.staff-page .status-text.status-pending {
+  color: #e7b776;
+}
+
+.staff-page .status-text.status-confirmed,
+.staff-page .status-text.status-completed {
+  color: #b7c28e;
+}
+
+.staff-page .status-text.status-cancelled,
+.staff-page .status-text.status-no_show {
+  color: var(--hud-rose-dusk);
+}
+
+.staff-page .availability-workspace {
+  gap: 14px;
+}
+
+.staff-page .availability-editor,
+.staff-page .unavailability-editor {
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.staff-page .availability-section-heading {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--hud-border-subtle);
+}
+
+.staff-page .availability-section-heading h2 {
+  font-size: 1.12rem;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+}
+
+.staff-page .availability-section-heading p,
+.staff-page .no-shift-label,
+.staff-page .staff-loading-state,
+.staff-page .staff-empty-state {
+  color: var(--hud-text-muted);
+  line-height: 1.6;
+}
+
+.staff-page .weekday-schedule-row,
+.staff-page .unavailability-list-row {
+  border-top-color: var(--hud-border-subtle);
+}
+
+.staff-page .weekday-schedule-heading strong,
+.staff-page .unavailability-list-row strong {
+  color: var(--hud-text-secondary);
+}
+
+.staff-page .add-shift-btn,
+.staff-page .remove-unavailability-btn {
+  border: 1px solid rgba(117, 187, 193, 0.28);
+  border-radius: 4px;
+  background: rgba(117, 187, 193, 0.08);
+  color: var(--hud-accent-cyan);
+  font-family: var(--hud-font-body);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.staff-page .add-shift-btn:hover,
+.staff-page .remove-unavailability-btn:hover {
+  border-color: var(--hud-accent-cyan);
+  background: rgba(117, 187, 193, 0.15);
+}
+
+.staff-page .save-btn {
+  border: 1px solid var(--hud-accent-cyan);
+  border-radius: 4px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  font-family: var(--hud-font-body);
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.staff-page .save-btn:hover:not(:disabled) {
+  background: #8acbd0;
+  transform: translateY(-1px);
+}
+
+.staff-page .remove-shift-btn {
+  border: 1px solid rgba(242, 174, 181, 0.24);
+  border-radius: 4px;
+  background: rgba(242, 174, 181, 0.08);
+  color: var(--hud-rose-dusk);
+}
+
+.staff-page .unavailability-list-row span,
+.staff-page .unavailability-list-row small {
+  color: var(--hud-text-muted);
+}
+
+.staff-page .staff-error-banner,
+.staff-page .staff-error-message {
+  border: 1px solid rgba(242, 174, 181, 0.28);
+  border-radius: 5px;
+  background: rgba(242, 174, 181, 0.08);
+  color: var(--hud-rose-dusk);
+}
+
+.staff-page .staff-error-banner button {
+  border-color: rgba(242, 174, 181, 0.28);
+  border-radius: 3px;
+  background: rgba(242, 174, 181, 0.08);
+  color: var(--hud-rose-dusk);
+}
+
+.staff-page .staff-error-banner button:hover {
+  background: rgba(242, 174, 181, 0.16);
+}
+
+.staff-page .staff-modal-backdrop {
+  background: rgba(8, 9, 11, 0.78) !important;
+  backdrop-filter: blur(8px);
+}
+
+.staff-page .staff-modal-box {
+  border: 1px solid var(--hud-border-subtle) !important;
+  border-radius: 9px !important;
+  background: var(--hud-bg-surface) !important;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58) !important;
+}
+
+.staff-page .staff-modal-box h2,
+.staff-page .staff-modal-box h3 {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+}
+
+.staff-page .staff-modal-close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 50%;
+  color: var(--hud-text-muted);
+}
+
+.staff-page .staff-modal-close:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-text-primary);
+}
+
+.staff-page .staff-modal-subtitle,
+.staff-page .appointment-detail-list > div > span,
+.staff-page .appointment-detail-modal .modal-eyebrow {
+  color: var(--hud-text-muted);
+}
+
+.staff-page .appointment-detail-modal .modal-eyebrow {
+  font-family: var(--hud-font-body);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+}
+
+.staff-page .client-info-box,
+.staff-page .read-only-field {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 5px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+}
+
+.staff-page .client-info-box h4 {
+  color: var(--hud-text-muted);
+}
+
+.staff-page .client-info-box p {
+  color: var(--hud-text-primary);
+}
+
+.staff-page .staff-edit-form .form-group label {
+  color: var(--hud-text-secondary);
+}
+
+.staff-page .staff-edit-form .form-group input {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+}
+
+.staff-page .appointment-detail-list,
+.staff-page .appointment-detail-list > div {
+  border-color: var(--hud-border-subtle);
+}
+
+.staff-page .edit-toggle-btn,
+.staff-page .secondary-modal-btn {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+}
+
+.staff-page .edit-toggle-btn:hover,
+.staff-page .secondary-modal-btn:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-text-primary);
+}
+
+.staff-page .appointment-modal-actions .save-btn {
+  flex: 1;
+}
+
+.staff-page .cancel-appt-btn {
+  border: 1px solid rgba(242, 174, 181, 0.3);
+  border-radius: 4px;
+  background: rgba(242, 174, 181, 0.08);
+  color: var(--hud-rose-dusk);
+}
+
+.staff-page button:focus-visible,
+.staff-page input:focus-visible,
+.staff-page select:focus-visible,
+.staff-page textarea:focus-visible {
+  outline: 2px solid var(--hud-accent-cyan);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .staff-page .staff-content {
+    padding: 22px 14px 44px;
+  }
+
+  .staff-page .staff-top-bar {
+    padding: 11px 14px;
+  }
+
+  .staff-brand-mark {
+    display: none;
+  }
+
+  .staff-page .schedule-header-controls {
+    align-items: flex-start;
+  }
+
+  .staff-page .view-toggle-buttons {
+    width: 100%;
+    max-width: none;
+  }
+
+  .staff-page .staff-calendar-container,
+  .staff-page .staff-day-zoom-container {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staff-page *,
+  .staff-page *::before,
+  .staff-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

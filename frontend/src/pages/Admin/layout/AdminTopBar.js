@@ -16,7 +16,7 @@ function AdminTopBar({
         >
           ☰
         </button>
-        <h2>Brand Dashboard</h2>
+        <h2>Studio management</h2>
       </div>
 
       <div className="top-bar-right">

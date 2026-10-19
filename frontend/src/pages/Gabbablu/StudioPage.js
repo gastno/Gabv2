@@ -62,25 +62,25 @@ function StudioPage({ brandId }) {
       });
       setCategories(brandCategories.map((category) => ({
         id: category.id,
-        title: category.title || category.name || "Category details coming soon",
-        subtitle: category.subtitle || category.description || "Category description coming soon.",
+        title: category.title || category.name || "Category details unavailable",
+        subtitle: category.subtitle || category.description || "",
         services: brandServices
           .filter((service) => Number(service.category_id) === Number(category.id))
           .map((service) => ({
             ...service,
-            name: service.name || "Service details coming soon",
+            name: service.name || "Service details unavailable",
             duration: service.duration || (service.duration_minutes
               ? `${service.duration_minutes} min`
               : "Duration unavailable"),
             price: service.price || (service.price_isk != null
               ? `${service.price_isk} kr`
               : "Price unavailable"),
-            image: getAssetUrl(service.image_url) || "/placeholder-service.jpg",
+            image: getAssetUrl(service.image_url),
           })),
       })));
 
       if ([brandsResult, categoriesResult, servicesResult].every((result) => result.status === "rejected")) {
-        setContentError("Studio information is unavailable. Placeholder content is shown.");
+        setContentError("Studio information is unavailable. Saved studio details are shown.");
       }
       setIsLoading(false);
     };
@@ -159,7 +159,10 @@ function StudioPage({ brandId }) {
             </div>
             <div className="store-text">
               <h1 className="store-name">{brand.name}</h1>
-              <p className="store-address">📍 {brand.location}</p>
+              <p className="store-address">
+                <span className="store-location-pin" aria-hidden="true" />
+                {brand.location}
+              </p>
             </div>
           </div>
         </section>

@@ -32,6 +32,7 @@ import CreateCategoryModal from "./modals/CreateCategoryModal";
 import CreateServiceModal from "./modals/CreateServiceModal";
 import CreateStaffModal from "./modals/CreateStaffModal";
 import ServiceStaffModal from "./modals/ServiceStaffModal";
+import "./AdminBrand.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();

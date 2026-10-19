@@ -6,17 +6,20 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: #232020;
+  background-color: rgba(18, 19, 22, 0.94);
   display: flex;
   align-items: center;
-  padding: 12px 24px;
-  border-bottom: 1px solid #302b2b;
+  padding: 15px clamp(18px, 4vw, 56px);
+  border-bottom: 1px solid var(--hud-border-subtle);
+  backdrop-filter: blur(12px);
 }
 
 .main-header .logo-space {
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #fff;
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.17em;
 }
 
 .main-header .spacer {
@@ -43,9 +46,9 @@
 }
 
 .logout-button {
-  background: #332d2d;
-  color: #eee;
-  border: 1px solid #443e3e;
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-secondary);
+  border: 1px solid var(--hud-border-subtle);
   padding: 6px 14px;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -55,14 +58,14 @@
 }
 
 .logout-button:hover {
-  background: #443d3d;
-  color: #fff;
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-text-primary);
 }
 
 .main-header .language-dropdown {
-  background: #181313;
-  color: #eee;
-  border: 1px solid #333;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  border: 1px solid var(--hud-border-subtle);
   padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
@@ -70,9 +73,9 @@
 }
 
 .main-header .login-button {
-  background: #eee;
-  color: #181313;
-  border: none;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  border: 1px solid var(--hud-accent-cyan);
   padding: 6px 16px;
   border-radius: 6px;
   font-weight: 600;
@@ -81,7 +84,8 @@
 }
 
 .main-header .login-button:hover {
-  background: #fff;
+  background: #8acbd0;
+  border-color: #8acbd0;
 }
 
 /* ==========================================================================
@@ -93,8 +97,8 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
+  background-color: rgba(10, 11, 13, 0.78);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,8 +108,8 @@
 }
 
 .header-auth-modal {
-  background-color: #242020;
-  border: 1px solid #383232;
+  background-color: var(--hud-bg-surface);
+  border: 1px solid var(--hud-border-subtle);
   border-radius: 16px;
   width: 100%;
   max-width: 440px;
@@ -115,14 +119,14 @@
   position: relative;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
   box-sizing: border-box;
-  color: #fff;
+  color: var(--hud-text-primary);
 }
 
 /* Sticky top bar inside modal ensuring Close Button is reachable */
 .modal-sticky-header {
   position: sticky;
   top: 0;
-  background-color: #242020;
+  background-color: var(--hud-bg-surface);
   z-index: 10;
   display: flex;
   justify-content: flex-end;
@@ -130,9 +134,9 @@
 }
 
 .header-auth-close {
-  background: #332d2d;
-  border: 1px solid #443e3e;
-  color: #ccc;
+  background: var(--hud-bg-main);
+  border: 1px solid var(--hud-border-subtle);
+  color: var(--hud-text-secondary);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -146,15 +150,15 @@
 }
 
 .header-auth-close:hover {
-  background: #443d3d;
-  color: #fff;
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-text-primary);
 }
 
 /* Modal Error Banner */
 .auth-error-banner {
-  background: #3d1c1c;
-  border: 1px solid #732a2a;
-  color: #ff9e9e;
+  background: rgba(242, 174, 181, 0.08);
+  border: 1px solid rgba(242, 174, 181, 0.24);
+  color: var(--hud-rose-dusk);
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -164,7 +168,7 @@
 /* Modal Tabs Header */
 .header-auth-tabs {
   display: flex;
-  border-bottom: 1px solid #302b2b;
+  border-bottom: 1px solid var(--hud-border-subtle);
   margin-bottom: 20px;
 }
 
@@ -172,7 +176,7 @@
   flex: 1;
   background: none;
   border: none;
-  color: #888;
+  color: var(--hud-text-muted);
   padding: 10px 0;
   font-size: 0.95rem;
   font-weight: 600;
@@ -182,7 +186,7 @@
 }
 
 .auth-tab-btn.active {
-  color: #fff;
+  color: var(--hud-text-primary);
 }
 
 .auth-tab-btn.active::after {
@@ -192,20 +196,22 @@
   left: 0;
   width: 100%;
   height: 2px;
-  background: #fff;
+  background: var(--hud-accent-cyan);
 }
 
 /* Form Styling */
 .header-auth-form h2 {
   margin: 0 0 6px 0;
   font-size: 1.3rem;
-  color: #fff;
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  letter-spacing: 0.06em;
 }
 
 .auth-subtitle {
   margin: 0 0 20px 0;
   font-size: 0.85rem;
-  color: #aaa;
+  color: var(--hud-text-muted);
 }
 
 .auth-field {
@@ -217,13 +223,13 @@
 
 .auth-field label {
   font-size: 0.82rem;
-  color: #ccc;
+  color: var(--hud-text-secondary);
 }
 
 .auth-field input {
-  background: #181313;
-  border: 1px solid #333;
-  color: #fff;
+  background: var(--hud-bg-main);
+  border: 1px solid var(--hud-border-subtle);
+  color: var(--hud-text-primary);
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -232,13 +238,14 @@
 }
 
 .auth-field input:focus {
-  border-color: #666;
+  border-color: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 3px rgba(117, 187, 193, 0.1);
 }
 
 .auth-submit-btn {
   width: 100%;
-  background: #fff;
-  color: #181313;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
   border: none;
   padding: 12px;
   border-radius: 8px;
@@ -250,7 +257,7 @@
 }
 
 .auth-submit-btn:hover:not(:disabled) {
-  background: #eee;
+  background: #8acbd0;
 }
 
 .auth-submit-btn:disabled {
@@ -272,15 +279,15 @@
   left: 0;
   width: 100%;
   height: 1px;
-  background: #332d2d;
+  background: var(--hud-border-subtle);
 }
 
 .auth-divider span {
   position: relative;
-  background: #242020;
+  background: var(--hud-bg-surface);
   padding: 0 10px;
   font-size: 0.78rem;
-  color: #777;
+  color: var(--hud-text-muted);
 }
 
 .social-auth-buttons {
@@ -290,9 +297,9 @@
 
 .social-btn {
   flex: 1;
-  background: #181313;
-  border: 1px solid #332d2d;
-  color: #eee;
+  background: var(--hud-bg-main);
+  border: 1px solid var(--hud-border-subtle);
+  color: var(--hud-text-secondary);
   padding: 10px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -302,7 +309,7 @@
 }
 
 .social-btn:hover {
-  background: #201c1c;
+  background: var(--hud-bg-surface-hover);
 }
 
 /* ==========================================================================
@@ -311,7 +318,12 @@
 
 @media (max-width: 600px) {
   .main-header {
-    padding: 10px 16px;
+    padding: 12px 16px;
+  }
+
+  .main-header .logo-space {
+    font-size: 0.84rem;
+    letter-spacing: 0.12em;
   }
 
   .user-welcome-text {

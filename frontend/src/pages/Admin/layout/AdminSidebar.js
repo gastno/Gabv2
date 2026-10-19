@@ -19,7 +19,7 @@ function AdminSidebar({
       )}
       <aside className="admin-sidebar">
         <div className="sidebar-header">
-          <div className="brand-logo-text">⚡ Admin HQ</div>
+          <div className="brand-logo-text">HÚÐ &amp; BLEK</div>
           <button
             type="button"
             className="collapse-toggle-btn"
@@ -56,6 +56,14 @@ function AdminSidebar({
           </button>
 
           <button
+            className={`nav-item ${activeTab === "staff" ? "active" : ""}`}
+            onClick={() => handleTabSelect("staff")}
+          >
+            <span className="nav-icon">👤</span>
+            <span className="nav-label">Staff Accounts</span>
+          </button>
+
+          <button
             className={`nav-item ${activeTab === "categories" ? "active" : ""}`}
             onClick={() => handleTabSelect("categories")}
           >
@@ -77,14 +85,6 @@ function AdminSidebar({
           >
             <span className="nav-icon">🔗</span>
             <span className="nav-label">Staff Services</span>
-          </button>
-
-          <button
-            className={`nav-item ${activeTab === "staff" ? "active" : ""}`}
-            onClick={() => handleTabSelect("staff")}
-          >
-            <span className="nav-icon">👤</span>
-            <span className="nav-label">Staff Accounts</span>
           </button>
 
           <button

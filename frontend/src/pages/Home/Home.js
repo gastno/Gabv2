@@ -6,7 +6,13 @@ function Home() {
   return (
     <CustomerLayout pageClassName="home-page">
       <main className="home-content">
-        <div className="gradient-space" />
+        <section className="gradient-space" aria-labelledby="home-brand-statement">
+          <p className="home-eyebrow">Reykjavík · Iceland</p>
+          <h1 id="home-brand-statement">
+            HÚÐ &amp; BLEK
+            <span>— DERMO-TATTOO CARE &amp; ARTISTRY</span>
+          </h1>
+        </section>
         <BrandChooser />
       </main>
     </CustomerLayout>

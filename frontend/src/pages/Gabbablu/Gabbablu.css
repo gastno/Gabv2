@@ -1001,3 +1001,924 @@
   color: #aaa;
   font-weight: 500;
 }
+
+/* HÚÐ & BLEK customer studio identity */
+.gabbablu-page {
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-body);
+}
+
+.gabbablu-page h1,
+.gabbablu-page h2,
+.gabbablu-page h3,
+.gabbablu-page h4,
+.gabbablu-page .store-name,
+.gabbablu-page .section-heading {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  letter-spacing: 0.07em;
+}
+
+.gabbablu-page .gabbablu-content {
+  max-width: 1160px;
+  padding: 32px 24px 76px;
+}
+
+.gabbablu-page .portfolio-gallery {
+  height: clamp(360px, 39vw, 470px);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 34px;
+  border-radius: 2px;
+}
+
+.gabbablu-page .portfolio-grid {
+  gap: 8px;
+}
+
+.gabbablu-page .portfolio-image,
+.gabbablu-page .portfolio-main-image {
+  background-color: var(--hud-bg-surface);
+}
+
+.gabbablu-page .portfolio-image img,
+.gabbablu-page .portfolio-main-image img {
+  filter: saturate(0.72) contrast(0.96);
+  transition: filter 500ms ease, transform 750ms cubic-bezier(0.2, 0.65, 0.25, 1);
+}
+
+.gabbablu-page .portfolio-image:hover img,
+.gabbablu-page .portfolio-main-image:hover img {
+  filter: saturate(0.9) contrast(1);
+  transform: scale(1.035);
+}
+
+.gabbablu-page .store-information {
+  margin: 0 0 32px;
+}
+
+.gabbablu-page .store-details {
+  gap: 20px;
+}
+
+.gabbablu-page .store-icon {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  background: var(--hud-bg-surface);
+  border: 1px solid var(--hud-border-subtle);
+}
+
+.gabbablu-page .store-name {
+  margin: 0 0 7px;
+  font-size: clamp(1.8rem, 4vw, 2.65rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.gabbablu-page .store-address {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--hud-text-muted);
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+}
+
+.gabbablu-page .store-location-pin {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--hud-accent-cyan);
+  transform: rotate(-45deg);
+}
+
+.gabbablu-page .store-location-pin::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--hud-bg-main);
+  content: "";
+}
+
+.gabbablu-page .placeholder-message {
+  padding: 14px 16px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.gabbablu-page .store-tabs {
+  gap: clamp(22px, 5vw, 48px);
+  margin-bottom: 30px;
+  border-bottom-color: var(--hud-border-subtle);
+}
+
+.gabbablu-page .tab-button {
+  padding: 12px 0 14px;
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-body);
+  font-size: 0.84rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gabbablu-page .tab-button:hover,
+.gabbablu-page .tab-button.active {
+  color: var(--hud-text-primary);
+}
+
+.gabbablu-page .tab-button.active::after {
+  bottom: -1px;
+  height: 2px;
+  background: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .section-heading {
+  margin: 0 0 22px;
+  font-size: 1.55rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.gabbablu-page .services-accordion-list {
+  gap: 10px;
+}
+
+.gabbablu-page .accordion-category {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+}
+
+.gabbablu-page .accordion-header {
+  min-height: 78px;
+  padding: 16px 22px;
+  transition: background-color 180ms ease;
+}
+
+.gabbablu-page .accordion-header:hover {
+  background: var(--hud-bg-surface-hover);
+}
+
+.gabbablu-page .category-icon-circle {
+  width: 42px;
+  height: 42px;
+  background: var(--hud-bg-main);
+  color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .category-header-text h3 {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.04rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.gabbablu-page .category-header-text p {
+  margin-top: 5px;
+  color: var(--hud-text-muted);
+  font-size: 0.78rem;
+}
+
+.gabbablu-page .accordion-arrow {
+  color: var(--hud-text-muted);
+}
+
+.gabbablu-page .accordion-content {
+  border-top-color: var(--hud-border-subtle);
+  background: rgba(18, 19, 22, 0.35);
+}
+
+.gabbablu-page .service-row-item {
+  min-height: 76px;
+  padding: 13px 22px;
+  border-bottom-color: var(--hud-border-subtle);
+  transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.gabbablu-page .service-row-item:hover {
+  background: rgba(117, 187, 193, 0.06);
+  box-shadow: inset 2px 0 0 var(--hud-accent-cyan);
+}
+
+.gabbablu-page .service-row-left {
+  min-width: 0;
+  gap: 15px;
+}
+
+.gabbablu-page .service-thumb-placeholder {
+  width: 46px;
+  height: 46px;
+  border-color: var(--hud-border-subtle);
+  border-radius: 6px;
+  background: #202329;
+}
+
+.gabbablu-page .thumb-fallback {
+  color: var(--hud-accent-cyan);
+  font-size: 0.9rem;
+}
+
+.gabbablu-page .service-info-col {
+  min-width: 0;
+  gap: 5px;
+}
+
+.gabbablu-page .service-row-title {
+  color: var(--hud-text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.gabbablu-page .service-duration-badge {
+  color: var(--hud-text-muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+}
+
+.gabbablu-page .service-row-price {
+  padding-left: 12px;
+  color: var(--hud-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.gabbablu-page .team-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.gabbablu-page .team-member {
+  padding: 26px 18px 24px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+  transition: border-color 220ms ease, transform 220ms ease;
+}
+
+.gabbablu-page .team-member:hover {
+  border-color: rgba(117, 187, 193, 0.36);
+  transform: translateY(-3px);
+}
+
+.gabbablu-page .team-profile-image,
+.gabbablu-page .team-member .user-avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 17px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.gabbablu-page .team-member .user-avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 83%, rgba(117, 187, 193, 0.28) 0 28%, transparent 29%),
+    radial-gradient(circle at 50% 36%, rgba(232, 223, 204, 0.5) 0 17%, transparent 18%),
+    #22252b;
+  color: transparent;
+  font-size: 0;
+}
+
+.gabbablu-page .team-member h3 {
+  margin: 0 0 7px;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.gabbablu-page .team-member p {
+  color: var(--hud-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.gabbablu-page .about-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 54px);
+  align-items: center;
+  padding: clamp(22px, 4vw, 40px);
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+}
+
+.gabbablu-page .about-description p {
+  margin: 0;
+  color: var(--hud-text-secondary);
+  font-size: 0.94rem;
+  line-height: 1.9;
+}
+
+.gabbablu-page .map-placeholder {
+  position: relative;
+  isolation: isolate;
+  height: 220px;
+  overflow: hidden;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 6px;
+  background-color: #242a30;
+  background-image:
+    linear-gradient(32deg, transparent 46%, rgba(117, 187, 193, 0.14) 47% 48%, transparent 49%),
+    linear-gradient(145deg, transparent 43%, rgba(232, 223, 204, 0.08) 44% 45%, transparent 46%),
+    linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.05) 49% 50%, transparent 51%),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(255, 255, 255, 0.035) 35px 36px);
+  margin-bottom: 14px;
+}
+
+.gabbablu-page .map-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--hud-bg-main);
+  border-radius: 50% 50% 50% 0;
+  background: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 7px rgba(117, 187, 193, 0.16), 0 5px 20px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -65%) rotate(-45deg);
+}
+
+.gabbablu-page .map-address {
+  gap: 14px;
+  color: var(--hud-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.gabbablu-page .map-address button {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border: 1px solid rgba(117, 187, 193, 0.44);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--hud-accent-cyan);
+  font-family: var(--hud-font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.gabbablu-page .map-address button:hover {
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+}
+
+.gabbablu-page .modal-backdrop {
+  background: rgba(8, 9, 11, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.gabbablu-page .modal-content {
+  width: min(100%, 560px);
+  max-height: min(90vh, 900px);
+  padding: 32px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 10px;
+  background: var(--hud-bg-surface);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58);
+  scrollbar-color: #41464e var(--hud-bg-surface);
+}
+
+.gabbablu-page .modal-close-btn {
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 50%;
+  color: var(--hud-text-muted);
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.gabbablu-page .modal-close-btn:hover {
+  border-color: var(--hud-border-active);
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-text-primary);
+}
+
+.gabbablu-page .modal-step h2 {
+  padding-right: 36px;
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.55rem;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+}
+
+.gabbablu-page .modal-subtitle {
+  color: var(--hud-text-muted);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.gabbablu-page .employee-option-card {
+  padding: 14px 16px;
+  border-color: var(--hud-border-subtle);
+  border-radius: 7px;
+  background: var(--hud-bg-main);
+}
+
+.gabbablu-page .employee-option-card:hover {
+  border-color: var(--hud-border-active);
+  background: var(--hud-bg-surface-hover);
+}
+
+.gabbablu-page .employee-avatar {
+  border: 1px solid var(--hud-border-subtle);
+}
+
+.gabbablu-page .employee-avatar .user-avatar-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 84%, rgba(117, 187, 193, 0.28) 0 28%, transparent 29%),
+    radial-gradient(circle at 50% 36%, rgba(232, 223, 204, 0.5) 0 17%, transparent 18%),
+    #22252b;
+  color: transparent;
+  font-size: 0;
+}
+
+.gabbablu-page .employee-info h4 {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 0.97rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.gabbablu-page .employee-info p {
+  color: var(--hud-text-muted);
+}
+
+.gabbablu-page .select-arrow {
+  color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .calendar-container,
+.gabbablu-page .appointment-summary-card {
+  border-color: var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-main);
+}
+
+.gabbablu-page .calendar-header {
+  margin-bottom: 16px;
+}
+
+.gabbablu-page .calendar-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-color: var(--hud-border-subtle);
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-secondary);
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.gabbablu-page .calendar-nav-btn:hover:not(:disabled) {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .calendar-month-title {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.03rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.gabbablu-page .calendar-weekdays {
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gabbablu-page .calendar-days-grid {
+  gap: 5px;
+}
+
+.gabbablu-page .calendar-day-cell {
+  border-radius: 5px;
+  color: #555a62;
+  font-family: var(--hud-font-body);
+  font-size: 0.8rem;
+}
+
+.gabbablu-page .calendar-day-cell.available {
+  border-color: rgba(156, 165, 119, 0.65);
+  background: rgba(156, 165, 119, 0.15);
+  color: var(--hud-accent-green);
+}
+
+.gabbablu-page .calendar-day-cell.available:hover {
+  border-color: var(--hud-accent-green);
+  background: rgba(156, 165, 119, 0.25);
+}
+
+.gabbablu-page .calendar-day-cell.selected {
+  border-color: var(--hud-accent-cyan) !important;
+  background: var(--hud-accent-cyan) !important;
+  box-shadow: 0 0 18px rgba(117, 187, 193, 0.22);
+  color: var(--hud-bg-main) !important;
+}
+
+.gabbablu-page .picker-label {
+  color: var(--hud-text-secondary);
+  font-size: 0.77rem;
+  letter-spacing: 0.04em;
+}
+
+.gabbablu-page .time-chip {
+  padding: 9px 12px;
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+  font-size: 0.82rem;
+}
+
+.gabbablu-page .time-chip:hover {
+  border-color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .time-chip.selected {
+  border-color: var(--hud-text-primary);
+  background: var(--hud-text-primary);
+  color: var(--hud-bg-main);
+}
+
+.gabbablu-page .modal-next-btn,
+.gabbablu-page .auth-btn.primary,
+.gabbablu-page .submit-booking-btn {
+  border: 1px solid var(--hud-accent-cyan);
+  border-radius: 4px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  font-family: var(--hud-font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.gabbablu-page .modal-next-btn:hover:not(:disabled),
+.gabbablu-page .auth-btn.primary:hover,
+.gabbablu-page .submit-booking-btn:hover {
+  border-color: #8acbd0;
+  background: #8acbd0;
+  transform: translateY(-1px);
+}
+
+.gabbablu-page .auth-btn.secondary {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gabbablu-page .auth-btn.secondary:hover {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-bg-surface-hover);
+}
+
+.gabbablu-page .auth-divider {
+  color: var(--hud-text-muted);
+}
+
+.gabbablu-page .appointment-summary-card {
+  padding: 16px;
+}
+
+.gabbablu-page .summary-badge {
+  color: var(--hud-accent-cyan);
+  font-family: var(--hud-font-body);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+}
+
+.gabbablu-page .summary-row {
+  gap: 16px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.gabbablu-page .summary-label {
+  color: var(--hud-text-muted);
+}
+
+.gabbablu-page .summary-value {
+  color: var(--hud-text-secondary);
+  text-align: right;
+}
+
+.gabbablu-page .summary-value.highlight {
+  color: var(--hud-text-primary);
+}
+
+.gabbablu-page .form-group label {
+  color: var(--hud-text-secondary);
+  font-size: 0.78rem;
+}
+
+.gabbablu-page .form-group input,
+.gabbablu-page .form-group textarea {
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-body);
+  font-size: 0.86rem;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.gabbablu-page .form-group input::placeholder,
+.gabbablu-page .form-group textarea::placeholder {
+  color: #676c75;
+}
+
+.gabbablu-page .form-group input:focus,
+.gabbablu-page .form-group textarea:focus {
+  border-color: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 3px rgba(117, 187, 193, 0.1);
+}
+
+.gabbablu-page .form-checkbox-group input[type="checkbox"] {
+  accent-color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .form-checkbox-group label {
+  color: var(--hud-text-muted);
+  line-height: 1.55;
+}
+
+.gabbablu-page .cancellation-warning-box {
+  border: 1px solid rgba(217, 119, 6, 0.28);
+  border-left: 3px solid var(--hud-warning-amber);
+  border-radius: 4px;
+  background: rgba(217, 119, 6, 0.07);
+}
+
+.gabbablu-page .cancellation-warning-box strong {
+  color: #e7a653;
+}
+
+.gabbablu-page .cancellation-warning-box p {
+  color: var(--hud-text-muted);
+  line-height: 1.55;
+}
+
+.gabbablu-page .booking-step-footer {
+  border-top-color: var(--hud-border-subtle);
+}
+
+.gabbablu-page .booking-progress-step {
+  color: var(--hud-text-muted);
+}
+
+.gabbablu-page .booking-progress-step.current,
+.gabbablu-page .booking-progress-step.complete {
+  color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .booking-progress-dot {
+  width: 11px;
+  height: 11px;
+  border-color: #596069;
+}
+
+.gabbablu-page .booking-progress-step.current .booking-progress-dot,
+.gabbablu-page .booking-progress-step.complete .booking-progress-dot {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-accent-cyan);
+}
+
+.gabbablu-page .booking-progress-step.current .booking-progress-dot {
+  box-shadow: 0 0 12px rgba(117, 187, 193, 0.55);
+}
+
+.gabbablu-page .booking-progress-step.complete .booking-progress-dot {
+  box-shadow: 0 0 8px rgba(117, 187, 193, 0.34);
+}
+
+.gabbablu-page .booking-progress-label {
+  color: inherit;
+  font-family: var(--hud-font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+}
+
+.gabbablu-page .booking-back-btn {
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+}
+
+.gabbablu-page .booking-back-btn:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+.gabbablu-page button:focus-visible {
+  outline: 2px solid var(--hud-accent-cyan);
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .gabbablu-page .portfolio-gallery {
+    height: 410px;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+
+  .gabbablu-page .portfolio-main-image,
+  .gabbablu-page .portfolio-grid {
+    height: 100%;
+  }
+
+  .gabbablu-page .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .gabbablu-page .gabbablu-content {
+    padding: 18px 16px 50px;
+  }
+
+  .gabbablu-page .portfolio-gallery {
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 26px;
+  }
+
+  .gabbablu-page .portfolio-main-image {
+    height: 250px;
+  }
+
+  .gabbablu-page .portfolio-grid {
+    height: 210px;
+    gap: 6px;
+  }
+
+  .gabbablu-page .store-details {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .gabbablu-page .store-icon {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+  }
+
+  .gabbablu-page .store-name {
+    font-size: 1.7rem;
+  }
+
+  .gabbablu-page .store-address {
+    max-width: 230px;
+    font-size: 0.77rem;
+    line-height: 1.5;
+  }
+
+  .gabbablu-page .store-tabs {
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .gabbablu-page .tab-button {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  .gabbablu-page .section-heading {
+    font-size: 1.35rem;
+  }
+
+  .gabbablu-page .accordion-header {
+    padding: 14px;
+  }
+
+  .gabbablu-page .accordion-header-left {
+    gap: 12px;
+  }
+
+  .gabbablu-page .service-row-item {
+    padding: 12px 13px;
+  }
+
+  .gabbablu-page .service-row-left {
+    gap: 10px;
+  }
+
+  .gabbablu-page .service-thumb-placeholder {
+    width: 38px;
+    height: 38px;
+  }
+
+  .gabbablu-page .service-row-title,
+  .gabbablu-page .service-row-price {
+    font-size: 0.8rem;
+  }
+
+  .gabbablu-page .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .gabbablu-page .team-member {
+    padding: 20px 10px;
+  }
+
+  .gabbablu-page .team-profile-image,
+  .gabbablu-page .team-member .user-avatar-placeholder {
+    width: 76px;
+    height: 76px;
+  }
+
+  .gabbablu-page .about-card {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 20px;
+  }
+
+  .gabbablu-page .map-placeholder {
+    height: 190px;
+  }
+
+  .gabbablu-page .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .gabbablu-page .modal-content {
+    width: 100%;
+    max-height: 92vh;
+    padding: 28px 20px 18px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .gabbablu-page .calendar-container {
+    padding: 13px;
+  }
+
+  .gabbablu-page .calendar-days-grid {
+    gap: 3px;
+  }
+
+  .gabbablu-page .times-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gabbablu-page .booking-progress-label {
+    font-size: 0.57rem;
+  }
+
+  .gabbablu-page .summary-row {
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gabbablu-page .portfolio-image img,
+  .gabbablu-page .portfolio-main-image img,
+  .gabbablu-page .team-member,
+  .gabbablu-page .modal-close-btn,
+  .gabbablu-page .modal-next-btn,
+  .gabbablu-page .submit-booking-btn {
+    transition: none;
+  }
+}

@@ -19,7 +19,7 @@ function ServicesTab({ categories, isLoading, error, onSelectService }) {
       {isLoading ? (
         <p className="placeholder-message">Loading studio services...</p>
       ) : categories.length === 0 ? (
-        <p className="placeholder-message">Services and categories coming soon.</p>
+        <p className="placeholder-message">No services are available at this time.</p>
       ) : null}
       <div className="services-accordion-list">
         {categories.map((category) => {
@@ -54,14 +54,16 @@ function ServicesTab({ categories, isLoading, error, onSelectService }) {
                     >
                       <div className="service-row-left">
                         <div className="service-thumb-placeholder">
-                          <img
-                            src={service.image}
-                            alt={service.name}
-                            onError={(event) => {
-                              event.currentTarget.style.display = "none";
-                            }}
-                          />
-                          <span className="thumb-fallback">IMG</span>
+                          {service.image && (
+                            <img
+                              src={service.image}
+                              alt={service.name}
+                              onError={(event) => {
+                                event.currentTarget.style.display = "none";
+                              }}
+                            />
+                          )}
+                          <span className="thumb-fallback" aria-hidden="true">✦</span>
                         </div>
                         <div className="service-info-col">
                           <span className="service-row-title">{service.name}</span>

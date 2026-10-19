@@ -7,7 +7,7 @@ function TeamTab({ employees, isLoading }) {
       {isLoading ? (
         <p className="placeholder-message">Loading team profiles...</p>
       ) : employees.length === 0 ? (
-        <p className="placeholder-message">Team profiles coming soon.</p>
+        <p className="placeholder-message">No team profiles are currently available.</p>
       ) : (
         <div className="team-grid">
           {employees.map((employee) => (
