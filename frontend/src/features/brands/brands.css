@@ -1,0 +1,2135 @@
+/* ==========================================================================
+   BRAND STOREFRONT STYLES
+   ========================================================================== */
+
+.brand-page {
+  background-color: #181313;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.brand-content {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  box-sizing: border-box;
+}
+
+/* Portfolio Gallery */
+.brand-page .portfolio-gallery {
+  width: 100%;
+  height: 420px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.brand-page .portfolio-grid {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.brand-page .portfolio-image,
+.brand-page .portfolio-main-image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background-color: #353535;
+}
+
+.brand-page .portfolio-image img,
+.brand-page .portfolio-main-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Store Information Row */
+.brand-page .store-information {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.brand-page .store-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-page .store-icon {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #242020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #333;
+}
+
+.brand-page .store-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+.brand-page .store-name {
+  font-size: 1.6rem;
+  margin: 0 0 4px 0;
+}
+
+.brand-page .store-address {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin: 0;
+}
+
+.brand-page .placeholder-message {
+  color: #aaa;
+  margin: 12px 0;
+}
+
+/* Tabs */
+.brand-page .store-tabs {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid #302b2b;
+  margin-bottom: 24px;
+}
+
+.brand-page .tab-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1rem;
+  padding: 12px 0;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.brand-page .tab-button:hover {
+  color: #eee;
+}
+
+.brand-page .tab-button.active {
+  color: #fff;
+  font-weight: 600;
+}
+
+.brand-page .tab-button.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+}
+
+@keyframes studio-tab-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brand-page .tab-content > div {
+  animation: studio-tab-enter 260ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-page .tab-content > div {
+    animation: none;
+  }
+}
+
+/* Services Expandable Accordion */
+.brand-page .services-section {
+  width: 100%;
+}
+
+.brand-page .section-heading {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.brand-page .services-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brand-page .accordion-category {
+  background-color: #242020;
+  border: 1px solid #302b2b;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+}
+
+.brand-page .accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.brand-page .accordion-header:hover {
+  background-color: #2a2525;
+}
+
+.brand-page .accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-page .category-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #181313;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.brand-page .category-header-text h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.brand-page .category-header-text p {
+  margin: 2px 0 0 0;
+  font-size: 0.82rem;
+  color: #aaa;
+}
+
+.brand-page .accordion-arrow {
+  color: #aaa;
+  font-size: 0.85rem;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-page .accordion-arrow.open {
+  transform: rotate(90deg);
+}
+
+.brand-page .accordion-content-wrapper {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.25s ease-out;
+}
+
+.brand-page .accordion-content-wrapper.expanded {
+  max-height: 1200px;
+  opacity: 1;
+}
+
+.brand-page .accordion-content {
+  border-top: 1px solid #302b2b;
+  background-color: #1e1a1a;
+}
+
+.brand-page .service-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #282424;
+  cursor: pointer;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.brand-page .service-row-item:last-child {
+  border-bottom: none;
+}
+
+.brand-page .service-row-item:hover {
+  background-color: rgba(157, 78, 221, 0.1);
+  box-shadow: inset 3px 0 0 #9d4edd, 0 0 16px rgba(157, 78, 221, 0.16);
+}
+
+.brand-page .service-row-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-page .service-thumb-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background-color: #353535;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #3a3a3a;
+}
+
+.brand-page .service-thumb-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-page .thumb-fallback {
+  position: absolute;
+  color: #777;
+  font-size: 0.65rem;
+  font-weight: 700;
+  z-index: 1;
+}
+
+.brand-page .service-row-title {
+  color: #eee;
+  font-size: 0.92rem;
+}
+
+.brand-page .service-row-price {
+  color: #ccc;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* Team Grid */
+.brand-page .team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.brand-page .team-member {
+  background: #242020;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #302b2b;
+}
+
+.brand-page .team-profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.brand-page .team-member h3 {
+  margin: 0 0 4px 0;
+  font-size: 1rem;
+}
+
+.brand-page .team-member p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* About Layout */
+.brand-page .about-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  background: #242020;
+  padding: 24px;
+  border-radius: 10px;
+  border: 1px solid #302b2b;
+}
+
+.brand-page .map-placeholder {
+  height: 180px;
+  background: #353535;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+
+.brand-page .map-address {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.brand-page .map-address button {
+  background: #302b2b;
+  color: #eee;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Modal Styling */
+.brand-page .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.brand-page .modal-content {
+  background-color: #242020;
+  border: 1px solid #333;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 14px;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.brand-page .modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+@keyframes booking-step-enter {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.brand-page .modal-step {
+  animation: booking-step-enter 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-page .modal-step {
+    animation: none;
+  }
+}
+
+.brand-page .modal-step h2 {
+  margin: 0 0 6px 0;
+  font-size: 1.3rem;
+  color: #fff;
+}
+
+.brand-page .modal-subtitle {
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.brand-page .booking-step-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #302b2b;
+}
+
+.brand-page .booking-step-indicator {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brand-page .booking-step-indicator li {
+  min-width: 0;
+}
+
+.brand-page .booking-progress-step {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+  border: 0;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+}
+
+.brand-page .booking-progress-step:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.brand-page .booking-progress-step.current,
+.brand-page .booking-progress-step.complete {
+  color: #e0aaff;
+}
+
+.brand-page .booking-progress-dot {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #777;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.brand-page .booking-progress-step.current .booking-progress-dot,
+.brand-page .booking-progress-step.complete .booking-progress-dot {
+  border-color: #9d4edd;
+  background: #9d4edd;
+}
+
+.brand-page .booking-progress-step.current .booking-progress-dot {
+  box-shadow: 0 0 8px rgba(157, 78, 221, 0.55);
+}
+
+.brand-page .booking-progress-step:focus-visible,
+.brand-page .booking-back-btn:focus-visible {
+  outline: 2px solid #c77dff;
+  outline-offset: 3px;
+}
+
+.brand-page .booking-progress-label {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-page .booking-back-btn {
+  padding: 6px 14px;
+  border: 1px solid #4a4141;
+  border-radius: 6px;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.brand-page .booking-back-btn:hover {
+  border-color: #9d4edd;
+  color: #fff;
+}
+
+.brand-page .employee-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brand-page .employee-option-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 16px;
+  background: #181313;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #302b2b;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.brand-page .employee-option-card:hover {
+  border-color: #555;
+  background: #1e1919;
+}
+
+.brand-page .employee-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #353535;
+}
+
+.brand-page .employee-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-page .employee-info {
+  flex: 1;
+}
+
+.brand-page .employee-info h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.brand-page .employee-info p {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.brand-page .select-arrow {
+  color: #777;
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   MONTHLY CALENDAR GRID & TIME PICKER STYLES
+   ========================================================================== */
+
+.brand-page .calendar-container {
+  background: #181313;
+  border: 1px solid #302b2b;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.brand-page .calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.brand-page .calendar-nav-btn {
+  background: #242020;
+  color: #eee;
+  border: 1px solid #3d3737;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.brand-page .calendar-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.brand-page .calendar-month-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #eee;
+}
+
+.brand-page .calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  color: #777;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.brand-page .calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.brand-page .calendar-day-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #555;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+}
+
+.brand-page .calendar-day-cell-empty {
+  aspect-ratio: 1;
+}
+
+/* Available Dates Color Highlight */
+.brand-page .calendar-day-cell.available {
+  background-color: #2d1d3a;
+  border-color: #7b2cbf;
+  color: #e0aaff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.brand-page .calendar-day-cell.available:hover {
+  background-color: #3c234f;
+  border-color: #9d4edd;
+}
+
+/* Selected Date Style */
+.brand-page .calendar-day-cell.selected {
+  background-color: #9d4edd !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+}
+
+.brand-page .picker-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+.brand-page .time-slots-section {
+  margin-bottom: 20px;
+}
+
+.brand-page .times-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.brand-page .time-chip {
+  background: #181313;
+  border: 1px solid #302b2b;
+  color: #eee;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.brand-page .time-chip:hover {
+  border-color: #555;
+}
+
+.brand-page .time-chip.selected {
+  background: #eee;
+  color: #181313;
+  font-weight: 600;
+  border-color: #eee;
+}
+
+.brand-page .modal-next-btn {
+  width: 100%;
+  background: #fff;
+  color: #181313;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.brand-page .modal-next-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Auth Buttons */
+.brand-page .auth-choice-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.brand-page .auth-btn {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.brand-page .auth-btn.primary {
+  background: #fff;
+  color: #181313;
+}
+
+.brand-page .auth-btn.secondary {
+  background: #302b2b;
+  color: #eee;
+  border: 1px solid #3a3535;
+}
+
+.brand-page .auth-divider {
+  text-align: center;
+  color: #777;
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+
+/* Summary Card */
+.brand-page .appointment-summary-card {
+  background: #181313;
+  border: 1px solid #302b2b;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+
+.brand-page .summary-header {
+  margin-bottom: 10px;
+}
+
+.brand-page .summary-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #aaa;
+  font-weight: 700;
+}
+
+.brand-page .summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brand-page .summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.brand-page .summary-label {
+  color: #888;
+}
+
+.brand-page .summary-value {
+  color: #eee;
+  font-weight: 500;
+}
+
+.brand-page .summary-value.highlight {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Guest Form Inputs */
+.brand-page .guest-booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brand-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brand-page .form-group label {
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.brand-page .form-group input,
+.brand-page .form-group textarea {
+  background: #181313;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.brand-page .form-group input:focus,
+.brand-page .form-group textarea:focus {
+  border-color: #666;
+}
+
+.brand-page .form-checkbox-group {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 2px;
+}
+
+.brand-page .form-checkbox-group input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: #eee;
+}
+
+.brand-page .form-checkbox-group label {
+  font-size: 0.78rem;
+  color: #bbb;
+  line-height: 1.35;
+}
+
+.brand-page .cancellation-warning-box {
+  background: #1c1818;
+  border: 1px solid #3a2c2c;
+  border-left: 3px solid #b34a4a;
+  padding: 12px 14px;
+  border-radius: 6px;
+}
+
+.brand-page .cancellation-warning-box strong {
+  display: block;
+  font-size: 0.82rem;
+  color: #e57373;
+  margin-bottom: 4px;
+}
+
+.brand-page .cancellation-warning-box p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #aaa;
+  line-height: 1.35;
+}
+
+.brand-page .submit-booking-btn {
+  background: #fff;
+  color: #181313;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* Responsive Rules */
+@media (max-width: 900px) {
+  .brand-page .portfolio-gallery {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .brand-page .portfolio-main-image {
+    height: 250px;
+  }
+  .brand-page .portfolio-grid {
+    height: 250px;
+  }
+  .brand-page .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .brand-page .about-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Service Info Column & Duration Badge */
+.brand-page .service-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.brand-page .service-duration-badge {
+  font-size: 0.78rem;
+  color: #aaa;
+  font-weight: 500;
+}
+
+/* HÚÐ & BLEK customer studio identity */
+.brand-page {
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-body);
+}
+
+.brand-page h1,
+.brand-page h2,
+.brand-page h3,
+.brand-page h4,
+.brand-page .store-name,
+.brand-page .section-heading {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  letter-spacing: 0.07em;
+}
+
+.brand-page .brand-content {
+  max-width: 1160px;
+  padding: 32px 24px 76px;
+}
+
+.brand-page .portfolio-gallery {
+  height: clamp(360px, 39vw, 470px);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-bottom: 34px;
+  border-radius: 2px;
+}
+
+.brand-page .portfolio-grid {
+  gap: 8px;
+}
+
+.brand-page .portfolio-image,
+.brand-page .portfolio-main-image {
+  background-color: var(--hud-bg-surface);
+}
+
+.brand-page .portfolio-image img,
+.brand-page .portfolio-main-image img {
+  filter: saturate(0.72) contrast(0.96);
+  transition: filter 500ms ease, transform 750ms cubic-bezier(0.2, 0.65, 0.25, 1);
+}
+
+.brand-page .portfolio-image:hover img,
+.brand-page .portfolio-main-image:hover img {
+  filter: saturate(0.9) contrast(1);
+  transform: scale(1.035);
+}
+
+.brand-page .store-information {
+  margin: 0 0 32px;
+}
+
+.brand-page .store-details {
+  gap: 20px;
+}
+
+.brand-page .store-icon {
+  width: 68px;
+  height: 68px;
+  min-width: 68px;
+  background: var(--hud-bg-surface);
+  border: 1px solid var(--hud-border-subtle);
+}
+
+.brand-page .store-name {
+  margin: 0 0 7px;
+  font-size: clamp(1.8rem, 4vw, 2.65rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.brand-page .store-address {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--hud-text-muted);
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+}
+
+.brand-page .store-location-pin {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--hud-accent-cyan);
+  transform: rotate(-45deg);
+}
+
+.brand-page .store-location-pin::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--hud-bg-main);
+  content: "";
+}
+
+.brand-page .placeholder-message {
+  padding: 14px 16px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.brand-page .store-tabs {
+  gap: clamp(22px, 5vw, 48px);
+  margin-bottom: 30px;
+  border-bottom-color: var(--hud-border-subtle);
+}
+
+.brand-page .tab-button {
+  padding: 12px 0 14px;
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-body);
+  font-size: 0.84rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.brand-page .tab-button:hover,
+.brand-page .tab-button.active {
+  color: var(--hud-text-primary);
+}
+
+.brand-page .tab-button.active::after {
+  bottom: -1px;
+  height: 2px;
+  background: var(--hud-accent-cyan);
+}
+
+.brand-page .section-heading {
+  margin: 0 0 22px;
+  font-size: 1.55rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.brand-page .services-accordion-list {
+  gap: 10px;
+}
+
+.brand-page .accordion-category {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+}
+
+.brand-page .accordion-header {
+  min-height: 78px;
+  padding: 16px 22px;
+  transition: background-color 180ms ease;
+}
+
+.brand-page .accordion-header:hover {
+  background: var(--hud-bg-surface-hover);
+}
+
+.brand-page .category-icon-circle {
+  width: 42px;
+  height: 42px;
+  background: var(--hud-bg-main);
+  color: var(--hud-accent-cyan);
+}
+
+.brand-page .category-header-text h3 {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.04rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.brand-page .category-header-text p {
+  margin-top: 5px;
+  color: var(--hud-text-muted);
+  font-size: 0.78rem;
+}
+
+.brand-page .accordion-arrow {
+  color: var(--hud-text-muted);
+}
+
+.brand-page .accordion-content {
+  border-top-color: var(--hud-border-subtle);
+  background: rgba(18, 19, 22, 0.35);
+}
+
+.brand-page .service-row-item {
+  min-height: 76px;
+  padding: 13px 22px;
+  border-bottom-color: var(--hud-border-subtle);
+  transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.brand-page .service-row-item:hover {
+  background: rgba(117, 187, 193, 0.06);
+  box-shadow: inset 2px 0 0 var(--hud-accent-cyan);
+}
+
+.brand-page .service-row-left {
+  min-width: 0;
+  gap: 15px;
+}
+
+.brand-page .service-thumb-placeholder {
+  width: 46px;
+  height: 46px;
+  border-color: var(--hud-border-subtle);
+  border-radius: 6px;
+  background: #202329;
+}
+
+.brand-page .thumb-fallback {
+  color: var(--hud-accent-cyan);
+  font-size: 0.9rem;
+}
+
+.brand-page .service-info-col {
+  min-width: 0;
+  gap: 5px;
+}
+
+.brand-page .service-row-title {
+  color: var(--hud-text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.brand-page .service-duration-badge {
+  color: var(--hud-text-muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+}
+
+.brand-page .service-row-price {
+  padding-left: 12px;
+  color: var(--hud-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.brand-page .team-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.brand-page .team-member {
+  padding: 26px 18px 24px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+  transition: border-color 220ms ease, transform 220ms ease;
+}
+
+.brand-page .team-member:hover {
+  border-color: rgba(117, 187, 193, 0.36);
+  transform: translateY(-3px);
+}
+
+.brand-page .team-profile-image,
+.brand-page .team-member .user-avatar-placeholder {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 17px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.brand-page .team-member .user-avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 83%, rgba(117, 187, 193, 0.28) 0 28%, transparent 29%),
+    radial-gradient(circle at 50% 36%, rgba(232, 223, 204, 0.5) 0 17%, transparent 18%),
+    #22252b;
+  color: transparent;
+  font-size: 0;
+}
+
+.brand-page .team-member h3 {
+  margin: 0 0 7px;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.brand-page .team-member p {
+  color: var(--hud-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.brand-page .about-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 54px);
+  align-items: center;
+  padding: clamp(22px, 4vw, 40px);
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-surface);
+}
+
+.brand-page .about-description p {
+  margin: 0;
+  color: var(--hud-text-secondary);
+  font-size: 0.94rem;
+  line-height: 1.9;
+}
+
+.brand-page .map-placeholder {
+  position: relative;
+  isolation: isolate;
+  height: 220px;
+  overflow: hidden;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 6px;
+  background-color: #242a30;
+  background-image:
+    linear-gradient(32deg, transparent 46%, rgba(117, 187, 193, 0.14) 47% 48%, transparent 49%),
+    linear-gradient(145deg, transparent 43%, rgba(232, 223, 204, 0.08) 44% 45%, transparent 46%),
+    linear-gradient(90deg, transparent 48%, rgba(255, 255, 255, 0.05) 49% 50%, transparent 51%),
+    repeating-linear-gradient(0deg, transparent 0 34px, rgba(255, 255, 255, 0.035) 35px 36px);
+  margin-bottom: 14px;
+}
+
+.brand-page .map-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--hud-bg-main);
+  border-radius: 50% 50% 50% 0;
+  background: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 7px rgba(117, 187, 193, 0.16), 0 5px 20px rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -65%) rotate(-45deg);
+}
+
+.brand-page .map-address {
+  gap: 14px;
+  color: var(--hud-text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.brand-page .map-address button {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border: 1px solid rgba(117, 187, 193, 0.44);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--hud-accent-cyan);
+  font-family: var(--hud-font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.brand-page .map-address button:hover {
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+}
+
+.brand-page .modal-backdrop {
+  background: rgba(8, 9, 11, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.brand-page .modal-content {
+  width: min(100%, 560px);
+  max-height: min(90vh, 900px);
+  padding: 32px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 10px;
+  background: var(--hud-bg-surface);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58);
+  scrollbar-color: #41464e var(--hud-bg-surface);
+}
+
+.brand-page .modal-close-btn {
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 50%;
+  color: var(--hud-text-muted);
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.brand-page .modal-close-btn:hover {
+  border-color: var(--hud-border-active);
+  background: var(--hud-bg-surface-hover);
+  color: var(--hud-text-primary);
+}
+
+.brand-page .modal-step h2 {
+  padding-right: 36px;
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.55rem;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+}
+
+.brand-page .modal-subtitle {
+  color: var(--hud-text-muted);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.brand-page .employee-option-card {
+  padding: 14px 16px;
+  border-color: var(--hud-border-subtle);
+  border-radius: 7px;
+  background: var(--hud-bg-main);
+}
+
+.brand-page .employee-option-card:hover {
+  border-color: var(--hud-border-active);
+  background: var(--hud-bg-surface-hover);
+}
+
+.brand-page .employee-avatar {
+  border: 1px solid var(--hud-border-subtle);
+}
+
+.brand-page .employee-avatar .user-avatar-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 84%, rgba(117, 187, 193, 0.28) 0 28%, transparent 29%),
+    radial-gradient(circle at 50% 36%, rgba(232, 223, 204, 0.5) 0 17%, transparent 18%),
+    #22252b;
+  color: transparent;
+  font-size: 0;
+}
+
+.brand-page .employee-info h4 {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 0.97rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.brand-page .employee-info p {
+  color: var(--hud-text-muted);
+}
+
+.brand-page .select-arrow {
+  color: var(--hud-accent-cyan);
+}
+
+.brand-page .calendar-container,
+.brand-page .appointment-summary-card {
+  border-color: var(--hud-border-subtle);
+  border-radius: 8px;
+  background: var(--hud-bg-main);
+}
+
+.brand-page .calendar-header {
+  margin-bottom: 16px;
+}
+
+.brand-page .calendar-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-color: var(--hud-border-subtle);
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-secondary);
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.brand-page .calendar-nav-btn:hover:not(:disabled) {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+.brand-page .calendar-month-title {
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: 1.03rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.brand-page .calendar-weekdays {
+  color: var(--hud-text-muted);
+  font-family: var(--hud-font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand-page .calendar-days-grid {
+  gap: 5px;
+}
+
+.brand-page .calendar-day-cell {
+  border-radius: 5px;
+  color: #555a62;
+  font-family: var(--hud-font-body);
+  font-size: 0.8rem;
+}
+
+.brand-page .calendar-day-cell.available {
+  border-color: rgba(156, 165, 119, 0.65);
+  background: rgba(156, 165, 119, 0.15);
+  color: var(--hud-accent-green);
+}
+
+.brand-page .calendar-day-cell.available:hover {
+  border-color: var(--hud-accent-green);
+  background: rgba(156, 165, 119, 0.25);
+}
+
+.brand-page .calendar-day-cell.selected {
+  border-color: var(--hud-accent-cyan) !important;
+  background: var(--hud-accent-cyan) !important;
+  box-shadow: 0 0 18px rgba(117, 187, 193, 0.22);
+  color: var(--hud-bg-main) !important;
+}
+
+.brand-page .picker-label {
+  color: var(--hud-text-secondary);
+  font-size: 0.77rem;
+  letter-spacing: 0.04em;
+}
+
+.brand-page .time-chip {
+  padding: 9px 12px;
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+  font-size: 0.82rem;
+}
+
+.brand-page .time-chip:hover {
+  border-color: var(--hud-accent-cyan);
+}
+
+.brand-page .time-chip.selected {
+  border-color: var(--hud-text-primary);
+  background: var(--hud-text-primary);
+  color: var(--hud-bg-main);
+}
+
+.brand-page .modal-next-btn,
+.brand-page .auth-btn.primary,
+.brand-page .submit-booking-btn {
+  border: 1px solid var(--hud-accent-cyan);
+  border-radius: 4px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  font-family: var(--hud-font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.brand-page .modal-next-btn:hover:not(:disabled),
+.brand-page .auth-btn.primary:hover,
+.brand-page .submit-booking-btn:hover {
+  border-color: #8acbd0;
+  background: #8acbd0;
+  transform: translateY(-1px);
+}
+
+.brand-page .auth-btn.secondary {
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand-page .auth-btn.secondary:hover {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-bg-surface-hover);
+}
+
+.brand-page .auth-divider {
+  color: var(--hud-text-muted);
+}
+
+.brand-page .appointment-summary-card {
+  padding: 16px;
+}
+
+.brand-page .summary-badge {
+  color: var(--hud-accent-cyan);
+  font-family: var(--hud-font-body);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+}
+
+.brand-page .summary-row {
+  gap: 16px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.brand-page .summary-label {
+  color: var(--hud-text-muted);
+}
+
+.brand-page .summary-value {
+  color: var(--hud-text-secondary);
+  text-align: right;
+}
+
+.brand-page .summary-value.highlight {
+  color: var(--hud-text-primary);
+}
+
+.brand-page .form-group label {
+  color: var(--hud-text-secondary);
+  font-size: 0.78rem;
+}
+
+.brand-page .form-group input,
+.brand-page .form-group textarea {
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-body);
+  font-size: 0.86rem;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.brand-page .form-group input::placeholder,
+.brand-page .form-group textarea::placeholder {
+  color: #676c75;
+}
+
+.brand-page .form-group input:focus,
+.brand-page .form-group textarea:focus {
+  border-color: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 3px rgba(117, 187, 193, 0.1);
+}
+
+.brand-page .form-checkbox-group input[type="checkbox"] {
+  accent-color: var(--hud-accent-cyan);
+}
+
+.brand-page .form-checkbox-group label {
+  color: var(--hud-text-muted);
+  line-height: 1.55;
+}
+
+.brand-page .cancellation-warning-box {
+  border: 1px solid rgba(217, 119, 6, 0.28);
+  border-left: 3px solid var(--hud-warning-amber);
+  border-radius: 4px;
+  background: rgba(217, 119, 6, 0.07);
+}
+
+.brand-page .cancellation-warning-box strong {
+  color: #e7a653;
+}
+
+.brand-page .cancellation-warning-box p {
+  color: var(--hud-text-muted);
+  line-height: 1.55;
+}
+
+.brand-page .booking-step-footer {
+  border-top-color: var(--hud-border-subtle);
+}
+
+.brand-page .booking-progress-step {
+  color: var(--hud-text-muted);
+}
+
+.brand-page .booking-progress-step.current,
+.brand-page .booking-progress-step.complete {
+  color: var(--hud-accent-cyan);
+}
+
+.brand-page .booking-progress-dot {
+  width: 11px;
+  height: 11px;
+  border-color: #596069;
+}
+
+.brand-page .booking-progress-step.current .booking-progress-dot,
+.brand-page .booking-progress-step.complete .booking-progress-dot {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-accent-cyan);
+}
+
+.brand-page .booking-progress-step.current .booking-progress-dot {
+  box-shadow: 0 0 12px rgba(117, 187, 193, 0.55);
+}
+
+.brand-page .booking-progress-step.complete .booking-progress-dot {
+  box-shadow: 0 0 8px rgba(117, 187, 193, 0.34);
+}
+
+.brand-page .booking-progress-label {
+  color: inherit;
+  font-family: var(--hud-font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+}
+
+.brand-page .booking-back-btn {
+  border-color: var(--hud-border-subtle);
+  border-radius: 4px;
+  color: var(--hud-text-secondary);
+  font-family: var(--hud-font-body);
+}
+
+.brand-page .booking-back-btn:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+.brand-page button:focus-visible {
+  outline: 2px solid var(--hud-accent-cyan);
+  outline-offset: 3px;
+}
+
+.brand-page .studio-cover-image {
+  width: 100%;
+  height: clamp(180px, 26vw, 300px);
+  margin-bottom: 10px;
+  overflow: hidden;
+  background: var(--hud-bg-surface);
+}
+
+.brand-page .studio-cover-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-page .portfolio-gallery {
+  position: relative;
+}
+
+.brand-page .portfolio-layout-grid {
+  height: auto;
+  min-height: 300px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(150px, 1fr);
+  overflow: visible;
+}
+
+.brand-page .portfolio-layout-grid .portfolio-image {
+  min-height: 150px;
+}
+
+.brand-page .portfolio-layout-masonry {
+  display: block;
+  height: auto;
+  columns: 3 220px;
+  column-gap: 8px;
+  overflow: visible;
+  border-radius: 0;
+}
+
+.brand-page .portfolio-layout-masonry .portfolio-image {
+  height: auto;
+  min-height: 150px;
+  margin: 0 0 8px;
+  break-inside: avoid;
+}
+
+.brand-page .portfolio-layout-masonry .portfolio-image img {
+  position: static;
+  height: auto;
+  min-height: 150px;
+  object-fit: cover;
+}
+
+.brand-page .portfolio-layout-mosaic {
+  height: auto;
+  min-height: 360px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(100px, 15vw);
+  overflow: visible;
+}
+
+.brand-page .portfolio-layout-mosaic .portfolio-image:nth-child(5n + 1) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.brand-page .portfolio-layout-mosaic .portfolio-image:nth-child(5n + 4) {
+  grid-column: span 2;
+}
+
+.brand-page .portfolio-layout-feature {
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+}
+
+.brand-page .portfolio-layout-feature .portfolio-grid {
+  grid-auto-rows: minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.brand-page .portfolio-error-message {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  bottom: 10px;
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 4px;
+  background: rgba(20, 16, 16, 0.88);
+  color: #ffb4b4;
+  font-size: 0.78rem;
+}
+
+.brand-page .portfolio-empty-state {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  border: 1px solid var(--hud-border-subtle);
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-secondary);
+  text-align: center;
+}
+
+.brand-page .portfolio-carousel {
+  position: relative;
+  width: 100%;
+  height: clamp(300px, 39vw, 470px);
+  margin-bottom: 34px;
+  overflow: hidden;
+  background: var(--hud-bg-surface);
+}
+
+.brand-page .portfolio-carousel-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-page .portfolio-carousel-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-page .portfolio-carousel-controls {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px;
+  background: rgba(20, 16, 16, 0.82);
+  color: #fff;
+}
+
+.brand-page .portfolio-carousel-controls button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--hud-border-subtle);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.brand-page .portfolio-carousel-controls button:hover {
+  border-color: var(--hud-accent-cyan);
+  color: var(--hud-accent-cyan);
+}
+
+@media (max-width: 900px) {
+  .brand-page .portfolio-gallery {
+    height: 410px;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+
+  .brand-page .portfolio-main-image,
+  .brand-page .portfolio-grid {
+    height: 100%;
+  }
+
+  .brand-page .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-page .brand-content {
+    padding: 18px 16px 50px;
+  }
+
+  .brand-page .portfolio-gallery {
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 26px;
+  }
+
+  .brand-page .portfolio-main-image {
+    height: 250px;
+  }
+
+  .brand-page .portfolio-grid {
+    height: 210px;
+    gap: 6px;
+  }
+
+  .brand-page .store-details {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .brand-page .store-icon {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+  }
+
+  .brand-page .store-name {
+    font-size: 1.7rem;
+  }
+
+  .brand-page .store-address {
+    max-width: 230px;
+    font-size: 0.77rem;
+    line-height: 1.5;
+  }
+
+  .brand-page .store-tabs {
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .brand-page .tab-button {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+
+  .brand-page .section-heading {
+    font-size: 1.35rem;
+  }
+
+  .brand-page .accordion-header {
+    padding: 14px;
+  }
+
+  .brand-page .accordion-header-left {
+    gap: 12px;
+  }
+
+  .brand-page .service-row-item {
+    padding: 12px 13px;
+  }
+
+  .brand-page .service-row-left {
+    gap: 10px;
+  }
+
+  .brand-page .service-thumb-placeholder {
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand-page .service-row-title,
+  .brand-page .service-row-price {
+    font-size: 0.8rem;
+  }
+
+  .brand-page .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .brand-page .team-member {
+    padding: 20px 10px;
+  }
+
+  .brand-page .team-profile-image,
+  .brand-page .team-member .user-avatar-placeholder {
+    width: 76px;
+    height: 76px;
+  }
+
+  .brand-page .about-card {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 20px;
+  }
+
+  .brand-page .map-placeholder {
+    height: 190px;
+  }
+
+  .brand-page .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .brand-page .modal-content {
+    width: 100%;
+    max-height: 92vh;
+    padding: 28px 20px 18px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .brand-page .calendar-container {
+    padding: 13px;
+  }
+
+  .brand-page .calendar-days-grid {
+    gap: 3px;
+  }
+
+  .brand-page .times-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .brand-page .booking-progress-label {
+    font-size: 0.57rem;
+  }
+
+  .brand-page .summary-row {
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-page .portfolio-image img,
+  .brand-page .portfolio-main-image img,
+  .brand-page .team-member,
+  .brand-page .modal-close-btn,
+  .brand-page .modal-next-btn,
+  .brand-page .submit-booking-btn {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .brand-page .portfolio-layout-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(140px, 1fr);
+  }
+
+  .brand-page .portfolio-layout-mosaic {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .brand-page .portfolio-layout-feature {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .brand-page .studio-cover-image {
+    height: 180px;
+  }
+
+  .brand-page .portfolio-layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 140px;
+  }
+
+  .brand-page .portfolio-layout-grid .portfolio-image {
+    min-height: 140px;
+  }
+
+  .brand-page .portfolio-layout-masonry {
+    columns: 2 140px;
+  }
+
+  .brand-page .portfolio-layout-mosaic {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 110px;
+  }
+
+  .brand-page .portfolio-layout-feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .brand-page .portfolio-layout-feature .portfolio-main-image {
+    height: 250px;
+  }
+
+  .brand-page .portfolio-layout-feature .portfolio-grid {
+    height: auto;
+    grid-auto-rows: 140px;
+    grid-template-rows: none;
+  }
+
+  .brand-page .portfolio-carousel {
+    height: 280px;
+  }
+}

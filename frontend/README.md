@@ -2,6 +2,14 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Source organization
+
+- `src/pages/` contains lightweight route adapters used by `App.jsx`.
+- `src/features/<domain>/` owns domain-specific screens, components, hooks, modals, data, and tests. `src/features/brands/` contains shared storefront behavior plus brand-specific entry points.
+- `src/components/common/` and `src/components/layout/` contain UI shared across features.
+- `src/utils/` contains utilities shared across feature boundaries. `src/services/` contains shared API access, `src/styles/` contains global styles, and `src/assets/` contains source-managed assets.
+- Use `.jsx` for React components and `.js` for non-component modules such as data and utilities.
+
 ## Available Scripts
 
 In the project directory, you can run:
