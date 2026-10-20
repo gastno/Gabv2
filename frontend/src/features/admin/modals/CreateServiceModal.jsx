@@ -34,7 +34,7 @@ function CreateServiceModal({
       onClick={() => setServiceModalOpen(false)}
     >
       <div
-        className="admin-modal-box create-service-modal-box"
+        className="admin-modal-box"
         onClick={(e) => e.stopPropagation()}
       >
         <button

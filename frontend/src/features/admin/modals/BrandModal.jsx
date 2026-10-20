@@ -13,7 +13,7 @@ function BrandModal({
   return (
     <div className="admin-modal-backdrop" onClick={closeInspectModal}>
       <div
-        className={`admin-modal-box brand-modal-box ${isEditMode ? "brand-modal-box-edit" : ""}`}
+        className="admin-modal-box"
         onClick={(e) => e.stopPropagation()}
       >
         <button

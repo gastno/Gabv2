@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./AdminModals.css";
 import "./ServiceStaffModal.css";
 import { staffServiceApi, getAssetUrl } from "../../../services/api";
 import UserAvatar from "../../../components/common/UserAvatar/UserAvatar";

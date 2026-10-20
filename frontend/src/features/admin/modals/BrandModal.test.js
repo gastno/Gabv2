@@ -28,13 +28,15 @@ function BrandModalHarness() {
 }
 
 describe("BrandModal", () => {
-  it("expands the modal and makes the form full width in edit mode", () => {
+  it("keeps the shared modal width when entering edit mode", () => {
     render(<BrandModalHarness />);
+    const modal = screen.getByRole("heading", { name: "Brand Details" }).parentElement;
+    const initialModalClasses = modal.className;
 
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
-    expect(screen.getByRole("heading", { name: "Brand Details" }).parentElement)
-      .toHaveClass("brand-modal-box-edit");
+    expect(modal.className).toBe(initialModalClasses);
+    expect(modal).toHaveClass("admin-modal-box");
     expect(screen.getByDisplayValue("Gabbablu").closest("form"))
       .toHaveClass("full-width-modal-form");
   });
