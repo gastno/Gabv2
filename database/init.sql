@@ -17,6 +17,8 @@ CREATE TABLE brands (
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(100) NOT NULL UNIQUE,
     location TEXT NOT NULL,
+    description_en TEXT,
+    description_is TEXT,
     about_description TEXT,
     logo_url VARCHAR(512),
     cover_image_url VARCHAR(512),

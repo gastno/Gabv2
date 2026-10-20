@@ -85,6 +85,35 @@ test('appointment list and detail responses include customer contact and health 
   assert.equal(deniedResponse.body.appointment, undefined);
 });
 
+test('appointment ledger query reads the localized service name and scopes admin reads to assigned brands', async () => {
+  let query;
+  db.query = async (sql, params) => {
+    query = { sql, params };
+    return { rows: [{ ...appointment, service_name: 'Lash lift' }] };
+  };
+
+  const res = response();
+  await controller.listAppointments({
+    user: { id: 8, type: 'staff', role: 'admin' },
+    query: { brand_id: '2' },
+  }, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.appointments[0].service_name, 'Lash lift');
+  assert.match(query.sql, /service\.name_en AS service_name/);
+  assert.doesNotMatch(query.sql, /service\.name AS service_name/);
+  assert.match(query.sql, /staff_brands scope/);
+  assert.deepEqual(query.params, [2, 8]);
+
+  const invalidBrandResponse = response();
+  await controller.listAppointments({
+    user: { id: 8, type: 'staff', role: 'admin' },
+    query: { brand_id: 'invalid' },
+  }, invalidBrandResponse);
+  assert.equal(invalidBrandResponse.statusCode, 400);
+  assert.equal(invalidBrandResponse.body.appointments, undefined);
+});
+
 test('fee-status updates accept each enum value and return the saved row without changing appointment status', async () => {
   const validStatuses = ['none', 'awaiting_fee', 'fee_charged', 'fee_waived'];
   const statements = [];

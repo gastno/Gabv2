@@ -24,6 +24,10 @@
   box-sizing: border-box;
 }
 
+.brand-modal-box-edit {
+  max-width: 760px;
+}
+
 .modal-close {
   position: absolute;
   top: 16px;

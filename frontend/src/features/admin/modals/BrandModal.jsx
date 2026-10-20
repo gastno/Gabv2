@@ -12,7 +12,10 @@ function BrandModal({
 }) {
   return (
     <div className="admin-modal-backdrop" onClick={closeInspectModal}>
-      <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`admin-modal-box brand-modal-box ${isEditMode ? "brand-modal-box-edit" : ""}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           type="button"
           className="modal-close"
@@ -22,7 +25,10 @@ function BrandModal({
         </button>
         <h3>Brand Details</h3>
 
-        <form onSubmit={handleSaveBrandEdit} className="admin-form">
+        <form
+          onSubmit={handleSaveBrandEdit}
+          className={`admin-form${isEditMode ? " full-width-modal-form" : ""}`}
+        >
           <div className="form-group">
             <label>Brand Name</label>
             {isEditMode ? (
@@ -69,21 +75,44 @@ function BrandModal({
           </div>
 
           <div className="form-group">
-            <label>About / Description</label>
+            <label htmlFor="brand-description-en">Description (English)</label>
             {isEditMode ? (
               <textarea
+                id="brand-description-en"
                 rows="4"
-                value={tempInspectBrand.about_description || ""}
+                value={tempInspectBrand.description_en ?? tempInspectBrand.about_description ?? ""}
                 onChange={(e) =>
                   setTempInspectBrand({
                     ...tempInspectBrand,
+                    description_en: e.target.value,
                     about_description: e.target.value,
                   })
                 }
               />
             ) : (
               <div className="read-only-field">
-                {tempInspectBrand.about_description || "N/A"}
+                {tempInspectBrand.description_en ?? tempInspectBrand.about_description ?? "N/A"}
+              </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="brand-description-is">Description (Icelandic)</label>
+            {isEditMode ? (
+              <textarea
+                id="brand-description-is"
+                rows="4"
+                value={tempInspectBrand.description_is || ""}
+                onChange={(e) =>
+                  setTempInspectBrand({
+                    ...tempInspectBrand,
+                    description_is: e.target.value,
+                  })
+                }
+              />
+            ) : (
+              <div className="read-only-field">
+                {tempInspectBrand.description_is || "N/A"}
               </div>
             )}
           </div>

@@ -438,8 +438,13 @@ function AdminDashboard() {
 
   // ================= BRAND HANDLERS =================
   const handleOpenBrandModal = (brand) => {
-    setInspectBrand({ ...brand });
-    setTempInspectBrand({ ...brand });
+    const localizedBrand = {
+      ...brand,
+      description_en: brand.description_en ?? brand.about_description ?? "",
+      description_is: brand.description_is ?? "",
+    };
+    setInspectBrand(localizedBrand);
+    setTempInspectBrand(localizedBrand);
     setIsEditMode(false);
   };
 
@@ -453,18 +458,21 @@ function AdminDashboard() {
     if (!isEditMode || !tempInspectBrand) return;
 
     try {
+      let savedBrand = tempInspectBrand;
       if (brandApi?.update) {
-        await brandApi.update(tempInspectBrand.id, {
+        const response = await brandApi.update(tempInspectBrand.id, {
           name: tempInspectBrand.name,
           location: tempInspectBrand.location,
-          about_description: tempInspectBrand.about_description,
+          description_en: tempInspectBrand.description_en,
+          description_is: tempInspectBrand.description_is,
         });
+        savedBrand = response.brand || tempInspectBrand;
       }
 
       setBrandsList((prev) =>
-        prev.map((b) => (b.id === tempInspectBrand.id ? tempInspectBrand : b))
+        prev.map((b) => (b.id === tempInspectBrand.id ? savedBrand : b))
       );
-      setInspectBrand({ ...tempInspectBrand });
+      setInspectBrand({ ...savedBrand });
       setIsEditMode(false);
       closeInspectModal();
     } catch (err) {

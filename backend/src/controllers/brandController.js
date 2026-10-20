@@ -114,8 +114,9 @@ const getPortfolio = async brandId => {
 exports.getAllBrands = async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT id, name, slug, location, about_description, logo_url,
-              cover_image_url, gallery_layout, updated_at
+      `SELECT id, name, slug, location,
+              COALESCE(description_en, about_description) AS about_description,
+              description_en, description_is, cover_image_url, gallery_layout, updated_at
        FROM brands
        ORDER BY id ASC`
     );
@@ -143,7 +144,7 @@ exports.getBrandPortfolio = async (req, res) => {
 exports.updateBrand = async (req, res) => {
   const { id } = req.params;
   const body = req.body || {};
-  const fields = ['name', 'location', 'about_description'];
+  const fields = ['name', 'location', 'about_description', 'description_en', 'description_is'];
   const suppliedFields = fields.filter(field => Object.hasOwn(body, field));
 
   if (suppliedFields.length === 0) {
@@ -161,14 +162,22 @@ exports.updateBrand = async (req, res) => {
       `UPDATE brands
        SET name = CASE WHEN $1 THEN $2 ELSE name END,
            location = CASE WHEN $3 THEN $4 ELSE location END,
-           about_description = CASE WHEN $5 THEN $6 ELSE about_description END,
+           description_en = CASE WHEN $5 THEN $6 WHEN $9 THEN $10 ELSE description_en END,
+           description_is = CASE WHEN $7 THEN $8 ELSE description_is END,
+           about_description = CASE
+             WHEN $5 OR $9 THEN CASE WHEN $5 THEN $6 ELSE $10 END
+             ELSE about_description
+           END,
            updated_at = CURRENT_TIMESTAMP
-       WHERE id = $7
-       RETURNING id, name, slug, location, about_description, logo_url,
+       WHERE id = $11
+       RETURNING id, name, slug, location, about_description,
+                 description_en, description_is, logo_url,
                  cover_image_url, gallery_layout, updated_at`,
       [
         Object.hasOwn(body, 'name'), body.name ?? null,
         Object.hasOwn(body, 'location'), body.location ?? null,
+        Object.hasOwn(body, 'description_en'), body.description_en ?? null,
+        Object.hasOwn(body, 'description_is'), body.description_is ?? null,
         Object.hasOwn(body, 'about_description'), body.about_description ?? null,
         id,
       ]

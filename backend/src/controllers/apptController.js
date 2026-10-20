@@ -8,7 +8,7 @@ const appointmentReadQuery = `
   SELECT a.id, a.brand_id, a.service_id, a.staff_id, a.customer_id,
          a.start_time, a.end_time, a.duration_snapshot_minutes, a.price_snapshot_isk,
          a.custom_options, a.status, a.fee_status, a.payment_status, a.cancellation_reason, a.created_at,
-         service.name AS service_name, staff.full_name AS staff_name,
+         service.name_en AS service_name, staff.full_name AS staff_name,
          customer.full_name AS customer_name, customer.phone_number AS customer_phone,
          customer.email AS customer_email, customer.kennitala AS customer_kennitala,
          customer.health_info AS health_info
@@ -101,6 +101,7 @@ exports.listAppointments = async (req, res) => {
     const result = await db.query(`${appointmentReadQuery} WHERE ${where} ORDER BY a.start_time LIMIT 200`, params);
     return res.json({ appointments: result.rows });
   } catch (error) {
+    console.error('Error retrieving appointments:', error);
     return res.status(500).json({ error: 'Failed to retrieve appointments.' });
   }
 };
