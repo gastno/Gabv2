@@ -5,6 +5,7 @@ import {
   brandPortfolioApi,
   categoryApi,
   getAssetUrl,
+  getLocalizedValue,
   serviceApi,
   staffServiceApi,
 } from "../../services/api";
@@ -13,9 +14,11 @@ import BookingModal from "./modals/BookingModal";
 import ServicesTab from "./components/ServicesTab";
 import TeamTab from "./components/TeamTab";
 import { STUDIO_DEFAULTS, toTeamMember } from "./data/studioData";
+import { useLanguage } from "../../components/i18n/LanguageContext";
 import "./brands.css";
 
 function StudioPage({ brandId }) {
+  const { language, t } = useLanguage();
   const studioDefaults = STUDIO_DEFAULTS[brandId] || STUDIO_DEFAULTS[1];
   const [activeTab, setActiveTab] = useState("services");
   const [brand, setBrand] = useState(studioDefaults);
@@ -65,25 +68,26 @@ function StudioPage({ brandId }) {
       });
       setCategories(brandCategories.map((category) => ({
         id: category.id,
-        title: category.title || category.name || "Category details unavailable",
-        subtitle: category.subtitle || category.description || "",
+        title: getLocalizedValue(category, "name", language) || category.title || t("studio.categoryUnavailable"),
+        subtitle: getLocalizedValue(category, "description", language) || category.subtitle || "",
         services: brandServices
           .filter((service) => Number(service.category_id) === Number(category.id))
           .map((service) => ({
             ...service,
-            name: service.name || "Service details unavailable",
-            duration: service.duration || (service.duration_minutes
-              ? `${service.duration_minutes} min`
-              : "Duration unavailable"),
-            price: service.price || (service.price_isk != null
-              ? `${service.price_isk} kr`
-              : "Price unavailable"),
+            name: getLocalizedValue(service, "name", language) || t("studio.serviceUnavailable"),
+            description: getLocalizedValue(service, "description", language),
+            duration: service.duration_minutes
+              ? `${service.duration_minutes} ${t("studio.minuteUnit")}`
+              : service.duration || t("studio.durationUnavailable"),
+            price: service.price_isk != null && Number.isFinite(Number(service.price_isk))
+              ? `${Number(service.price_isk).toLocaleString(language === "is" ? "is-IS" : "en-IS")} ${t("studio.currencyUnit")}`
+              : service.price || t("studio.priceUnavailable"),
             image: getAssetUrl(service.image_url),
           })),
       })));
 
       if ([brandsResult, categoriesResult, servicesResult].every((result) => result.status === "rejected")) {
-        setContentError("Studio information is unavailable. Saved studio details are shown.");
+        setContentError(t("studio.contentUnavailable"));
       }
       setIsLoading(false);
     };
@@ -92,7 +96,7 @@ function StudioPage({ brandId }) {
     return () => {
       isCurrent = false;
     };
-  }, [brandId, studioDefaults]);
+  }, [brandId, language, studioDefaults, t]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -105,14 +109,14 @@ function StudioPage({ brandId }) {
       })
       .catch((error) => {
         if (isCurrent) {
-          setPortfolioError(error.message || "Portfolio images are temporarily unavailable.");
+          setPortfolioError(t("studio.portfolioUnavailable"));
         }
       });
 
     return () => {
       isCurrent = false;
     };
-  }, [brandId]);
+  }, [brandId, t]);
 
   useEffect(() => {
     if (activeTab !== "team") return undefined;
@@ -142,7 +146,7 @@ function StudioPage({ brandId }) {
         workerLists.flat().forEach((worker) => {
           if (worker?.id != null) uniqueWorkers.set(String(worker.id), worker);
         });
-        setEmployees(Array.from(uniqueWorkers.values()).map(toTeamMember));
+        setEmployees(Array.from(uniqueWorkers.values()).map((worker) => toTeamMember(worker, language)));
         setTeamLoading(false);
       }
     };
@@ -151,7 +155,7 @@ function StudioPage({ brandId }) {
     return () => {
       isCurrent = false;
     };
-  }, [activeTab, categories]);
+  }, [activeTab, categories, language]);
 
   const legacyPortfolioImages = useMemo(() => (
     [1, 2, 3, 4, 5].map((imageNumber) => ({
@@ -182,7 +186,7 @@ function StudioPage({ brandId }) {
           />
         ) : (
           <section className="portfolio-empty-state" aria-live="polite">
-            {portfolioError || "This studio has not added portfolio images yet."}
+            {portfolioError || t("studio.portfolioEmpty")}
           </section>
         )}
 
@@ -201,11 +205,11 @@ function StudioPage({ brandId }) {
           </div>
         </section>
 
-        <nav className="store-tabs" aria-label={`${brand.name} information`}>
+        <nav className="store-tabs" aria-label={t("studio.information", { brand: brand.name })}>
           {[
-            ["services", "Services"],
-            ["team", "Our Team"],
-            ["about", "About"],
+            ["services", t("studio.services")],
+            ["team", t("studio.team")],
+            ["about", t("studio.about")],
           ].map(([tabId, label]) => (
             <button
               type="button"
@@ -247,6 +251,7 @@ function StudioPage({ brandId }) {
 }
 
 function PortfolioGallery({ images, layout, brandName, error }) {
+  const { t } = useLanguage();
   const [activeImage, setActiveImage] = useState(0);
   const safeLayout = ["grid", "masonry", "mosaic", "feature", "carousel"].includes(layout)
     ? layout
@@ -277,13 +282,13 @@ function PortfolioGallery({ images, layout, brandName, error }) {
           <div className="portfolio-carousel-controls">
             <button
               type="button"
-              aria-label="Previous portfolio image"
+              aria-label={t("studio.previousImage")}
               onClick={() => setActiveImage((index) => (index - 1 + images.length) % images.length)}
             >←</button>
             <span>{activeIndex + 1} / {images.length}</span>
             <button
               type="button"
-              aria-label="Next portfolio image"
+              aria-label={t("studio.nextImage")}
               onClick={() => setActiveImage((index) => (index + 1) % images.length)}
             >→</button>
           </div>

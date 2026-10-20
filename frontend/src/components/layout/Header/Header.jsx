@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { authApi } from "../../../services/api";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./Header.css";
 
-function Header({ language, onLanguageChange }) {
+function Header({ language: languageProp, onLanguageChange }) {
+  const languageContext = useLanguage();
+  const language = languageProp || languageContext.language;
+  const t = languageContext.t;
+  const changeLanguage = onLanguageChange || languageContext.setLanguage;
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [currentUser, setCurrentUser] = useState(null);
@@ -99,7 +104,7 @@ function Header({ language, onLanguageChange }) {
       setLoginForm({ email: "", password: "" });
     } catch (err) {
       await delay(800); // Brief pause before showing error
-      setErrorMessage(err.message || "Failed to log in. Please check your credentials.");
+      setErrorMessage(err.message || t("header.loginError"));
     } finally {
       setLoading(false);
     }
@@ -130,7 +135,7 @@ function Header({ language, onLanguageChange }) {
       setSignupForm({ fullName: "", email: "", phone: "", password: "" });
     } catch (err) {
       await delay(800);
-      setErrorMessage(err.message || "Registration failed. Please try again.");
+      setErrorMessage(err.message || t("header.signupError"));
     } finally {
       setLoading(false);
     }
@@ -167,10 +172,10 @@ function Header({ language, onLanguageChange }) {
           {currentUser ? (
             <div className="user-profile-controls">
               <span className="user-welcome-text">
-                Welcome, {getUserDisplayName()}!
+                {t("header.welcome", { name: getUserDisplayName() })}
               </span>
               <button className="logout-button" onClick={handleLogout}>
-                Log out
+                {t("header.logout")}
               </button>
             </div>
           ) : (
@@ -178,14 +183,15 @@ function Header({ language, onLanguageChange }) {
               className="login-button" 
               onClick={() => handleOpenModal("login")}
             >
-              Log in
+              {t("header.login")}
             </button>
           )}
 
           <select
             value={language}
-            onChange={(e) => onLanguageChange && onLanguageChange(e.target.value)}
+            onChange={(e) => changeLanguage(e.target.value)}
             className="language-dropdown"
+            aria-label={t("header.language")}
           >
             <option value="en">English</option>
             <option value="is">Íslenska</option>
@@ -217,7 +223,7 @@ function Header({ language, onLanguageChange }) {
                   setAuthMode("login");
                 }}
               >
-                Log In
+                {t("header.loginTab")}
               </button>
               <button
                 type="button"
@@ -227,7 +233,7 @@ function Header({ language, onLanguageChange }) {
                   setAuthMode("signup");
                 }}
               >
-                Sign Up
+                {t("header.signupTab")}
               </button>
             </div>
 
@@ -239,22 +245,22 @@ function Header({ language, onLanguageChange }) {
 
             {authMode === "login" ? (
               <form onSubmit={handleLoginSubmit} className="header-auth-form">
-                <h2>Welcome Back</h2>
-                <p className="auth-subtitle">Log in to view and manage your appointments</p>
+                <h2>{t("header.welcomeBack")}</h2>
+                <p className="auth-subtitle">{t("header.loginSubtitle")}</p>
 
                 <div className="auth-field">
-                  <label>Email Address</label>
+                  <label>{t("header.email")}</label>
                   <input
                     type="email"
                     required
-                    placeholder="name@example.com"
+                    placeholder={t("header.emailPlaceholder")}
                     value={loginForm.email}
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                   />
                 </div>
 
                 <div className="auth-field">
-                  <label>Password</label>
+                  <label>{t("header.password")}</label>
                   <input
                     type="password"
                     required
@@ -268,57 +274,57 @@ function Header({ language, onLanguageChange }) {
                   {loading ? (
                     <span className="spinner-container">
                       <span className="spinning-circle" />
-                      Logging in...
+                      {t("header.loggingIn")}
                     </span>
                   ) : (
-                    "Log In"
+                    t("header.loginTab")
                   )}
                 </button>
               </form>
             ) : (
               <form onSubmit={handleSignupSubmit} className="header-auth-form">
-                <h2>Create an Account</h2>
-                <p className="auth-subtitle">Save your information for faster future bookings</p>
+                <h2>{t("header.createAccount")}</h2>
+                <p className="auth-subtitle">{t("header.signupSubtitle")}</p>
 
                 <div className="auth-field">
-                  <label>Full Name</label>
+                  <label>{t("header.fullName")}</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Guðrún Jónsdóttir"
+                    placeholder={t("header.namePlaceholder")}
                     value={signupForm.fullName}
                     onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })}
                   />
                 </div>
 
                 <div className="auth-field">
-                  <label>Email Address</label>
+                  <label>{t("header.email")}</label>
                   <input
                     type="email"
                     required
-                    placeholder="name@example.com"
+                    placeholder={t("header.emailPlaceholder")}
                     value={signupForm.email}
                     onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                   />
                 </div>
 
                 <div className="auth-field">
-                  <label>Phone Number</label>
+                  <label>{t("header.phone")}</label>
                   <input
                     type="tel"
                     required
-                    placeholder="e.g. 123 4567"
+                    placeholder={t("header.phonePlaceholder")}
                     value={signupForm.phone}
                     onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
                   />
                 </div>
 
                 <div className="auth-field">
-                  <label>Password</label>
+                  <label>{t("header.password")}</label>
                   <input
                     type="password"
                     required
-                    placeholder="Create a password"
+                    placeholder={t("header.passwordPlaceholder")}
                     value={signupForm.password}
                     onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                   />
@@ -328,10 +334,10 @@ function Header({ language, onLanguageChange }) {
                   {loading ? (
                     <span className="spinner-container">
                       <span className="spinning-circle" />
-                      Creating...
+                      {t("header.creating")}
                     </span>
                   ) : (
-                    "Create Account"
+                    t("header.createAccountButton")
                   )}
                 </button>
               </form>

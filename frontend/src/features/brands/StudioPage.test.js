@@ -1,6 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import StudioPage, { PortfolioGallery } from "./StudioPage";
 
+jest.mock("react-router-dom", () => ({
+  Link: ({ to, children, ...props }) =>
+    require("react").createElement("a", { href: to, ...props }, children),
+}));
+
 jest.mock("../../services/api", () => ({
   brandApi: { getAll: jest.fn() },
   brandPortfolioApi: { get: jest.fn() },

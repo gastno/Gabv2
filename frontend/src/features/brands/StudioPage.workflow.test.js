@@ -1,5 +1,6 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import StudioPage from './StudioPage';
+import { LanguageProvider } from '../../components/i18n/LanguageContext';
 import {
   apptApi,
   brandApi,
@@ -25,9 +26,12 @@ jest.mock('../../services/api', () => ({
   serviceApi: { getAll: jest.fn() },
   staffServiceApi: { getByServiceId: jest.fn() },
   getAssetUrl: (path) => path ? `http://localhost:5000${path}` : null,
+  getLocalizedValue: (record, field, language = 'en') =>
+    record?.[`${field}_${language}`] || record?.[`${field}_en`] || record?.[field] || '',
 }));
 
 beforeEach(() => {
+  localStorage.removeItem('site_language');
   apptApi.createAppointment.mockResolvedValue({ appointment: { id: 1 } });
   brandPortfolioApi.get.mockResolvedValue(null);
   brandApi.getAll.mockResolvedValue([
@@ -51,6 +55,7 @@ beforeEach(() => {
       { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T11:00:00.000Z', end_time: '2099-01-01T12:30:00.000Z' },
     ],
   });
+
 });
 
 test('loads brand 2 details and only its categories and services', async () => {
@@ -125,6 +130,7 @@ test("requires cancellation policy acceptance and stores it with the appointment
     expect(day).toBeTruthy();
     return day;
   });
+
   fireEvent.click(availableDay);
   const timeChip = await waitFor(() => {
     const chip = document.querySelector(".time-chip");
@@ -158,4 +164,63 @@ test("requires cancellation policy acceptance and stores it with the appointment
       })
     );
   });
+});
+
+test('renders Icelandic database content and translated studio labels when Icelandic is selected', async () => {
+  staffServiceApi.getByServiceId.mockResolvedValue([
+    {
+      id: 7,
+      name: 'Artist One',
+      description_en: 'Tattoo artist',
+      description_is: 'Húðflúrari',
+      avatar_url: '/uploads/artist.webp',
+    },
+  ]);
+  categoryApi.getAll.mockResolvedValue([
+    {
+      id: 11,
+      brand_id: 1,
+      name_en: 'Lashes',
+      name_is: 'Augnhár',
+      description_en: 'Lash services',
+      description_is: 'Augnháraþjónusta',
+    },
+  ]);
+  serviceApi.getAll.mockResolvedValue([
+    {
+      id: 101,
+      brand_id: 1,
+      category_id: 11,
+      name_en: 'Classic Lashes',
+      name_is: 'Klassísk augnhár',
+      description_en: 'A classic lash treatment',
+      description_is: 'Klassísk augnhárameðferð',
+      duration_minutes: 90,
+      duration: '90 min',
+      price_isk: 14000,
+      price: '14,000 kr',
+    },
+  ]);
+
+  await act(async () => {
+    render(<LanguageProvider><StudioPage brandId={1} /></LanguageProvider>);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  expect(await screen.findByText('Classic Lashes')).toBeInTheDocument();
+  await act(async () => {
+    fireEvent.change(screen.getByRole('combobox', { name: 'Select language' }), {
+      target: { value: 'is' },
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+  expect(await screen.findByText('Klassísk augnhár')).toBeInTheDocument();
+  expect(screen.getByText('Klassísk augnhárameðferð')).toBeInTheDocument();
+  expect(screen.getByText(/90 mín/)).toBeInTheDocument();
+  expect(screen.getByText('14.000 kr.')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Þjónusta' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Þjónustan okkar' })).toBeInTheDocument();
+  expect(screen.getByText('Augnháraþjónusta')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Teymið okkar' }));
+  expect(await screen.findByText('Húðflúrari')).toBeInTheDocument();
 });

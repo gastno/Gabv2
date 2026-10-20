@@ -78,13 +78,24 @@ function CreateStaffModal({
           </div>
 
           <div className="form-group">
-            <label>Role Title / Description</label>
+            <label>Description (English)</label>
             <input
               type="text"
               placeholder="e.g. Senior Lash Artist"
               value={newStaff.description}
               onChange={(e) =>
                 setNewStaff({ ...newStaff, description: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Description (Icelandic)</label>
+            <input
+              type="text"
+              value={newStaff.description_is}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, description_is: e.target.value })
               }
             />
           </div>

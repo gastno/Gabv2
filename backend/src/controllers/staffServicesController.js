@@ -10,11 +10,17 @@ exports.getStaffServices = async (req, res) => {
     const queryText = `
       SELECT 
         s.id AS service_id,
-        s.name AS service_name,
+        s.name_en AS service_name_en,
+        s.name_is AS service_name_is,
+        s.name_en AS service_name,
+        s.description_en AS service_description_en,
+        s.description_is AS service_description_is,
         s.duration_minutes,
         s.price_isk,
         s.image_url,
-        c.name AS category_name,
+        c.name_en AS category_name_en,
+        c.name_is AS category_name_is,
+        c.name_en AS category_name,
         b.name AS brand_name
       FROM staff_services ss
       JOIN services s ON ss.service_id = s.id
@@ -42,7 +48,9 @@ exports.getStaffByService = async (req, res) => {
         s.id,
         s.username,
         s.full_name AS name,
-        s.description,
+        s.description_en,
+        s.description_is,
+        s.description_en AS description,
         s.is_active,
         COALESCE(s.avatar_url, '/placeholder-person-1.jpg') AS avatar_url,
         r.name AS role,

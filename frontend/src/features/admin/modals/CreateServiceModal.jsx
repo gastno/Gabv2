@@ -98,7 +98,7 @@ function CreateServiceModal({
           </div>
 
           <div className="form-group">
-            <label>Service Name</label>
+            <label>Service Name (English)</label>
             <input
               type="text"
               required
@@ -111,13 +111,35 @@ function CreateServiceModal({
           </div>
 
           <div className="form-group">
-            <label>Description</label>
+            <label>Service Name (Icelandic)</label>
+            <input
+              type="text"
+              value={newService.name_is}
+              onChange={(e) =>
+                setNewService({ ...newService, name_is: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Description (English)</label>
             <textarea
               rows="3"
               placeholder="Detail what is included in the service..."
               value={newService.description}
               onChange={(e) =>
                 setNewService({ ...newService, description: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Description (Icelandic)</label>
+            <textarea
+              rows="3"
+              value={newService.description_is}
+              onChange={(e) =>
+                setNewService({ ...newService, description_is: e.target.value })
               }
             />
           </div>

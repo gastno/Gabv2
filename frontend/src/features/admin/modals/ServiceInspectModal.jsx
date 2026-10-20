@@ -73,29 +73,55 @@ function ServiceInspectModal({
           </div>
 
           <div className="form-group">
-            <label>Service Name</label>
+            <label>Service Name (English)</label>
             {isEditMode ? (
               <input
                 type="text"
                 required
-                value={inspectService.name}
-                onChange={(e) => setInspectService({ ...inspectService, name: e.target.value })}
+                value={inspectService.name_en || inspectService.name || ""}
+                onChange={(e) => setInspectService({ ...inspectService, name_en: e.target.value })}
               />
             ) : (
-              <div className="read-only-field">{inspectService.name}</div>
+              <div className="read-only-field">{inspectService.name_en || inspectService.name}</div>
             )}
           </div>
 
           <div className="form-group">
-            <label>Description</label>
+            <label>Service Name (Icelandic)</label>
+            {isEditMode ? (
+              <input
+                type="text"
+                value={inspectService.name_is || ""}
+                onChange={(e) => setInspectService({ ...inspectService, name_is: e.target.value })}
+              />
+            ) : (
+              <div className="read-only-field">{inspectService.name_is || "N/A"}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Description (English)</label>
             {isEditMode ? (
               <textarea
                 rows="3"
-                value={inspectService.description}
-                onChange={(e) => setInspectService({ ...inspectService, description: e.target.value })}
+                value={inspectService.description_en ?? inspectService.description ?? ""}
+                onChange={(e) => setInspectService({ ...inspectService, description_en: e.target.value })}
               />
             ) : (
-              <div className="read-only-field">{inspectService.description}</div>
+              <div className="read-only-field">{inspectService.description_en || inspectService.description}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Description (Icelandic)</label>
+            {isEditMode ? (
+              <textarea
+                rows="3"
+                value={inspectService.description_is || ""}
+                onChange={(e) => setInspectService({ ...inspectService, description_is: e.target.value })}
+              />
+            ) : (
+              <div className="read-only-field">{inspectService.description_is || "N/A"}</div>
             )}
           </div>
 

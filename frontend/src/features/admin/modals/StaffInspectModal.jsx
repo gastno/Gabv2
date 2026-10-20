@@ -129,22 +129,37 @@ function StaffInspectModal({
           </div>
 
           <div className="form-group">
-            <label>Description</label>
+            <label>Description (English)</label>
             {isEditMode ? (
               <input
                 type="text"
-                value={tempInspectStaff.description}
+                value={tempInspectStaff.description_en ?? tempInspectStaff.description ?? ""}
                 onChange={(e) =>
                   setTempInspectStaff({
                     ...tempInspectStaff,
-                    description: e.target.value,
+                    description_en: e.target.value,
                   })
                 }
               />
             ) : (
               <div className="read-only-field">
-                {tempInspectStaff.description}
+                {tempInspectStaff.description_en || tempInspectStaff.description}
               </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Description (Icelandic)</label>
+            {isEditMode ? (
+              <input
+                type="text"
+                value={tempInspectStaff.description_is || ""}
+                onChange={(e) =>
+                  setTempInspectStaff({ ...tempInspectStaff, description_is: e.target.value })
+                }
+              />
+            ) : (
+              <div className="read-only-field">{tempInspectStaff.description_is || "N/A"}</div>
             )}
           </div>
 

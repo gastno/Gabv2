@@ -13,8 +13,12 @@ exports.getAllServices = async (req, res) => {
         s.id,
         s.brand_id,
         s.category_id,
-        s.name,
-        s.description,
+        s.name_en,
+        s.name_is,
+        s.description_en,
+        s.description_is,
+        s.name_en AS name,
+        s.description_en AS description,
         s.duration_minutes,
         CONCAT(s.duration_minutes, ' min') AS duration,
         s.price_isk,
@@ -22,7 +26,9 @@ exports.getAllServices = async (req, res) => {
         s.image_url,
         s.is_active,
         b.name AS brand,
-        c.name AS category
+        c.name_en AS category,
+        c.name_en AS category_en,
+        c.name_is AS category_is
       FROM services s
       JOIN brands b ON s.brand_id = b.id
       JOIN categories c ON s.category_id = c.id
@@ -41,7 +47,11 @@ exports.getAllServices = async (req, res) => {
 exports.createService = async (req, res) => {
   const { 
     name, 
+    name_en,
+    name_is,
     description, 
+    description_en,
+    description_is,
     duration_minutes, 
     duration, 
     price_isk, 
@@ -63,7 +73,10 @@ exports.createService = async (req, res) => {
     targetPrice = parseFloat(price.toString().replace(/[^0-9.]/g, ''));
   }
 
-  if (!name || !targetDuration || !targetPrice) {
+  const serviceNameEn = name_en ?? name;
+  const serviceDescriptionEn = description_en ?? description ?? null;
+
+  if (!serviceNameEn || !targetDuration || !targetPrice) {
     return res.status(400).json({ 
       error: 'Service name, duration (in minutes), and price (ISK) are required.' 
     });
@@ -79,7 +92,7 @@ exports.createService = async (req, res) => {
 
     let targetCategoryId = category_id;
     if (!targetCategoryId && category) {
-      const catRes = await db.query('SELECT id FROM categories WHERE name = $1 AND brand_id = $2', [category, targetBrandId]);
+      const catRes = await db.query('SELECT id FROM categories WHERE (name_en = $1 OR name_is = $1) AND brand_id = $2', [category, targetBrandId]);
       if (catRes.rows.length > 0) targetCategoryId = catRes.rows[0].id;
     }
 
@@ -88,16 +101,19 @@ exports.createService = async (req, res) => {
     }
 
     const queryText = `
-      INSERT INTO services (brand_id, category_id, name, description, duration_minutes, price_isk, image_url)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, brand_id, category_id, name, description, duration_minutes, price_isk, image_url, is_active;
+      INSERT INTO services (brand_id, category_id, name_en, name_is, description_en, description_is, duration_minutes, price_isk, image_url)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING id, brand_id, category_id, name_en, name_is, description_en, description_is,
+                name_en AS name, description_en AS description, duration_minutes, price_isk, image_url, is_active;
     `;
 
     const values = [
       targetBrandId,
       targetCategoryId,
-      name,
-      description || null,
+      serviceNameEn,
+      name_is ?? null,
+      serviceDescriptionEn,
+      description_is ?? null,
       targetDuration,
       targetPrice,
       image_url || null
@@ -120,7 +136,11 @@ exports.updateService = async (req, res) => {
   const { id } = req.params;
   const { 
     name, 
+    name_en,
+    name_is,
     description, 
+    description_en,
+    description_is,
     duration_minutes, 
     duration, 
     price_isk, 
@@ -130,6 +150,8 @@ exports.updateService = async (req, res) => {
     image_url,
     is_active 
   } = req.body;
+  const serviceNameEn = name_en ?? name;
+  const serviceDescriptionEn = description_en ?? description;
 
   let targetDuration = duration_minutes;
   if (!targetDuration && duration) {
@@ -149,21 +171,26 @@ exports.updateService = async (req, res) => {
 
     const queryText = `
       UPDATE services
-      SET name = COALESCE($1, name),
-          description = COALESCE($2, description),
-          duration_minutes = COALESCE($3, duration_minutes),
-          price_isk = COALESCE($4, price_isk),
-          brand_id = COALESCE($5, brand_id),
-          category_id = COALESCE($6, category_id),
-          image_url = COALESCE($7, image_url),
-          is_active = COALESCE($8, is_active)
-      WHERE id = $9
-      RETURNING id, brand_id, category_id, name, description, duration_minutes, price_isk, image_url, is_active;
+      SET name_en = COALESCE($1, name_en),
+          name_is = COALESCE($2, name_is),
+          description_en = COALESCE($3, description_en),
+          description_is = COALESCE($4, description_is),
+          duration_minutes = COALESCE($5, duration_minutes),
+          price_isk = COALESCE($6, price_isk),
+          brand_id = COALESCE($7, brand_id),
+          category_id = COALESCE($8, category_id),
+          image_url = COALESCE($9, image_url),
+          is_active = COALESCE($10, is_active)
+      WHERE id = $11
+      RETURNING id, brand_id, category_id, name_en, name_is, description_en, description_is,
+                name_en AS name, description_en AS description, duration_minutes, price_isk, image_url, is_active;
     `;
 
     const values = [
-      name,
-      description,
+      serviceNameEn,
+      name_is,
+      serviceDescriptionEn,
+      description_is,
       targetDuration,
       targetPrice,
       brand_id,
@@ -218,7 +245,7 @@ exports.uploadServiceImage = async (req, res) => {
     const oldImageUrl = currentService.rows[0].image_url;
 
     const updateResult = await db.query(
-      'UPDATE services SET image_url = $1 WHERE id = $2 RETURNING id, name, price_isk, image_url',
+      'UPDATE services SET image_url = $1 WHERE id = $2 RETURNING id, name_en, name_is, name_en AS name, price_isk, image_url',
       [dbRelativeUrl, serviceId]
     );
 

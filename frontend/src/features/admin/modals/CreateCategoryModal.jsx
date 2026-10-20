@@ -41,7 +41,7 @@ function CreateCategoryModal({
           </div>
 
           <div className="form-group">
-            <label>Category Title</label>
+            <label>Category Name (English)</label>
             <input
               type="text"
               required
@@ -54,13 +54,35 @@ function CreateCategoryModal({
           </div>
 
           <div className="form-group">
-            <label>Subtitle / Short Description</label>
+            <label>Category Name (Icelandic)</label>
+            <input
+              type="text"
+              value={newCategory.title_is}
+              onChange={(e) =>
+                setNewCategory({ ...newCategory, title_is: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Description (English)</label>
             <input
               type="text"
               placeholder="e.g. Shaping, tinting & lamination"
               value={newCategory.subtitle}
               onChange={(e) =>
                 setNewCategory({ ...newCategory, subtitle: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Description (Icelandic)</label>
+            <input
+              type="text"
+              value={newCategory.subtitle_is}
+              onChange={(e) =>
+                setNewCategory({ ...newCategory, subtitle_is: e.target.value })
               }
             />
           </div>

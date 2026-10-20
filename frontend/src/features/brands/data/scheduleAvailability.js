@@ -23,9 +23,9 @@ export function shiftMonth(monthCursor, amount) {
   return { year: next.getUTCFullYear(), month: next.getUTCMonth() };
 }
 
-export function formatStudioDate(dateKey, options = { weekday: "long", day: "numeric", month: "long", year: "numeric" }) {
+export function formatStudioDate(dateKey, options = { weekday: "long", day: "numeric", month: "long", year: "numeric" }, locale = "en-GB") {
   const [year, month, day] = dateKey.split("-").map(Number);
-  return new Intl.DateTimeFormat("en-GB", { ...options, timeZone: "UTC" })
+  return new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" })
     .format(new Date(Date.UTC(year, month - 1, day, 12)));
 }
 

@@ -38,7 +38,7 @@ def seed_database():
 
         # 3. Initial Staff Seeding
         cursor.execute("""
-            INSERT INTO staff (id, role_id, username, password_hash, full_name, description) VALUES
+            INSERT INTO staff (id, role_id, username, password_hash, full_name, description_en) VALUES
                 (1, 2, 'gabbablu', '$2b$10$1IUDHUtOhELtoGJF44RFZug4ZT7DuxSuoX/uxgwEIbHaf50y978ne', 'Gabbablu Admin', 'Brand Administrator')
             ON CONFLICT (username) DO NOTHING;
         """)

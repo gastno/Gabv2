@@ -1,13 +1,15 @@
 import UserAvatar from "../../../components/common/UserAvatar/UserAvatar";
+import { useLanguage } from "../../../components/i18n/LanguageContext";
 
 function TeamTab({ employees, isLoading }) {
+  const { t } = useLanguage();
   return (
     <div className="team-section">
-      <h2 className="section-heading">The People</h2>
+      <h2 className="section-heading">{t("studio.teamHeading")}</h2>
       {isLoading ? (
-        <p className="placeholder-message">Loading team profiles...</p>
+        <p className="placeholder-message">{t("studio.loadingTeam")}</p>
       ) : employees.length === 0 ? (
-        <p className="placeholder-message">No team profiles are currently available.</p>
+        <p className="placeholder-message">{t("studio.noTeam")}</p>
       ) : (
         <div className="team-grid">
           {employees.map((employee) => (

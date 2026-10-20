@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useLanguage } from "../../../components/i18n/LanguageContext";
 
 function ServicesTab({ categories, isLoading, error, onSelectService }) {
+  const { t } = useLanguage();
   const [expandedCategories, setExpandedCategories] = useState({
     "Lashes Extension": false,
   });
@@ -14,12 +16,12 @@ function ServicesTab({ categories, isLoading, error, onSelectService }) {
 
   return (
     <div className="services-section">
-      <h2 className="section-heading">Our Services</h2>
+      <h2 className="section-heading">{t("studio.servicesHeading")}</h2>
       {error && <p className="placeholder-message">{error}</p>}
       {isLoading ? (
-        <p className="placeholder-message">Loading studio services...</p>
+        <p className="placeholder-message">{t("studio.loadingServices")}</p>
       ) : categories.length === 0 ? (
-        <p className="placeholder-message">No services are available at this time.</p>
+        <p className="placeholder-message">{t("studio.noServices")}</p>
       ) : null}
       <div className="services-accordion-list">
         {categories.map((category) => {
@@ -67,6 +69,9 @@ function ServicesTab({ categories, isLoading, error, onSelectService }) {
                         </div>
                         <div className="service-info-col">
                           <span className="service-row-title">{service.name}</span>
+                          {service.description && (
+                            <span className="service-row-description">{service.description}</span>
+                          )}
                           <span className="service-duration-badge">⏱ {service.duration}</span>
                         </div>
                       </div>

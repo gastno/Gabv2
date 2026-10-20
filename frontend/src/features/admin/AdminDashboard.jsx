@@ -90,6 +90,8 @@ function AdminDashboard() {
     brand: "Gabbablu",
     title: "",
     subtitle: "",
+    title_is: "",
+    subtitle_is: "",
   });
 
   const [newService, setNewService] = useState({
@@ -97,6 +99,8 @@ function AdminDashboard() {
     category: "Lashes Extension",
     name: "",
     description: "",
+    name_is: "",
+    description_is: "",
     duration: "60 min",
     price: "",
   });
@@ -106,6 +110,7 @@ function AdminDashboard() {
     password: "",
     name: "",
     description: "",
+    description_is: "",
     brands: ["Gabbablu"],
     photo: "",
   });
@@ -134,7 +139,9 @@ function AdminDashboard() {
           userId: s.username,
           password: "••••••••",
           name: s.name || s.full_name,
-          description: s.description || "Staff Member",
+          description: s.description_en || s.description || "Staff Member",
+          description_en: s.description_en || s.description || "",
+          description_is: s.description_is || "",
           brands:
             Array.isArray(s.assigned_brands) && s.assigned_brands.length > 0
               ? s.assigned_brands.map((b) => b.name)
@@ -165,6 +172,10 @@ function AdminDashboard() {
           brand: c.brand || "Gabbablu",
           title: c.title || c.name,
           subtitle: c.subtitle || c.description || "",
+          name_en: c.name_en || c.title || c.name || "",
+          name_is: c.name_is || "",
+          description_en: c.description_en || c.subtitle || c.description || "",
+          description_is: c.description_is || "",
         }));
         setCategories(formatted);
       }
@@ -186,8 +197,12 @@ function AdminDashboard() {
           category_id: s.category_id,
           brand: s.brand || "Gabbablu",
           category: s.category || "General",
-          name: s.name,
-          description: s.description || "",
+          name: s.name_en || s.name,
+          name_en: s.name_en || s.name || "",
+          name_is: s.name_is || "",
+          description: s.description_en || s.description || "",
+          description_en: s.description_en || s.description || "",
+          description_is: s.description_is || "",
           duration: s.duration || `${s.duration_minutes || 60} min`,
           price: s.price || `${s.price_isk || 0} kr`,
           image: getAssetUrl(s.image_url),
@@ -291,7 +306,11 @@ function AdminDashboard() {
           category_id: categoryId,
           category: newService.category,
           name: newService.name,
+          name_en: newService.name,
+          name_is: newService.name_is,
           description: newService.description,
+          description_en: newService.description,
+          description_is: newService.description_is,
           duration: newService.duration,
           price: newService.price,
         });
@@ -315,6 +334,8 @@ function AdminDashboard() {
         category: resetBrandCategories[0]?.title || "",
         name: "",
         description: "",
+        name_is: "",
+        description_is: "",
         duration: "60 min",
         price: "",
       });
@@ -339,8 +360,12 @@ function AdminDashboard() {
           brand: inspectService.brand,
           category_id: categoryId,
           category: inspectService.category,
-          name: inspectService.name,
-          description: inspectService.description,
+          name: inspectService.name_en || inspectService.name,
+          name_en: inspectService.name_en || inspectService.name,
+          name_is: inspectService.name_is,
+          description: inspectService.description_en ?? inspectService.description,
+          description_en: inspectService.description_en ?? inspectService.description,
+          description_is: inspectService.description_is,
           duration: inspectService.duration,
           price: inspectService.price,
         });
@@ -370,11 +395,15 @@ function AdminDashboard() {
           brand: newCategory.brand,
           title: newCategory.title,
           subtitle: newCategory.subtitle,
+          name_en: newCategory.title,
+          name_is: newCategory.title_is,
+          description_en: newCategory.subtitle,
+          description_is: newCategory.subtitle_is,
         });
         await fetchCategories();
       }
       setCategoryModalOpen(false);
-      setNewCategory({ brand: selectedBrand, title: "", subtitle: "" });
+      setNewCategory({ brand: selectedBrand, title: "", subtitle: "", title_is: "", subtitle_is: "" });
     } catch (err) {
       alert(err.message || "Failed to create category.");
     }
@@ -392,8 +421,12 @@ function AdminDashboard() {
         await categoryApi.update(inspectCategory.id, {
           brand_id: brandId,
           brand: inspectCategory.brand,
-          title: inspectCategory.title,
-          subtitle: inspectCategory.subtitle,
+          title: inspectCategory.name_en || inspectCategory.title,
+          subtitle: inspectCategory.description_en ?? inspectCategory.subtitle,
+          name_en: inspectCategory.name_en || inspectCategory.title,
+          name_is: inspectCategory.name_is,
+          description_en: inspectCategory.description_en ?? inspectCategory.subtitle,
+          description_is: inspectCategory.description_is,
         });
         await fetchCategories();
       }
@@ -511,6 +544,8 @@ function AdminDashboard() {
           full_name: newStaff.name,
           name: newStaff.name,
           description: newStaff.description,
+          description_en: newStaff.description,
+          description_is: newStaff.description_is,
           brand_ids: brandIdsToSave,
           role_id: 3,
         });
@@ -529,6 +564,7 @@ function AdminDashboard() {
         password: "",
         name: "",
         description: "",
+        description_is: "",
         brands: ["Gabbablu"],
         photo: "",
       });
@@ -555,7 +591,9 @@ function AdminDashboard() {
         await staffApi.update(tempInspectStaff.id, {
           name: tempInspectStaff.name,
           full_name: tempInspectStaff.name,
-          description: tempInspectStaff.description,
+          description: tempInspectStaff.description_en ?? tempInspectStaff.description,
+          description_en: tempInspectStaff.description_en ?? tempInspectStaff.description,
+          description_is: tempInspectStaff.description_is,
           userId: tempInspectStaff.userId,
           username: tempInspectStaff.userId,
           password: tempInspectStaff.password,

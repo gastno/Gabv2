@@ -1,4 +1,5 @@
 import "./Footer.css";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 const socialLinks = [
   {
@@ -37,6 +38,8 @@ function SocialIcon({ network }) {
 }
 
 function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="site-footer">
       <div className="site-footer-content">
@@ -45,12 +48,12 @@ function Footer() {
             <img src="/gbbco.svg" alt="" aria-hidden="true" />
             <div className="site-footer-brand-copy">
               <span className="site-footer-wordmark">gbb &amp; co</span>
-              <span className="site-footer-tagline">Beauty &amp; tattoo studios</span>
+              <span className="site-footer-tagline">{t("footer.tagline")}</span>
             </div>
           </div>
           <div className="site-footer-links">
             <section className="site-footer-section" aria-labelledby="footer-find-us">
-              <h2 id="footer-find-us">Find Us</h2>
+              <h2 id="footer-find-us">{t("footer.findUs")}</h2>
               <ul>
                 {socialLinks.map(({ href, label, network }) => (
                   <li key={href}>
@@ -63,16 +66,16 @@ function Footer() {
               </ul>
             </section>
             <section className="site-footer-section" aria-labelledby="footer-legal">
-              <h2 id="footer-legal">Legal</h2>
+              <h2 id="footer-legal">{t("footer.legal")}</h2>
               <ul>
-                <li><a href="/privacy-policy">Privacy policy</a></li>
-                <li><a href="/cookie-settings">Cookie settings</a></li>
+                <li><a href="/privacy-policy">{t("footer.privacy")}</a></li>
+                <li><a href="/cookie-settings">{t("footer.cookies")}</a></li>
               </ul>
             </section>
           </div>
         </div>
         <div className="site-footer-divider" />
-        <p className="site-footer-text">Independent beauty and tattoo studios in Reykjavík, Iceland.</p>
+        <p className="site-footer-text">{t("footer.description")}</p>
       </div>
     </footer>
   );

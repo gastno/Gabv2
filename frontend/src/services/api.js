@@ -18,6 +18,15 @@ export const getAssetUrl = (path) => {
   return `${SERVER_BASE_URL}${cleanPath}`;
 };
 
+export const getLocalizedValue = (record, field, language = "en") => {
+  if (!record) return "";
+  const localizedValue = record[`${field}_${language}`];
+  if (localizedValue != null && localizedValue !== "") return localizedValue;
+  const englishValue = record[`${field}_en`];
+  if (englishValue != null && englishValue !== "") return englishValue;
+  return record[field] || "";
+};
+
 async function request(endpoint, options = {}, tokenKey = STAFF_TOKEN_KEY) {
   const token = tokenKey === STAFF_TOKEN_KEY
     ? getStaffToken()

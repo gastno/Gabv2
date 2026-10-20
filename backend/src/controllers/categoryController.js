@@ -8,8 +8,14 @@ exports.getAllCategories = async (req, res) => {
       SELECT 
         c.id,
         c.brand_id,
-        c.name AS title,
-        c.description AS subtitle,
+        c.name_en,
+        c.name_is,
+        c.description_en,
+        c.description_is,
+        c.name_en AS name,
+        c.name_en AS title,
+        c.description_en AS description,
+        c.description_en AS subtitle,
         b.name AS brand
       FROM categories c
       JOIN brands b ON c.brand_id = b.id
@@ -25,11 +31,13 @@ exports.getAllCategories = async (req, res) => {
 
 // 2. CREATE CATEGORY (Admin/SuperAdmin only)
 exports.createCategory = async (req, res) => {
-  const { name, title, description, subtitle, brand_id, brand } = req.body;
+  const { name, name_en, name_is, title, description, description_en, description_is, subtitle, brand_id, brand } = req.body;
 
   // Normalize field names sent from frontend or postman
-  const categoryName = name || title;
-  const categoryDesc = description || subtitle;
+  const categoryName = name_en ?? name ?? title;
+  const categoryNameIs = name_is ?? null;
+  const categoryDesc = description_en ?? description ?? subtitle ?? null;
+  const categoryDescIs = description_is ?? null;
 
   if (!categoryName) {
     return res.status(400).json({ error: 'Category name/title is required.' });
@@ -52,12 +60,13 @@ exports.createCategory = async (req, res) => {
     }
 
     const queryText = `
-      INSERT INTO categories (brand_id, name, description)
-      VALUES ($1, $2, $3)
-      RETURNING id, brand_id, name AS title, description AS subtitle;
+      INSERT INTO categories (brand_id, name_en, name_is, description_en, description_is)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, brand_id, name_en, name_is, description_en, description_is,
+                name_en AS name, name_en AS title, description_en AS description, description_en AS subtitle;
     `;
 
-    const result = await db.query(queryText, [targetBrandId, categoryName, categoryDesc || null]);
+    const result = await db.query(queryText, [targetBrandId, categoryName, categoryNameIs, categoryDesc, categoryDescIs]);
 
     res.status(201).json({
       message: 'Category created successfully',
@@ -72,10 +81,12 @@ exports.createCategory = async (req, res) => {
 // 3. UPDATE CATEGORY (Admin/SuperAdmin only)
 exports.updateCategory = async (req, res) => {
   const { id } = req.params;
-  const { name, title, description, subtitle, brand_id, brand } = req.body;
+  const { name, name_en, name_is, title, description, description_en, description_is, subtitle, brand_id, brand } = req.body;
 
-  const categoryName = name || title;
-  const categoryDesc = description || subtitle;
+  const categoryName = name_en ?? name ?? title;
+  const categoryNameIs = name_is;
+  const categoryDesc = description_en ?? description ?? subtitle;
+  const categoryDescIs = description_is;
 
   try {
     const checkResult = await db.query('SELECT * FROM categories WHERE id = $1', [id]);
@@ -93,14 +104,17 @@ exports.updateCategory = async (req, res) => {
 
     const queryText = `
       UPDATE categories
-      SET name = COALESCE($1, name),
-          description = COALESCE($2, description),
-          brand_id = COALESCE($3, brand_id)
-      WHERE id = $4
-      RETURNING id, brand_id, name AS title, description AS subtitle;
+      SET name_en = COALESCE($1, name_en),
+          name_is = COALESCE($2, name_is),
+          description_en = COALESCE($3, description_en),
+          description_is = COALESCE($4, description_is),
+          brand_id = COALESCE($5, brand_id)
+      WHERE id = $6
+      RETURNING id, brand_id, name_en, name_is, description_en, description_is,
+                name_en AS name, name_en AS title, description_en AS description, description_en AS subtitle;
     `;
 
-    const result = await db.query(queryText, [categoryName, categoryDesc, targetBrandId, id]);
+    const result = await db.query(queryText, [categoryName, categoryNameIs, categoryDesc, categoryDescIs, targetBrandId, id]);
 
     res.json({
       message: 'Category updated successfully',

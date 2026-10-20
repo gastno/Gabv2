@@ -8,6 +8,7 @@ import GabbabluPage from "./pages/GabbabluPage";
 import AmorTattooPage from "./pages/AmorTattooPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import CookieSettingsPage from "./pages/CookieSettingsPage";
+import { LanguageProvider } from "./components/i18n/LanguageContext";
 
 // Protected Route Guard with Defensive Checks
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -38,8 +39,9 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <LanguageProvider>
+      <Router>
+        <Routes>
         {/* Customer Public Pages */}
         <Route
           path="/"
@@ -84,8 +86,9 @@ function App() {
 
         {/* Fallback Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 }
 

@@ -17,9 +17,10 @@ export const STUDIO_DEFAULTS = {
   },
 };
 
-export const toTeamMember = (person) => ({
+export const toTeamMember = (person, language = "en") => ({
   id: person.id,
-  name: person.name || person.full_name || "Team member",
-  title: person.description || "Studio specialist",
+  name: person.name || person.full_name || (language === "is" ? "Starfsmaður" : "Team member"),
+  title: person[`description_${language}`] || person.description_en || person.description
+    || (language === "is" ? "Sérfræðingur stofunnar" : "Studio specialist"),
   img: getAssetUrl(person.avatar_url),
 });

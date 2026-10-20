@@ -52,7 +52,9 @@ exports.getAllStaff = async (req, res) => {
         s.id,
         s.username,
         s.full_name AS name,
-        s.description,
+        s.description_en,
+        s.description_is,
+        s.description_en AS description,
         s.is_active,
         s.avatar_url,
         r.name AS role,
@@ -88,6 +90,8 @@ exports.createStaff = async (req, res) => {
     full_name, 
     name, 
     description, 
+    description_en,
+    description_is,
     brand_ids, 
     role_id,
     photo 
@@ -113,42 +117,42 @@ exports.createStaff = async (req, res) => {
       avatarUrl = await processAndSaveAvatar(req.file.buffer);
     }
 
-    await db.query('BEGIN');
-
     const insertStaffQuery = `
-      INSERT INTO staff (role_id, username, password_hash, full_name, description, avatar_url)
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, role_id, username, full_name, description, avatar_url;
+      INSERT INTO staff (role_id, username, password_hash, full_name, description_en, description_is, avatar_url)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id, role_id, username, full_name, description_en, description_is, avatar_url;
     `;
 
-    const staffResult = await db.query(insertStaffQuery, [
-      parsedRoleId,
-      targetUsername,
-      hashedPassword,
-      staffName,
-      description || null,
-      avatarUrl
-    ]);
+    const newStaff = await db.withTransaction(async client => {
+      const staffResult = await client.query(insertStaffQuery, [
+        parsedRoleId,
+        targetUsername,
+        hashedPassword,
+        staffName,
+        description_en ?? description ?? null,
+        description_is || null,
+        avatarUrl
+      ]);
 
-    const newStaff = staffResult.rows[0];
+      const createdStaff = staffResult.rows[0];
+      let parsedBrandIds = [];
+      if (typeof brand_ids === 'string') {
+        try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = [1]; }
+      } else if (Array.isArray(brand_ids) && brand_ids.length > 0) {
+        parsedBrandIds = brand_ids;
+      } else {
+        parsedBrandIds = [1];
+      }
 
-    let parsedBrandIds = [];
-    if (typeof brand_ids === 'string') {
-      try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = [1]; }
-    } else if (Array.isArray(brand_ids) && brand_ids.length > 0) {
-      parsedBrandIds = brand_ids;
-    } else {
-      parsedBrandIds = [1];
-    }
+      for (const bId of parsedBrandIds) {
+        await client.query(
+          `INSERT INTO staff_brands (staff_id, brand_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+          [createdStaff.id, bId]
+        );
+      }
 
-    for (const bId of parsedBrandIds) {
-      await db.query(
-        `INSERT INTO staff_brands (staff_id, brand_id) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
-        [newStaff.id, bId]
-      );
-    }
-
-    await db.query('COMMIT');
+      return { ...createdStaff, brand_ids: parsedBrandIds };
+    });
 
     res.status(201).json({
       message: 'Staff account created successfully',
@@ -157,13 +161,14 @@ exports.createStaff = async (req, res) => {
         role_id: newStaff.role_id,
         username: newStaff.username,
         full_name: newStaff.full_name,
-        description: newStaff.description,
+        description_en: newStaff.description_en,
+        description_is: newStaff.description_is,
+        description: newStaff.description_en,
         avatar_url: newStaff.avatar_url,
-        brand_ids: parsedBrandIds,
+        brand_ids: newStaff.brand_ids,
       },
     });
   } catch (error) {
-    await db.query('ROLLBACK');
     console.error('Error creating staff account:', error);
 
     if (error.code === '23505' && error.detail && error.detail.includes('username')) {
@@ -184,6 +189,8 @@ exports.updateStaff = async (req, res) => {
     full_name, 
     name, 
     description, 
+    description_en,
+    description_is,
     role_id, 
     brand_ids 
   } = req.body;
@@ -205,55 +212,56 @@ exports.updateStaff = async (req, res) => {
       removeOldAvatarFile(currentStaff.avatar_url);
     }
 
-    await db.query('BEGIN');
-
+    const englishDescription = description_en ?? description;
     const isNewPasswordProvided = password && password.trim() !== '' && !password.includes('•');
 
-    if (isNewPasswordProvided) {
-      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-      await db.query(
-        `UPDATE staff
-         SET username = COALESCE($1, username),
-             full_name = COALESCE($2, full_name),
-             description = COALESCE($3, description),
-             role_id = COALESCE($4, role_id),
-             avatar_url = $5,
-             password_hash = $6
-         WHERE id = $7`,
-        [targetUsername, staffName, description, role_id || currentStaff.role_id, newAvatarUrl, hashedPassword, id]
-      );
-    } else {
-      await db.query(
-        `UPDATE staff
-         SET username = COALESCE($1, username),
-             full_name = COALESCE($2, full_name),
-             description = COALESCE($3, description),
-             role_id = COALESCE($4, role_id),
-             avatar_url = $5
-         WHERE id = $6`,
-        [targetUsername, staffName, description, role_id || currentStaff.role_id, newAvatarUrl, id]
-      );
-    }
-
-    let parsedBrandIds = brand_ids;
-    if (typeof brand_ids === 'string') {
-      try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = null; }
-    }
-
-    if (Array.isArray(parsedBrandIds)) {
-      await db.query('DELETE FROM staff_brands WHERE staff_id = $1', [id]);
-      for (const bId of parsedBrandIds) {
-        await db.query(
-          'INSERT INTO staff_brands (staff_id, brand_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-          [id, bId]
+    await db.withTransaction(async client => {
+      if (isNewPasswordProvided) {
+        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        await client.query(
+          `UPDATE staff
+           SET username = COALESCE($1, username),
+               full_name = COALESCE($2, full_name),
+               description_en = COALESCE($3, description_en),
+               description_is = COALESCE($4, description_is),
+               role_id = COALESCE($5, role_id),
+               avatar_url = $6,
+               password_hash = $7
+           WHERE id = $8`,
+          [targetUsername, staffName, englishDescription, description_is, role_id || currentStaff.role_id, newAvatarUrl, hashedPassword, id]
+        );
+      } else {
+        await client.query(
+          `UPDATE staff
+           SET username = COALESCE($1, username),
+               full_name = COALESCE($2, full_name),
+               description_en = COALESCE($3, description_en),
+               description_is = COALESCE($4, description_is),
+               role_id = COALESCE($5, role_id),
+               avatar_url = $6
+           WHERE id = $7`,
+          [targetUsername, staffName, englishDescription, description_is, role_id || currentStaff.role_id, newAvatarUrl, id]
         );
       }
-    }
 
-    await db.query('COMMIT');
+      let parsedBrandIds = brand_ids;
+      if (typeof brand_ids === 'string') {
+        try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = null; }
+      }
+
+      if (Array.isArray(parsedBrandIds)) {
+        await client.query('DELETE FROM staff_brands WHERE staff_id = $1', [id]);
+        for (const bId of parsedBrandIds) {
+          await client.query(
+            'INSERT INTO staff_brands (staff_id, brand_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            [id, bId]
+          );
+        }
+      }
+    });
+
     res.json({ message: 'Staff account updated successfully' });
   } catch (error) {
-    await db.query('ROLLBACK');
     console.error('Error updating staff account:', error);
     res.status(500).json({ error: 'Failed to update staff account.' });
   }
@@ -278,7 +286,7 @@ exports.uploadAvatar = async (req, res) => {
     const dbRelativeUrl = await processAndSaveAvatar(req.file.buffer);
 
     const updateResult = await db.query(
-      'UPDATE staff SET avatar_url = $1 WHERE id = $2 RETURNING id, username, full_name, avatar_url',
+      'UPDATE staff SET avatar_url = $1 WHERE id = $2 RETURNING id, username, full_name, description_en, description_is, avatar_url',
       [dbRelativeUrl, staffId]
     );
 

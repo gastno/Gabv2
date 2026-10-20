@@ -49,7 +49,8 @@ CREATE TABLE staff (
     username VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     full_name VARCHAR(255) NOT NULL,
-    description TEXT,
+    description_en TEXT,
+    description_is TEXT,
     avatar_url VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -68,18 +69,22 @@ CREATE TABLE staff_brands (
 CREATE TABLE categories (
     id BIGSERIAL PRIMARY KEY,
     brand_id BIGINT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
+    name_en VARCHAR(255) NOT NULL,
+    name_is VARCHAR(255),
+    description_en TEXT,
+    description_is TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-CREATE INDEX idx_categories_brand_name ON categories(brand_id, name);
+CREATE INDEX idx_categories_brand_name ON categories(brand_id, name_en);
 
 CREATE TABLE services (
     id BIGSERIAL PRIMARY KEY,
     brand_id BIGINT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
     category_id BIGINT NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
+    name_en VARCHAR(255) NOT NULL,
+    name_is VARCHAR(255),
+    description_en TEXT,
+    description_is TEXT,
     duration_minutes INT NOT NULL,
     price_isk DECIMAL(12,2) NOT NULL,
     image_url VARCHAR(512),

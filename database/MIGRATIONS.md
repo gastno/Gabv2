@@ -37,3 +37,9 @@ The studio frontend must read `logo_url`, `cover_image_url`, and `gallery_layout
 ## Date-Specific Staff Availability
 
 Apply `migrations/002_date_specific_staff_availability.sql` before deploying the date-specific availability API. It creates `staff_availabilities`, whose rows belong to one calendar date and contain a same-day start/end time. `staff_schedules` is left intact as legacy data and is no longer read by the backend; weekly rows are not expanded into dates because that would invent availability. Back up first and apply with the same Docker Compose procedure above, substituting the `002` migration filename.
+
+## English and Icelandic Staff and Catalog Content
+
+Apply `migrations/005_localized_catalog_content.sql` to existing databases before deploying the localized staff/category/service API. Back up the database first and apply it with the Docker Compose procedure above, substituting the `005` migration filename. The migration renames each legacy `description`/`name` column to its `_en` counterpart so existing English content is retained, and adds nullable `_is` columns for Icelandic text. It is safe to rerun. New installations get the same schema from `init.sql`; the seed script writes the staff description to `description_en`.
+
+Staff records expose `description_en` and `description_is`; categories and services expose `name_en`, `name_is`, `description_en`, and `description_is`. English-only aliases (`description`, and for categories `name`, `title`, and `subtitle`) remain in API responses for existing clients. Legacy create/update input fields are still accepted as English content. The frontend should select the `_en` or `_is` value based on the chosen language and handle null Icelandic content until translations are entered.

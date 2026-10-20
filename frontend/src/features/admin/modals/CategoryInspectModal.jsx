@@ -47,41 +47,67 @@ function CategoryInspectModal({
           </div>
 
           <div className="form-group">
-            <label>Category Title</label>
+            <label>Category Name (English)</label>
             {isEditMode ? (
               <input
                 type="text"
                 required
-                value={inspectCategory.title}
+                value={inspectCategory.name_en || inspectCategory.title || ""}
                 onChange={(e) =>
                   setInspectCategory({
                     ...inspectCategory,
-                    title: e.target.value,
+                    name_en: e.target.value,
                   })
                 }
               />
             ) : (
-              <div className="read-only-field">{inspectCategory.title}</div>
+              <div className="read-only-field">{inspectCategory.name_en || inspectCategory.title}</div>
             )}
           </div>
 
           <div className="form-group">
-            <label>Subtitle / Description</label>
+            <label>Category Name (Icelandic)</label>
             {isEditMode ? (
               <input
                 type="text"
-                value={inspectCategory.subtitle || ""}
+                value={inspectCategory.name_is || ""}
+                onChange={(e) => setInspectCategory({ ...inspectCategory, name_is: e.target.value })}
+              />
+            ) : (
+              <div className="read-only-field">{inspectCategory.name_is || "N/A"}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Description (English)</label>
+            {isEditMode ? (
+              <input
+                type="text"
+                value={inspectCategory.description_en ?? inspectCategory.subtitle ?? ""}
                 onChange={(e) =>
                   setInspectCategory({
                     ...inspectCategory,
-                    subtitle: e.target.value,
+                    description_en: e.target.value,
                   })
                 }
               />
             ) : (
               <div className="read-only-field">
-                {inspectCategory.subtitle || "N/A"}
+                {inspectCategory.description_en || inspectCategory.subtitle || "N/A"}
               </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Description (Icelandic)</label>
+            {isEditMode ? (
+              <input
+                type="text"
+                value={inspectCategory.description_is || ""}
+                onChange={(e) => setInspectCategory({ ...inspectCategory, description_is: e.target.value })}
+              />
+            ) : (
+              <div className="read-only-field">{inspectCategory.description_is || "N/A"}</div>
             )}
           </div>
 
