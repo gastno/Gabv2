@@ -55,3 +55,21 @@ Apply `migrations/006_localized_brand_descriptions.sql` to existing databases be
 Apply `migrations/007_appointment_reference_images.sql` to existing databases before deploying appointment reference uploads. Back up first and use the Docker Compose migration procedure above, substituting the `007` migration filename. Fresh databases receive the same table from `init.sql`.
 
 Customers may submit an optional multipart booking with up to five `reference_images` files (JPEG, PNG, or WebP; maximum 5 MB per file), alongside the normal booking fields. The images are validated, resized, stripped of metadata, and stored in PostgreSQL. Appointment list/detail responses include `reference_images` entries with an `id` and protected `url`; fetch the URL with an authenticated request. Only the appointment's customer, assigned staff member, or an admin authorized for its brand can retrieve the image. The frontend must switch the booking request to multipart when images are attached and fetch/display each protected image using its auth token.
+
+## Clerk Customer Sign-In
+
+Apply `migrations/008_clerk_customer_identities.sql` to existing databases before deploying Clerk sign-in. Back up first and run:
+
+```powershell
+Get-Content -Raw database/migrations/008_clerk_customer_identities.sql | docker compose exec -T postgres_db psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB
+```
+
+Use the deployment's actual PostgreSQL credentials; this migration is not run during backend tests. Fresh databases receive the same identity table from `init.sql`. The table stores only the provider (`clerk`), stable Clerk user subject, and customer foreign key; it does not store Clerk session tokens, access tokens, or secrets.
+
+Configure these backend environment variables without committing them:
+
+- `CLERK_SECRET_KEY`: secret key for the Clerk instance; the backend uses it for SDK token verification and authoritative user lookup.
+- `CLERK_ISSUER`: exact issuer URL shown in the verified Clerk session token's `iss` claim (for example, the instance's Clerk domain). It is enforced during verification.
+- `CLERK_AUTHORIZED_PARTIES`: comma-separated list of exact frontend origins allowed to mint the session tokens, such as `http://localhost:3000` and the production frontend origin.
+
+The frontend should obtain a Clerk session token and send it as `Authorization: Bearer <token>` to `POST /api/auth/customer/clerk/session`. A mapped identity returns `{ "status": "authenticated", "token": "<Gabv2 JWT>", "customer": { "id": 1, "full_name": "...", "email": "..." } }`; an unmapped identity returns `{ "status": "profile_required", "profile": { "full_name": "...", "email": "..." } }`. For the latter, collect `full_name`, `phone_number`, and `kennitala`, then send them with the same Bearer token to `POST /api/auth/customer/clerk/complete-profile`. Success returns the authenticated shape. Treat browser-supplied `full_name` as new profile input only; the backend takes the identity subject and verified email from Clerk and ignores client-supplied email, role, or customer ID. Missing/invalid profile fields return HTTP 400, invalid/unverified sessions return HTTP 401, unavailable Clerk verification returns HTTP 503, and profile conflicts return HTTP 409 with a generic message that does not identify whether the email or Kennitala is already in use. The backend never links an existing customer or guest profile by matching email or Kennitala.

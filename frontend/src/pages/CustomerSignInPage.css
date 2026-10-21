@@ -1,0 +1,177 @@
+.customer-sign-in-page {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(117, 187, 193, 0.08), transparent 55%),
+    var(--hud-bg-main);
+  color: var(--hud-text-primary);
+}
+
+.customer-sign-in-shell {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: clamp(28px, 7vw, 76px) 20px;
+}
+
+.customer-sign-in-card {
+  width: min(100%, 470px);
+  box-sizing: border-box;
+  padding: clamp(26px, 6vw, 46px);
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 16px;
+  background: rgba(26, 28, 32, 0.96);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+.customer-sign-in-eyebrow {
+  margin: 0 0 10px;
+  color: var(--hud-accent-cyan);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.customer-sign-in-card h1 {
+  margin: 0;
+  color: var(--hud-text-primary);
+  font-family: var(--hud-font-heading);
+  font-size: clamp(1.65rem, 5vw, 2.15rem);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.customer-sign-in-intro {
+  margin: 12px 0 26px;
+  color: var(--hud-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.customer-provider-options,
+.customer-clerk-auth,
+.customer-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.customer-clerk-auth {
+  width: 100%;
+  min-width: 0;
+}
+
+.customer-sign-in-submit,
+.customer-sign-in-cancel {
+  min-height: 48px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+}
+
+.customer-sign-in-cancel {
+  border: 1px solid var(--hud-border-subtle);
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+}
+
+.customer-sign-in-cancel:hover:not(:disabled) {
+  border-color: var(--hud-accent-cyan);
+  background: var(--hud-bg-surface-hover);
+}
+
+.customer-sign-in-submit {
+  margin-top: 4px;
+  border: 1px solid var(--hud-accent-cyan);
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+}
+
+.customer-sign-in-submit:hover:not(:disabled) {
+  background: #8acbd0;
+}
+
+.customer-sign-in-submit:disabled,
+.customer-sign-in-cancel:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.customer-profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--hud-text-secondary);
+  font-size: 0.84rem;
+}
+
+.customer-profile-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 8px;
+  outline: none;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+  font: inherit;
+}
+
+.customer-profile-form input:focus {
+  border-color: var(--hud-accent-cyan);
+  box-shadow: 0 0 0 3px rgba(117, 187, 193, 0.1);
+}
+
+.customer-profile-form input[readonly] {
+  color: var(--hud-text-muted);
+}
+
+.customer-sign-in-error {
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  border: 1px solid rgba(242, 174, 181, 0.3);
+  border-radius: 8px;
+  background: rgba(242, 174, 181, 0.08);
+  color: var(--hud-rose-dusk);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.customer-sign-in-note,
+.customer-sign-in-status {
+  margin: 4px 0 0;
+  color: var(--hud-text-muted);
+  font-size: 0.79rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.customer-sign-in-back {
+  display: inline-block;
+  margin-top: 24px;
+  color: var(--hud-text-muted);
+  font-size: 0.84rem;
+  text-decoration: none;
+}
+
+.customer-sign-in-back:hover {
+  color: var(--hud-accent-cyan);
+}
+
+@media (max-width: 480px) {
+  .customer-sign-in-shell {
+    padding: 24px 14px;
+  }
+
+  .customer-sign-in-card {
+    padding: 24px 20px;
+  }
+}

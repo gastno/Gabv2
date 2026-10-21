@@ -153,9 +153,12 @@ function AccountStep({ service, dateLabel, timeLabel, onContinue }) {
         {service.name} on {dateLabel} at {timeLabel}
       </p>
       <div className="auth-choice-container">
-        <button type="button" className="auth-btn primary" onClick={() => window.alert(t("header.login"))}>
-        {t("booking.login")}
-        </button>
+        <a
+          className="auth-btn primary"
+          href={`/customer/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`}
+        >
+          {t("booking.login")}
+        </a>
         <div className="auth-divider"><span>{t("booking.or")}</span></div>
         <button type="button" className="auth-btn secondary" onClick={onContinue}>
           {t("booking.continueGuest")}

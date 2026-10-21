@@ -10,6 +10,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - `src/utils/` contains utilities shared across feature boundaries. `src/services/` contains shared API access, `src/styles/` contains global styles, and `src/assets/` contains source-managed assets.
 - Use `.jsx` for React components and `.js` for non-component modules such as data and utilities.
 
+## Environment variables
+
+- `REACT_APP_API_URL` optionally sets the backend API base URL; it defaults to `http://localhost:5000/api`.
+- `REACT_APP_CLERK_PUBLISHABLE_KEY` enables customer Google and Apple sign-in through Clerk. Set it in your local `frontend/.env` or deployment environment; do not commit a real key or a Clerk secret key. Enable and configure the Google and Apple social connection providers in your Clerk application. Without this publishable key, the dedicated customer sign-in page explains that provider sign-in is unavailable.
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { Suspense, lazy, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { authApi } from "../../../services/api";
+import {
+  clearCustomerSession,
+  getCustomerSessionEventName,
+  requestClerkSignOut,
+} from "../../../services/customerSession";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./Header.css";
+
+const clerkPublishableKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
+const ClerkAuthForm = lazy(() => import("./ClerkAuthForm"));
 
 function Header({ language: languageProp, onLanguageChange }) {
   const languageContext = useLanguage();
@@ -12,20 +20,15 @@ function Header({ language: languageProp, onLanguageChange }) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [currentUser, setCurrentUser] = useState(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [logoutError, setLogoutError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Forms State
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [signupForm, setSignupForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    password: "",
-  });
-
-  // Helper delay to ensure spinner animation is visible
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const currentPath = `${window.location.pathname}${window.location.search}`;
+  const customerReturnTo = window.location.pathname.startsWith("/customer/")
+    ? "/"
+    : currentPath;
+  const authSearch = `?returnTo=${encodeURIComponent(customerReturnTo || "/")}`;
+  const customerSignInUrl = `/customer/sign-in${authSearch}`;
+  const customerSignUpUrl = `/customer/sign-up${authSearch}`;
 
   // Check auth session and cached user details on mount
   useEffect(() => {
@@ -34,6 +37,15 @@ function Header({ language: languageProp, onLanguageChange }) {
     if (token) {
       checkAuthStatus();
     }
+  }, []);
+
+  useEffect(() => {
+    const handleSessionChange = (event) => {
+      setCurrentUser(event.detail?.customer || null);
+    };
+    const eventName = getCustomerSessionEventName();
+    window.addEventListener(eventName, handleSessionChange);
+    return () => window.removeEventListener(eventName, handleSessionChange);
   }, []);
 
   const checkAuthStatus = async () => {
@@ -66,85 +78,26 @@ function Header({ language: languageProp, onLanguageChange }) {
   };
 
   const handleOpenModal = (mode = "login") => {
-    setErrorMessage("");
     setAuthMode(mode);
     setIsAuthModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsAuthModalOpen(false);
-    setErrorMessage("");
   };
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
+  const handleLogout = async () => {
+    setLogoutError("");
     setLoading(true);
-
     try {
-      // API call execution
-      const data = await authApi.customerLogin(loginForm.email, loginForm.password);
-      
-      // Extended delay (1.5 seconds) so the user sees the spinner animation
-      await delay(1500);
-
-      const userPayload = data.customer || data.user || data;
-      const resolvedName =
-        userPayload.full_name ||
-        userPayload.fullName ||
-        userPayload.name ||
-        userPayload.display_name;
-
-      if (resolvedName) {
-        localStorage.setItem("customer_auth_user_name", resolvedName);
-      }
-
-      setCurrentUser(userPayload);
-      setIsAuthModalOpen(false);
-      setLoginForm({ email: "", password: "" });
-    } catch (err) {
-      await delay(800); // Brief pause before showing error
-      setErrorMessage(err.message || t("header.loginError"));
+      if (clerkPublishableKey) await requestClerkSignOut();
+      clearCustomerSession();
+      setCurrentUser(null);
+    } catch (error) {
+      setLogoutError(error.message || t("header.logoutError"));
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage("");
-    setLoading(true);
-
-    try {
-      const data = await authApi.customerRegister({
-        full_name: signupForm.fullName,
-        email: signupForm.email,
-        phone_number: signupForm.phone,
-        password: signupForm.password,
-        kennitala: "0000000000",
-      });
-
-      // Extended delay (1.5 seconds) so the user sees the spinner animation
-      await delay(1500);
-
-      localStorage.setItem("customer_auth_user_name", signupForm.fullName);
-
-      const userPayload = data.customer || { full_name: signupForm.fullName, email: signupForm.email };
-      setCurrentUser(userPayload);
-      setIsAuthModalOpen(false);
-      setSignupForm({ fullName: "", email: "", phone: "", password: "" });
-    } catch (err) {
-      await delay(800);
-      setErrorMessage(err.message || t("header.signupError"));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("customer_auth_token");
-    localStorage.removeItem("customer_auth_user_name");
-    setCurrentUser(null);
   };
 
   const getUserDisplayName = () => {
@@ -171,10 +124,11 @@ function Header({ language: languageProp, onLanguageChange }) {
         <div className="controls">
           {currentUser ? (
             <div className="user-profile-controls">
+              {logoutError && <span role="alert" className="header-session-error">{logoutError}</span>}
               <span className="user-welcome-text">
                 {t("header.welcome", { name: getUserDisplayName() })}
               </span>
-              <button className="logout-button" onClick={handleLogout}>
+              <button className="logout-button" onClick={handleLogout} disabled={loading}>
                 {t("header.logout")}
               </button>
             </div>
@@ -218,129 +172,32 @@ function Header({ language: languageProp, onLanguageChange }) {
               <button
                 type="button"
                 className={`auth-tab-btn ${authMode === "login" ? "active" : ""}`}
-                onClick={() => {
-                  setErrorMessage("");
-                  setAuthMode("login");
-                }}
+                onClick={() => setAuthMode("login")}
               >
                 {t("header.loginTab")}
               </button>
               <button
                 type="button"
                 className={`auth-tab-btn ${authMode === "signup" ? "active" : ""}`}
-                onClick={() => {
-                  setErrorMessage("");
-                  setAuthMode("signup");
-                }}
+                onClick={() => setAuthMode("signup")}
               >
                 {t("header.signupTab")}
               </button>
             </div>
 
-            {errorMessage && (
-              <div className="auth-error-banner">
-                {errorMessage}
-              </div>
-            )}
-
-            {authMode === "login" ? (
-              <form onSubmit={handleLoginSubmit} className="header-auth-form">
-                <h2>{t("header.welcomeBack")}</h2>
-                <p className="auth-subtitle">{t("header.loginSubtitle")}</p>
-
-                <div className="auth-field">
-                  <label>{t("header.email")}</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder={t("header.emailPlaceholder")}
-                    value={loginForm.email}
-                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                  />
-                </div>
-
-                <div className="auth-field">
-                  <label>{t("header.password")}</label>
-                  <input
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  />
-                </div>
-
-                <button type="submit" className="auth-submit-btn" disabled={loading}>
-                  {loading ? (
-                    <span className="spinner-container">
-                      <span className="spinning-circle" />
-                      {t("header.loggingIn")}
-                    </span>
-                  ) : (
-                    t("header.loginTab")
-                  )}
-                </button>
-              </form>
+            {!clerkPublishableKey ? (
+              <p role="alert" className="header-clerk-config-error">
+                {t("customerSignIn.notConfigured")}
+              </p>
             ) : (
-              <form onSubmit={handleSignupSubmit} className="header-auth-form">
-                <h2>{t("header.createAccount")}</h2>
-                <p className="auth-subtitle">{t("header.signupSubtitle")}</p>
-
-                <div className="auth-field">
-                  <label>{t("header.fullName")}</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder={t("header.namePlaceholder")}
-                    value={signupForm.fullName}
-                    onChange={(e) => setSignupForm({ ...signupForm, fullName: e.target.value })}
-                  />
-                </div>
-
-                <div className="auth-field">
-                  <label>{t("header.email")}</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder={t("header.emailPlaceholder")}
-                    value={signupForm.email}
-                    onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
-                  />
-                </div>
-
-                <div className="auth-field">
-                  <label>{t("header.phone")}</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder={t("header.phonePlaceholder")}
-                    value={signupForm.phone}
-                    onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
-                  />
-                </div>
-
-                <div className="auth-field">
-                  <label>{t("header.password")}</label>
-                  <input
-                    type="password"
-                    required
-                    placeholder={t("header.passwordPlaceholder")}
-                    value={signupForm.password}
-                    onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
-                  />
-                </div>
-
-                <button type="submit" className="auth-submit-btn" disabled={loading}>
-                  {loading ? (
-                    <span className="spinner-container">
-                      <span className="spinning-circle" />
-                      {t("header.creating")}
-                    </span>
-                  ) : (
-                    t("header.createAccountButton")
-                  )}
-                </button>
-              </form>
+              <Suspense fallback={null}>
+                <ClerkAuthForm
+                  authMode={authMode}
+                  customerSignInUrl={customerSignInUrl}
+                  customerSignUpUrl={customerSignUpUrl}
+                  t={t}
+                />
+              </Suspense>
             )}
           </div>
         </div>

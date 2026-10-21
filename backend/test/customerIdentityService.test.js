@@ -49,6 +49,9 @@ test('registration inserts a profile under the Kennitala advisory lock when iden
   const customer = await registerCustomerProfile(database, profile);
 
   assert.equal(customer.id, 7);
-  assert.match(statements[0].text, /pg_advisory_xact_lock/);
-  assert.equal(statements[0].params[0], '0101901234');
+  const identityLocks = statements.filter(statement => statement.text.includes('pg_advisory_xact_lock'));
+  assert.deepEqual(identityLocks.map(statement => statement.params[0]), [
+    'customer-email:test@example.invalid',
+    'customer-kennitala:0101901234',
+  ]);
 });

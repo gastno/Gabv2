@@ -49,7 +49,9 @@ async function request(endpoint, options = {}, tokenKey = STAFF_TOKEN_KEY) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.error || "An error occurred with the request.");
+    const error = new Error(data.error || data.message || "An error occurred with the request.");
+    error.status = response.status;
+    throw error;
   }
 
   return data;
@@ -79,6 +81,19 @@ export const authApi = {
     if (data.token) localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
     return data;
   },
+
+  customerClerkSession: (clerkToken) =>
+    request("/auth/customer/clerk/session", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${clerkToken}` },
+    }, null),
+
+  customerClerkCompleteProfile: (clerkToken, profile) =>
+    request("/auth/customer/clerk/complete-profile", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${clerkToken}` },
+      body: JSON.stringify(profile),
+    }, null),
 
   getMe: () => request("/auth/me", { method: "GET" }, CUSTOMER_TOKEN_KEY),
 };
