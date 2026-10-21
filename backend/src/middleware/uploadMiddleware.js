@@ -21,6 +21,19 @@ const uploadAvatar = multer({
   fileFilter: fileFilter
 });
 
+const uploadAppointmentReferences = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 5,
+    fields: 20,
+    fieldSize: 100 * 1024,
+    parts: 25,
+  },
+  fileFilter,
+});
+
 module.exports = {
-  uploadAvatar
+  uploadAvatar,
+  uploadAppointmentReferences,
 };

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import UserAvatar from "../../../components/common/UserAvatar/UserAvatar";
 import { useLanguage } from "../../../components/i18n/LanguageContext";
 import { apptApi, staffServiceApi } from "../../../services/api";
+import ReferenceImagePicker from "../components/ReferenceImagePicker";
 import { toTeamMember } from "../data/studioData";
 import {
   formatStudioDate,
@@ -164,7 +165,22 @@ function AccountStep({ service, dateLabel, timeLabel, onContinue }) {
   );
 }
 
-function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, guestForm, onFieldChange, onSubmit }) {
+function GuestDetailsStep({
+  brandName,
+  service,
+  employee,
+  dateLabel,
+  timeLabel,
+  guestForm,
+  onFieldChange,
+  referenceImages,
+  referenceImageError,
+  onReferenceImagesSelected,
+  onReferenceImageRemove,
+  onSubmit,
+  submitError,
+  isSubmitting,
+}) {
   const { t } = useLanguage();
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -217,6 +233,13 @@ function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, 
           <label htmlFor="booking-health-info">{t("booking.healthInfo")}</label>
           <textarea id="booking-health-info" rows="3" value={guestForm.healthInfo} onChange={(event) => onFieldChange("healthInfo", event.target.value)} placeholder={t("booking.healthPlaceholder")} />
         </div>
+        <ReferenceImagePicker
+          files={referenceImages}
+          error={referenceImageError}
+          disabled={isSubmitting}
+          onFilesSelected={onReferenceImagesSelected}
+          onRemove={onReferenceImageRemove}
+        />
         <div className="form-checkbox-group">
           <input id="consentKennitala" type="checkbox" checked={guestForm.consentPrivacy} onChange={(event) => onFieldChange("consentPrivacy", event.target.checked)} />
           <label htmlFor="consentKennitala">
@@ -241,7 +264,10 @@ function GuestDetailsStep({ brandName, service, employee, dateLabel, timeLabel, 
             {t("booking.cancellationConsent")}
           </label>
         </div>
-        <button type="submit" className="submit-booking-btn">{t("booking.confirm")}</button>
+        {submitError && <p className="booking-submit-error" role="alert">{submitError}</p>}
+        <button type="submit" className="submit-booking-btn" disabled={isSubmitting}>
+          {isSubmitting ? t("booking.submitting") : t("booking.confirm")}
+        </button>
       </form>
     </div>
   );
@@ -277,6 +303,10 @@ function BookingModal({ service, brandName, onClose }) {
   const [availabilityError, setAvailabilityError] = useState("");
   const [selectedDateKey, setSelectedDateKey] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [referenceImages, setReferenceImages] = useState([]);
+  const [referenceImageError, setReferenceImageError] = useState("");
+  const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     let isCurrent = true;
@@ -383,7 +413,27 @@ function BookingModal({ service, brandName, onClose }) {
   const selectedDateLabel = selectedDateKey ? formatStudioDate(selectedDateKey, undefined, locale) : "";
   const selectedTimeLabel = selectedSlot ? formatStudioTime(selectedSlot.start_time) : "";
 
+  const handleReferenceImagesSelected = (files) => {
+    const selectedFiles = Array.from(files);
+    if (referenceImages.length + selectedFiles.length > 5) {
+      setReferenceImageError(t("booking.referenceLimit"));
+      return;
+    }
+    if (selectedFiles.some((file) => !["image/jpeg", "image/png", "image/webp"].includes(file.type))) {
+      setReferenceImageError(t("booking.referenceTypeError"));
+      return;
+    }
+    if (selectedFiles.some((file) => file.size > 5 * 1024 * 1024)) {
+      setReferenceImageError(t("booking.referenceSizeError"));
+      return;
+    }
+    setReferenceImageError("");
+    setReferenceImages((previous) => [...previous, ...selectedFiles]);
+  };
+
   const handleGuestSubmit = async (submittedGuestForm) => {
+    setIsSubmitting(true);
+    setSubmitError("");
     try {
       // PostgreSQL TIMESTAMPTZ requires a combined ISO-8601 datetime string[cite: 3]
       const finalStartTime = selectedSlot.start_time.includes("T") 
@@ -413,7 +463,11 @@ function BookingModal({ service, brandName, onClose }) {
         },
       };
 
-      await apptApi.createAppointment(payload);
+      if (referenceImages.length > 0) {
+        await apptApi.createAppointment(payload, referenceImages);
+      } else {
+        await apptApi.createAppointment(payload);
+      }
       window.alert(t("booking.confirmed", {
         service: service.name,
         specialist: selectedEmployee.name,
@@ -423,9 +477,11 @@ function BookingModal({ service, brandName, onClose }) {
       onClose();
     } catch (error) {
       console.error("Booking API Error:", error);
-      window.alert(t("booking.failed", {
+      setSubmitError(t("booking.failed", {
         error: error.message || (language === "is" ? "Innri villa á netþjóni" : "Internal Server Error"),
       }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -482,7 +538,16 @@ function BookingModal({ service, brandName, onClose }) {
             onFieldChange={(field, value) => {
               setGuestForm((previous) => ({ ...previous, [field]: value }));
             }}
+            referenceImages={referenceImages}
+            referenceImageError={referenceImageError}
+            onReferenceImagesSelected={handleReferenceImagesSelected}
+            onReferenceImageRemove={(index) => {
+              setReferenceImages((previous) => previous.filter((_, fileIndex) => fileIndex !== index));
+              setReferenceImageError("");
+            }}
             onSubmit={handleGuestSubmit}
+            submitError={submitError}
+            isSubmitting={isSubmitting}
           />
         )}
 

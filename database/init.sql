@@ -169,6 +169,16 @@ CREATE INDEX idx_appointments_staff_time ON appointments(staff_id, start_time, e
 CREATE INDEX idx_appointments_customer_time ON appointments(customer_id, start_time);
 CREATE INDEX idx_appointments_brand_status ON appointments(brand_id, status);
 
+CREATE TABLE appointment_reference_images (
+    id BIGSERIAL PRIMARY KEY,
+    appointment_id BIGINT NOT NULL REFERENCES appointments(id) ON DELETE CASCADE,
+    content_type VARCHAR(32) NOT NULL CHECK (content_type IN ('image/jpeg', 'image/png', 'image/webp')),
+    image_data BYTEA NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_appointment_reference_images_appointment
+    ON appointment_reference_images(appointment_id, id);
+
 -- --------------------------------------------------------------------------
 -- DOMAIN 4: AVAILABILITY & CALENDAR ENGINE
 -- --------------------------------------------------------------------------

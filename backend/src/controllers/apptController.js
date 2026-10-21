@@ -3,6 +3,7 @@ const db = require('../config/db');
 const { validateBookingRequest } = require('../services/bookingContract');
 const { BookingError, createBooking } = require('../services/bookingService');
 const { canTransitionAppointment, isAppointmentAccessible } = require('../services/appointmentAccess');
+const { ReferenceImageError, processReferenceImage } = require('../services/appointmentReferenceImage');
 
 const appointmentReadQuery = `
   SELECT a.id, a.brand_id, a.service_id, a.staff_id, a.customer_id,
@@ -11,7 +12,15 @@ const appointmentReadQuery = `
          service.name_en AS service_name, staff.full_name AS staff_name,
          customer.full_name AS customer_name, customer.phone_number AS customer_phone,
          customer.email AS customer_email, customer.kennitala AS customer_kennitala,
-         customer.health_info AS health_info
+         customer.health_info AS health_info,
+         COALESCE((
+           SELECT json_agg(json_build_object(
+             'id', reference_image.id,
+             'url', '/api/appointments/' || a.id || '/references/' || reference_image.id
+           ) ORDER BY reference_image.id)
+           FROM appointment_reference_images reference_image
+           WHERE reference_image.appointment_id = a.id
+         ), '[]'::json) AS reference_images
   FROM appointments a
   JOIN services service ON service.id = a.service_id
   JOIN staff staff ON staff.id = a.staff_id
@@ -47,7 +56,11 @@ exports.createAppointment = async (req, res) => {
   if (validation.error) return res.status(400).json({ error: validation.error });
 
   try {
-    const appointment = await createBooking(db, validation.value);
+    const referenceImages = await Promise.all((req.files || []).map(processReferenceImage));
+    const appointment = await createBooking(db, {
+      ...validation.value,
+      referenceImages,
+    });
 
     res.status(201).json({
       message: 'Appointment booked successfully',
@@ -55,22 +68,18 @@ exports.createAppointment = async (req, res) => {
     });
 
   } catch (error) {
-    // 1. Log the full error to your Node.js terminal
-    console.error("\n=== DB BOOKING REJECTION ===");
-    console.error(error);
-    console.error("============================\n");
-
     if (error instanceof BookingError) {
       return res.status(error.status).json({ error: error.message });
+    }
+    if (error instanceof ReferenceImageError) {
+      return res.status(400).json({ error: error.message });
     }
     if (error.code === '23P01' || error.code === '23505') {
       return res.status(409).json({ error: 'The booking conflicts with an existing record.' });
     }
-    
-    // 2. Send the exact database error message back to the frontend
-    res.status(500).json({ 
-      error: `Failed to create appointment: ${error.message || error.detail || "Unknown constraint violation"}` 
-    });
+
+    console.error('Error creating appointment:', error);
+    return res.status(500).json({ error: 'Failed to create appointment.' });
   }
 };
 
@@ -120,6 +129,43 @@ exports.getAppointment = async (req, res) => {
     return res.json({ appointment });
   } catch (error) {
     return res.status(500).json({ error: 'Failed to retrieve appointment.' });
+  }
+};
+
+exports.getAppointmentReferenceImage = async (req, res) => {
+  const appointmentId = parsePositiveId(req.params.id);
+  const referenceId = parsePositiveId(req.params.referenceId);
+  if (!appointmentId || !referenceId) {
+    return res.status(400).json({ error: 'Invalid appointment or reference image ID.' });
+  }
+
+  try {
+    const appointmentResult = await db.query(
+      'SELECT id, brand_id, staff_id, customer_id FROM appointments WHERE id = $1',
+      [appointmentId]
+    );
+    const appointment = appointmentResult.rows[0];
+    if (!appointment) return res.status(404).json({ error: 'Appointment not found.' });
+    if (!(await authorizeAppointment(db, req.user, appointment))) {
+      return res.status(403).json({ error: 'Forbidden.' });
+    }
+
+    const imageResult = await db.query(`
+      SELECT content_type, image_data
+      FROM appointment_reference_images
+      WHERE id = $1 AND appointment_id = $2
+    `, [referenceId, appointmentId]);
+    const image = imageResult.rows[0];
+    if (!image) return res.status(404).json({ error: 'Reference image not found.' });
+
+    res.set({
+      'Cache-Control': 'private, no-store',
+      'X-Content-Type-Options': 'nosniff',
+    });
+    return res.type(image.content_type).send(image.image_data);
+  } catch (error) {
+    console.error('Error retrieving appointment reference image:', error);
+    return res.status(500).json({ error: 'Failed to retrieve reference image.' });
   }
 };
 

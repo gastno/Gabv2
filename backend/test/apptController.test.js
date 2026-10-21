@@ -19,6 +19,7 @@ const appointment = {
   customer_email: 'customer@example.com',
   customer_kennitala: '0000000000',
   health_info: 'Allergic to fragrance',
+  reference_images: [{ id: 17, url: '/api/appointments/41/references/17' }],
 };
 
 const response = () => ({
@@ -26,6 +27,18 @@ const response = () => ({
   body: undefined,
   status(code) {
     this.statusCode = code;
+    return this;
+  },
+  set(headers) {
+    this.headers = headers;
+    return this;
+  },
+  type(contentType) {
+    this.contentType = contentType;
+    return this;
+  },
+  send(body) {
+    this.body = body;
     return this;
   },
   json(body) {
@@ -37,6 +50,40 @@ const response = () => ({
 test.afterEach(() => {
   db.query = savedQuery;
   db.withTransaction = savedWithTransaction;
+});
+
+test('appointment reference image reads require appointment access and stream private bytes', async () => {
+  const imageData = Buffer.from('private-image-bytes');
+  const queries = [];
+  db.query = async (sql, params) => {
+    queries.push({ sql, params });
+    if (sql.includes('FROM appointments')) return { rows: [{ ...appointment }] };
+    return { rows: [{ content_type: 'image/jpeg', image_data: imageData }] };
+  };
+
+  const allowedResponse = response();
+  await controller.getAppointmentReferenceImage({
+    params: { id: '41', referenceId: '17' },
+    user: { id: 3, type: 'staff', role: 'staff' },
+  }, allowedResponse);
+
+  assert.equal(allowedResponse.statusCode, 200);
+  assert.equal(allowedResponse.contentType, 'image/jpeg');
+  assert.deepEqual(allowedResponse.headers, {
+    'Cache-Control': 'private, no-store',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  assert.equal(allowedResponse.body, imageData);
+  assert.deepEqual(queries[1].params, [17, 41]);
+
+  queries.length = 0;
+  const deniedResponse = response();
+  await controller.getAppointmentReferenceImage({
+    params: { id: '41', referenceId: '17' },
+    user: { id: 99, type: 'staff', role: 'staff' },
+  }, deniedResponse);
+  assert.equal(deniedResponse.statusCode, 403);
+  assert.equal(queries.length, 1);
 });
 
 test('appointment list and detail responses include customer contact and health details while preserving access scope', async () => {
@@ -66,12 +113,14 @@ test('appointment list and detail responses include customer contact and health 
   assert.equal(detailResponse.body.appointment.customer_kennitala, '0000000000');
   assert.equal(detailResponse.body.appointment.health_info, 'Allergic to fragrance');
   assert.equal(detailResponse.body.appointment.payment_status, 'pending');
+  assert.deepEqual(detailResponse.body.appointment.reference_images, appointment.reference_images);
   assert.equal(queries.length, 2);
   for (const { sql } of queries) {
     assert.match(sql, /customer\.email AS customer_email/);
     assert.match(sql, /customer\.kennitala AS customer_kennitala/);
     assert.match(sql, /customer\.health_info AS health_info/);
     assert.match(sql, /a\.payment_status/);
+    assert.match(sql, /appointment_reference_images/);
   }
   assert.deepEqual(queries[0].params, [3]);
   assert.deepEqual(queries[1].params, [41]);

@@ -135,7 +135,21 @@ const createBooking = (database, booking) => database.withTransaction(async clie
     booking.customOptions === null ? null : JSON.stringify(booking.customOptions),
   ]);
 
-  return appointmentResult.rows[0];
+  const appointment = appointmentResult.rows[0];
+  const referenceImages = [];
+  for (const image of booking.referenceImages || []) {
+    const imageResult = await client.query(`
+      INSERT INTO appointment_reference_images (appointment_id, content_type, image_data)
+      VALUES ($1, $2, $3)
+      RETURNING id
+    `, [appointment.id, image.mimeType, image.buffer]);
+    referenceImages.push({
+      id: imageResult.rows[0].id,
+      url: `/api/appointments/${appointment.id}/references/${imageResult.rows[0].id}`,
+    });
+  }
+
+  return { ...appointment, reference_images: referenceImages };
 });
 
 module.exports = { BookingError, createBooking };

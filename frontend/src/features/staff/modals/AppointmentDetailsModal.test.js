@@ -82,4 +82,34 @@ describe("AppointmentDetailsModal payment status", () => {
     }).closest("div");
     expect(within(healthInfoRow).getByText("Allergic to fragrance")).toBeInTheDocument();
   });
+
+  it("shows reference images in the appointment details", () => {
+    render(
+      <AppointmentDetailsModal
+        appointment={{
+          ...appointment,
+          reference_images: [{ id: 15, url: "/api/appointments/1/references/15" }],
+        }}
+        referenceImages={[{ id: 15, url: "blob:reference-image" }]}
+        onClose={jest.fn()}
+        onSaveStatus={jest.fn()}
+        statusEditMode={false}
+        setStatusEditMode={jest.fn()}
+        statusDraft="pending"
+        setStatusDraft={jest.fn()}
+        feeStatusDraft="none"
+        setFeeStatusDraft={jest.fn()}
+        paymentStatusDraft="pending"
+        setPaymentStatusDraft={jest.fn()}
+        cancellationReason=""
+        setCancellationReason={jest.fn()}
+        error=""
+        saving={false}
+        formatDate={() => "Tuesday, October 6"}
+      />
+    );
+
+    expect(screen.getByRole("heading", { name: "Customer reference images" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Customer reference 1" })).toHaveAttribute("src", "blob:reference-image");
+  });
 });

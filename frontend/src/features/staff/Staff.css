@@ -1035,6 +1035,36 @@ button.zoom-appt-card {
   text-align: right;
 }
 
+.appointment-reference-images {
+  margin: 18px 0;
+}
+
+.appointment-reference-images h3 {
+  margin: 0 0 10px;
+  color: #ddd;
+  font-size: 0.9rem;
+}
+
+.appointment-reference-images > p {
+  color: #aaa;
+  font-size: 0.82rem;
+}
+
+.appointment-reference-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.appointment-reference-gallery img {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
 .appointment-status-form {
   display: flex;
   flex-direction: column;

@@ -947,6 +947,66 @@
   border-color: #666;
 }
 
+.brand-page .reference-image-picker input[type="file"] {
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.brand-page .reference-image-help {
+  margin: 0;
+  color: #aaa;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.brand-page .reference-image-preview-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brand-page .reference-image-preview-list li {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  color: #ccc;
+  font-size: 0.72rem;
+}
+
+.brand-page .reference-image-preview-list img {
+  width: 100%;
+  height: 90px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.brand-page .reference-image-preview-list span {
+  overflow-wrap: anywhere;
+}
+
+.brand-page .reference-image-preview-list button {
+  align-self: flex-start;
+  padding: 3px 7px;
+  border: 1px solid #514747;
+  border-radius: 4px;
+  background: transparent;
+  color: #ddd;
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.brand-page .booking-submit-error {
+  margin: 0;
+  color: #f2aeb5;
+  font-size: 0.82rem;
+}
+
 .brand-page .form-checkbox-group {
   display: flex;
   gap: 10px;

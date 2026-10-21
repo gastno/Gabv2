@@ -3,6 +3,9 @@ import { STATUS_TRANSITIONS } from "../../../utils/staffCalendarUtils";
 
 function AppointmentDetailsModal({
   appointment,
+  referenceImages = [],
+  referenceImagesLoading = false,
+  referenceImagesError = "",
   onClose,
   onSaveStatus,
   statusEditMode,
@@ -60,6 +63,21 @@ function AppointmentDetailsModal({
             </strong>
           </div>
         </div>
+
+        {Array.isArray(appointment.reference_images) && appointment.reference_images.length > 0 && (
+          <section className="appointment-reference-images" aria-labelledby="appointment-reference-heading">
+            <h3 id="appointment-reference-heading">Customer reference images</h3>
+            {referenceImagesLoading && <p>Loading reference images...</p>}
+            {referenceImagesError && <p className="staff-error-message" role="alert">{referenceImagesError}</p>}
+            {referenceImages.length > 0 && (
+              <div className="appointment-reference-gallery">
+                {referenceImages.map((image, index) => (
+                  <img key={image.id} src={image.url} alt={`Customer reference ${index + 1}`} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {statusEditMode ? (
           <form className="appointment-status-form" onSubmit={onSaveStatus}>

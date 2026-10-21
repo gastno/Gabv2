@@ -49,3 +49,9 @@ Staff records expose `description_en` and `description_is`; categories and servi
 Apply `migrations/006_localized_brand_descriptions.sql` to existing databases before deploying the localized brand API. Back up first and use the Docker Compose migration procedure above, substituting the `006` migration filename. It adds nullable `description_en` and `description_is` columns and copies existing `about_description` values to `description_en` without overwriting existing translations. Fresh databases receive the same columns through `init.sql`.
 
 `GET /api/brands` returns both locale fields and retains the `about_description` English alias for older clients. `PUT /api/brands/:id` accepts either or both locale fields; the legacy `about_description` input remains supported as English content and is kept synchronized with `description_en`. Brand mutation access remains restricted to super admins and admins assigned to that brand.
+
+## Appointment Reference Images
+
+Apply `migrations/007_appointment_reference_images.sql` to existing databases before deploying appointment reference uploads. Back up first and use the Docker Compose migration procedure above, substituting the `007` migration filename. Fresh databases receive the same table from `init.sql`.
+
+Customers may submit an optional multipart booking with up to five `reference_images` files (JPEG, PNG, or WebP; maximum 5 MB per file), alongside the normal booking fields. The images are validated, resized, stripped of metadata, and stored in PostgreSQL. Appointment list/detail responses include `reference_images` entries with an `id` and protected `url`; fetch the URL with an authenticated request. Only the appointment's customer, assigned staff member, or an admin authorized for its brand can retrieve the image. The frontend must switch the booking request to multipart when images are attached and fetch/display each protected image using its auth token.

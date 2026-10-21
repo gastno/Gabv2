@@ -59,6 +59,9 @@ function StaffPortal() {
   const [unavailabilityError, setUnavailabilityError] = useState("");
   const [unavailabilitySaving, setUnavailabilitySaving] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [referenceImages, setReferenceImages] = useState([]);
+  const [referenceImagesLoading, setReferenceImagesLoading] = useState(false);
+  const [referenceImagesError, setReferenceImagesError] = useState("");
   const [statusEditMode, setStatusEditMode] = useState(false);
   const [statusDraft, setStatusDraft] = useState("");
   const [feeStatusDraft, setFeeStatusDraft] = useState("none");
@@ -70,6 +73,8 @@ function StaffPortal() {
   const [calendarBlockError, setCalendarBlockError] = useState("");
   const [calendarBlockSaving, setCalendarBlockSaving] = useState(false);
   const selectedDailyAvailability = availabilityByDate[selectedDateKey];
+  const selectedAppointmentId = selectedAppointment?.id;
+  const selectedReferenceImages = selectedAppointment?.reference_images;
 
   useEffect(() => {
     let isMounted = true;
@@ -90,6 +95,41 @@ function StaffPortal() {
       });
     return () => { isMounted = false; };
   }, []);
+
+  useEffect(() => {
+    if (!selectedAppointmentId || !Array.isArray(selectedReferenceImages) || selectedReferenceImages.length === 0) {
+      setReferenceImages([]);
+      setReferenceImagesLoading(false);
+      setReferenceImagesError("");
+      return undefined;
+    }
+
+    let isMounted = true;
+    const objectUrls = [];
+    setReferenceImages([]);
+    setReferenceImagesLoading(true);
+    setReferenceImagesError("");
+
+    Promise.all(selectedReferenceImages.map(async (reference) => {
+      const image = await apptApi.getReferenceImage(reference.url);
+      const url = URL.createObjectURL(image);
+      objectUrls.push(url);
+      return { id: reference.id, url };
+    })).then((images) => {
+      if (isMounted) setReferenceImages(images);
+      else objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    }).catch((error) => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+      if (isMounted) setReferenceImagesError(error.message || "Could not load reference images.");
+    }).finally(() => {
+      if (isMounted) setReferenceImagesLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedAppointmentId, selectedReferenceImages]);
 
   useEffect(() => {
     const dateKeys = getMonthCells(monthCursor.year, monthCursor.month)
@@ -196,6 +236,9 @@ function StaffPortal() {
   };
 
   const handleOpenAppointment = (appointment) => {
+    setReferenceImages([]);
+    setReferenceImagesLoading(false);
+    setReferenceImagesError("");
     setSelectedAppointment(appointment);
     setStatusEditMode(false);
     setStatusDraft(appointment.status);
@@ -676,6 +719,9 @@ function StaffPortal() {
 
       <AppointmentDetailsModal
         appointment={selectedAppointment}
+        referenceImages={referenceImages}
+        referenceImagesLoading={referenceImagesLoading}
+        referenceImagesError={referenceImagesError}
         onClose={handleCloseAppointment}
         onSaveStatus={handleSaveAppointmentStatus}
         statusEditMode={statusEditMode}

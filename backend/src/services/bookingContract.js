@@ -59,7 +59,7 @@ const validateBookingRequest = (body, identity = null) => {
     return { error: 'Guest kennitala must contain 10 digits, optionally separated by a hyphen.' };
   }
 
-  if (body.consent_privacy !== true) {
+  if (body.consent_privacy !== true && body.consent_privacy !== 'true') {
     return { error: 'Privacy consent must be provided to create a booking.' };
   }
 
@@ -67,8 +67,16 @@ const validateBookingRequest = (body, identity = null) => {
     return { error: 'start_time must be a valid ISO 8601 timestamp with an explicit timezone offset.' };
   }
 
-  if (body.custom_options !== undefined && body.custom_options !== null
-      && (typeof body.custom_options !== 'object' || Array.isArray(body.custom_options))) {
+  let customOptions = body.custom_options ?? null;
+  if (typeof customOptions === 'string') {
+    try {
+      customOptions = JSON.parse(customOptions);
+    } catch (error) {
+      return { error: 'custom_options must be a valid JSON object.' };
+    }
+  }
+  if (customOptions !== null
+      && (typeof customOptions !== 'object' || Array.isArray(customOptions))) {
     return { error: 'custom_options must be an object.' };
   }
 
@@ -87,7 +95,7 @@ const validateBookingRequest = (body, identity = null) => {
       phoneNumber: customerId ? null : body.phone_number.trim(),
       kennitala,
       startTime: new Date(body.start_time),
-      customOptions: body.custom_options ?? null,
+      customOptions,
       healthInfo: body.health_info ?? null,
       consentPrivacy: true,
     },

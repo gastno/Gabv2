@@ -27,6 +27,24 @@ test('accepts a well-formed guest request and normalizes identity', () => {
   assert.equal(result.value.startTime.toISOString(), '2026-10-01T10:00:00.000Z');
 });
 
+test('accepts multipart booking fields and decodes custom options', () => {
+  const result = validateBookingRequest({
+    ...validRequest(),
+    consent_privacy: 'true',
+    custom_options: '{"design":"floral"}',
+  });
+
+  assert.equal(result.error, undefined);
+  assert.deepEqual(result.value.customOptions, { design: 'floral' });
+});
+
+test('rejects invalid multipart custom options', () => {
+  assert.match(validateBookingRequest({
+    ...validRequest(),
+    custom_options: '[1,2]',
+  }).error, /custom_options/i);
+});
+
 test('rejects missing or invalid guest email addresses', () => {
   for (const email of [undefined, '', 'not-an-email', 'x'.repeat(250) + '@example.com']) {
     assert.match(validateBookingRequest({ ...validRequest(), email }).error, /email/i);

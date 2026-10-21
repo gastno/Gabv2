@@ -34,8 +34,9 @@ async function request(endpoint, options = {}, tokenKey = STAFF_TOKEN_KEY) {
       ? localStorage.getItem(tokenKey)
       : null;
 
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers = {
-    "Content-Type": "application/json",
+    ...(!isFormData ? { "Content-Type": "application/json" } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
@@ -83,11 +84,43 @@ export const authApi = {
 };
 
 export const apptApi = {
-  createAppointment: (bookingData) =>
-    request("/appointments", {
+  createAppointment: (bookingData, referenceImages = []) => {
+    if (!referenceImages.length) {
+      return request("/appointments", {
+        method: "POST",
+        body: JSON.stringify(bookingData),
+      }, CUSTOMER_TOKEN_KEY);
+    }
+
+    const formData = new FormData();
+    Object.entries(bookingData).forEach(([key, value]) => {
+      formData.append(key, value !== null && typeof value === "object" ? JSON.stringify(value) : String(value));
+    });
+    referenceImages.forEach((image) => formData.append("reference_images", image));
+
+    return request("/appointments", {
       method: "POST",
-      body: JSON.stringify(bookingData),
-    }, CUSTOMER_TOKEN_KEY),
+      body: formData,
+    }, CUSTOMER_TOKEN_KEY);
+  },
+
+  getReferenceImage: async (url) => {
+    if (typeof url !== "string" || !/^\/api\/appointments\/\d+\/references\/\d+$/.test(url)) {
+      throw new Error("Invalid appointment reference image URL.");
+    }
+
+    const token = getStaffToken();
+    if (!token) throw new Error("Staff authentication is required to view reference images.");
+
+    const response = await fetch(`${SERVER_BASE_URL}${url}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || "Could not load appointment reference image.");
+    }
+    return response.blob();
+  },
 
   // Public: get bookable slots for a service (optionally filtered to one staff member) on a given date.
   getAvailability: ({ serviceId, staffId, date }) => {

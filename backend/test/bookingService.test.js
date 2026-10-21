@@ -66,6 +66,9 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
           appointments.push(params);
           return { rows: [{ id: appointments.length, params }] };
         }
+        if (text.includes('INSERT INTO appointment_reference_images')) {
+          return { rows: [{ id: 23 }] };
+        }
         throw new Error(`Unexpected query: ${text}`);
       },
       releaseLocks() {
@@ -103,6 +106,30 @@ test('creates appointments with database-owned duration and price snapshots', as
   assert.equal(appointments[0][5].getTime() - appointments[0][4].getTime(), 45 * 60_000);
   assert.deepEqual(availabilityParameters, [[booking.startTime, booking.staffId, 45]]);
   assert.equal(result.id, 1);
+});
+
+test('stores optional reference images with the new appointment and returns protected URLs', async () => {
+  const statements = [];
+  const image = { buffer: Buffer.from('processed-image'), mimeType: 'image/jpeg' };
+  const { database } = makeDatabase();
+  const originalTransaction = database.withTransaction;
+  database.withTransaction = callback => originalTransaction(client => {
+    const query = client.query.bind(client);
+    client.query = async (text, params = []) => {
+      statements.push({ text, params });
+      return query(text, params);
+    };
+    return callback(client);
+  });
+
+  const result = await createBooking(database, { ...booking, referenceImages: [image] });
+
+  assert.deepEqual(result.reference_images, [{
+    id: 23,
+    url: '/api/appointments/1/references/23',
+  }]);
+  const imageInsert = statements.find(({ text }) => text.includes('INSERT INTO appointment_reference_images'));
+  assert.deepEqual(imageInsert.params, [1, 'image/jpeg', image.buffer]);
 });
 
 test('rejects unavailable, inactive, unassigned, or brand-mismatched selections', async () => {
