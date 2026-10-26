@@ -102,6 +102,15 @@
   border-radius: 4px;
 }
 
+.card-top-tags .service-sale-tag {
+  background: #ffe04a;
+  color: #111;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 4px;
+}
+
 .service-card-body {
   display: flex;
   flex: 1;

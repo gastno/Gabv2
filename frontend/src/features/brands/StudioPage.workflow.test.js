@@ -72,7 +72,7 @@ test('loads team profiles from the selected service assignments', async () => {
   render(<StudioPage brandId={1} />);
 
   expect(await screen.findByText('Classic Lashes')).toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: 'Our Team' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Our Team' }));
 
   expect(await screen.findByRole('heading', { name: 'Artist One' })).toBeInTheDocument();
   expect(screen.getByText('Tattoo artist')).toBeInTheDocument();
@@ -80,7 +80,7 @@ test('loads team profiles from the selected service assignments', async () => {
 });
 
 test('booking progress supports forward and backward navigation', async () => {
-  const { container } = render(<StudioPage brandId={1} />);
+  render(<StudioPage brandId={1} />);
 
   const serviceName = await screen.findByText('Classic Lashes');
   fireEvent.click(serviceName.closest('.service-row-item'));
@@ -89,13 +89,13 @@ test('booking progress supports forward and backward navigation', async () => {
   expect(screen.getByRole('heading', { name: 'Select Date & Time' })).toBeInTheDocument();
   await waitFor(() => expect(apptApi.getAvailability).toHaveBeenCalled());
   const availableDay = await waitFor(() => {
-    const day = container.querySelector('.calendar-day-cell.available');
+    const day = document.querySelector('.calendar-day-cell.available');
     expect(day).toBeTruthy();
     return day;
   });
   fireEvent.click(availableDay);
   const timeChip = await waitFor(() => {
-    const chip = container.querySelector('.time-chip');
+    const chip = document.querySelector('.time-chip');
     expect(chip).toBeTruthy();
     return chip;
   });
@@ -218,9 +218,9 @@ test('renders Icelandic database content and translated studio labels when Icela
   expect(screen.getByText('Klassísk augnhárameðferð')).toBeInTheDocument();
   expect(screen.getByText(/90 mín/)).toBeInTheDocument();
   expect(screen.getByText('14.000 kr.')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Þjónusta' })).toBeInTheDocument();
+  expect(screen.getByRole('tab', { name: 'Þjónusta' })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Þjónustan okkar' })).toBeInTheDocument();
   expect(screen.getByText('Augnháraþjónusta')).toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: 'Teymið okkar' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Teymið okkar' }));
   expect(await screen.findByText('Húðflúrari')).toBeInTheDocument();
 });

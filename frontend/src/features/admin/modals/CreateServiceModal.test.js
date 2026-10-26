@@ -58,4 +58,15 @@ describe("CreateServiceModal", () => {
     expect(screen.getByRole("combobox", { name: "Category" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Create Service" })).toBeDisabled();
   });
+
+  it("allows an optional sale price and an initially disabled service", () => {
+    renderModal();
+    fireEvent.change(screen.getByLabelText("Promotional price (ISK)"), {
+      target: { value: "9000" },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: /available for public booking/i }));
+
+    expect(screen.getByLabelText("Promotional price (ISK)")).toHaveValue(9000);
+    expect(screen.getByRole("checkbox", { name: /available for public booking/i })).not.toBeChecked();
+  });
 });

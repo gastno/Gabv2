@@ -1,18 +1,26 @@
 :root {
-  --hud-bg-main: #121316;
-  --hud-bg-surface: #1a1c20;
-  --hud-bg-surface-hover: #22252b;
-  --hud-border-subtle: rgba(255, 255, 255, 0.08);
-  --hud-border-active: #75bbc1;
-  --hud-accent-cyan: #75bbc1;
-  --hud-accent-green: #9ca577;
-  --hud-text-primary: #f4f3ef;
-  --hud-text-secondary: #e8dfcc;
-  --hud-text-muted: #8c9099;
-  --hud-rose-dusk: #f2aeb5;
-  --hud-warning-amber: #d97706;
+  --hud-bg-main: #1d211e;
+  --hud-bg-surface: #272c28;
+  --hud-bg-surface-hover: #303732;
+  --hud-border-subtle: rgba(229, 235, 228, 0.14);
+  --hud-border-active: #91aaa0;
+  --hud-accent-cyan: #91aaa0;
+  --hud-accent-green: #a3b39b;
+  --hud-text-primary: #f2f3ee;
+  --hud-text-secondary: #d8ddd6;
+  --hud-text-muted: #b3bcb4;
+  --hud-rose-dusk: #c99b98;
+  --hud-warning-amber: #b98b60;
   --hud-font-heading: "Bodoni Moda", "Cinzel", "Playfair Display", Georgia, serif;
   --hud-font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -20,6 +28,27 @@ body {
   font-family: var(--hud-font-body, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+:focus-visible {
+  outline: 2px solid var(--hud-accent-cyan);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 @keyframes modal-backdrop-fade-in {

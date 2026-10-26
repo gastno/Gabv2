@@ -22,7 +22,7 @@ function CategoriesTab({
     <section className="admin-section">
       <div className="section-header">
         <div>
-          <h3>Category Management</h3>
+          <h1>Category Management</h1>
           <p className="subtitle">Organize services into group categories</p>
         </div>
         <div className="categories-header-actions">

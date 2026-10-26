@@ -12,6 +12,9 @@ const staffServicesRoutes = require('./routes/staffServicesRoutes');
 const brandRoutes = require('./routes/brandRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const customerNotificationRoutes = require('./routes/customerNotificationRoutes');
+const { startNotificationWorker } = require('./services/notificationService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,6 +32,8 @@ app.use('/api/staffservices', staffServicesRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/customers/notifications', customerNotificationRoutes);
 
 // Serve static assets from <root>/uploads
 app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
@@ -41,3 +46,5 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 API Server running on http://localhost:${PORT}`);
 });
+
+startNotificationWorker(require('./config/db'));

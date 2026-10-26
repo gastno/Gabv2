@@ -31,4 +31,21 @@ describe("ServicesTab", () => {
     expect(screen.getByText("Tattoo")).toBeInTheDocument();
     expect(screen.queryByText("Beauty")).not.toBeInTheDocument();
   });
+
+  it("shows a sale price and disabled state to service administrators", () => {
+    render(<ServicesTab
+      {...props}
+      services={[{
+        ...props.services[0],
+        price: "12,000 kr",
+        sale_price_isk: "9000",
+        is_active: false,
+      }]}
+    />);
+
+    expect(screen.getByText("Disabled")).toBeInTheDocument();
+    expect(screen.getByText("On sale")).toHaveClass("service-sale-tag");
+    expect(screen.getByText("12,000 kr").tagName).toBe("DEL");
+    expect(screen.getByText(/9[.,]000 kr/)).toBeInTheDocument();
+  });
 });

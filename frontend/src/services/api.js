@@ -149,6 +149,13 @@ export const apptApi = {
     return request(`/appointments${query}`);
   },
 
+  listCustomerAppointments: (filters = {}) => {
+    const query = filters.period
+      ? `?${new URLSearchParams({ period: filters.period })}`
+      : "";
+    return request(`/appointments${query}`, { method: "GET" }, CUSTOMER_TOKEN_KEY);
+  },
+
   updateStatus: (appointmentId, status) =>
     request(`/appointments/${appointmentId}/status`, {
       method: "PATCH",
@@ -364,6 +371,32 @@ export const serviceApi = {
 
     return await response.json();
   },
+};
+
+export const notificationApi = {
+  getPreferences: () =>
+    request("/notifications/preferences", { method: "GET" }, CUSTOMER_TOKEN_KEY),
+
+  updatePreferences: (preferences) =>
+    request("/notifications/preferences", {
+      method: "PUT",
+      body: JSON.stringify(preferences),
+    }, CUSTOMER_TOKEN_KEY),
+
+  list: () =>
+    request("/notifications", { method: "GET" }, CUSTOMER_TOKEN_KEY),
+
+  markRead: (notificationIds) =>
+    request("/customers/notifications/read", {
+      method: "PATCH",
+      body: JSON.stringify({ notification_ids: notificationIds }),
+    }, CUSTOMER_TOKEN_KEY),
+
+  markAllRead: () =>
+    request("/customers/notifications/read", {
+      method: "PATCH",
+      body: JSON.stringify({ all: true }),
+    }, CUSTOMER_TOKEN_KEY),
 };
 
 export const staffServiceApi = {

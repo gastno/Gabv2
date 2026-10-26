@@ -11,6 +11,7 @@ import AmorTattooPage from "./pages/AmorTattooPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import CookieSettingsPage from "./pages/CookieSettingsPage";
 import CustomerSignInPage from "./pages/CustomerSignInPage";
+import CustomerAccountPage from "./pages/CustomerAccountPage";
 import { LanguageProvider } from "./components/i18n/LanguageContext";
 
 const clerkPublishableKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
@@ -74,6 +75,11 @@ function App() {
           <Route path="/cookie-settings" element={<CookieSettingsPage />} />
           <Route path="/customer/sign-in" element={<CustomerSignInPage />} />
           <Route path="/customer/sign-up" element={<CustomerSignInPage />} />
+          <Route path="/customer/account" element={<CustomerAccountPage />} />
+          <Route
+            path="/customer/appointments/previous"
+            element={<CustomerAccountPage previousOnly />}
+          />
           {clerkPublishableKey && (
             <Route
               path="/sso-callback"

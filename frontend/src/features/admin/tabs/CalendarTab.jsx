@@ -327,7 +327,7 @@ function CalendarTab({ brands, loadingBrand, staffList, loadingStaff }) {
     <section className="admin-section admin-calendar-section">
       <div className="section-header">
         <div>
-          <h3>Global Calendar</h3>
+          <h1>Global Calendar</h1>
           <p className="subtitle">
             Appointments and working hours for {selectedBrandId === "all"
               ? "all staff across all brands"

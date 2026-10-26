@@ -186,7 +186,7 @@ function PortfolioTab({ brands = [], loadingBrands = false, onBrandUpdate }) {
     <section className="admin-section portfolio-admin">
       <div className="section-header">
         <div>
-          <h3>Studio imagery &amp; portfolio</h3>
+          <h1>Studio imagery &amp; portfolio</h1>
           <p className="subtitle">
             Update studio photos, choose a gallery layout, and arrange portfolio images.
           </p>

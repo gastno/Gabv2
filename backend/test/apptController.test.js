@@ -163,6 +163,47 @@ test('appointment ledger query reads the localized service name and scopes admin
   assert.equal(invalidBrandResponse.body.appointments, undefined);
 });
 
+test('previous appointment history is customer-scoped and rejects unsupported filters or staff access', async () => {
+  let query;
+  db.query = async (sql, params) => {
+    query = { sql, params };
+    return { rows: [{ ...appointment }] };
+  };
+  const previousResponse = response();
+  await controller.listAppointments({
+    user: { id: 12, type: 'customer', role: 'customer' },
+    query: { period: 'previous' },
+  }, previousResponse);
+  assert.equal(previousResponse.statusCode, 200);
+  assert.deepEqual(query.params, [12]);
+  assert.match(query.sql, /a\.customer_id = \$1 AND a\.end_time < NOW\(\)/);
+  assert.match(query.sql, /ORDER BY a\.start_time DESC/);
+
+  const upcomingResponse = response();
+  await controller.listAppointments({
+    user: { id: 12, type: 'customer', role: 'customer' },
+    query: { period: 'upcoming' },
+  }, upcomingResponse);
+  assert.equal(upcomingResponse.statusCode, 200);
+  assert.deepEqual(query.params, [12]);
+  assert.match(query.sql, /a\.customer_id = \$1 AND a\.end_time >= NOW\(\)/);
+  assert.match(query.sql, /a\.status IN \('pending', 'confirmed'\)/);
+
+  const invalidResponse = response();
+  await controller.listAppointments({
+    user: { id: 12, type: 'customer', role: 'customer' },
+    query: { period: 'all' },
+  }, invalidResponse);
+  assert.equal(invalidResponse.statusCode, 400);
+
+  const staffResponse = response();
+  await controller.listAppointments({
+    user: { id: 3, type: 'staff', role: 'staff' },
+    query: { period: 'previous' },
+  }, staffResponse);
+  assert.equal(staffResponse.statusCode, 403);
+});
+
 test('fee-status updates accept each enum value and return the saved row without changing appointment status', async () => {
   const validStatuses = ['none', 'awaiting_fee', 'fee_charged', 'fee_waived'];
   const statements = [];
@@ -332,4 +373,65 @@ test('fee-status updates enforce assigned staff and admin brand scope', async ()
     assert.equal(res.statusCode, 403);
   }
   assert.equal(updateAttempted, false);
+});
+
+test('appointment status updates enqueue one event only after a permitted persisted transition', async () => {
+  const statements = [];
+  const client = {
+    async query(sql, params) {
+      statements.push({ sql, params });
+      if (sql.startsWith('SELECT id, brand_id')) return { rows: [{ ...appointment, status: 'pending' }] };
+      if (sql.startsWith('UPDATE appointments')) return { rows: [{ ...appointment, status: 'confirmed' }] };
+      return { rows: [] };
+    },
+  };
+  db.withTransaction = async callback => callback(client);
+
+  const res = response();
+  await controller.updateAppointmentStatus({
+    params: { id: '41' },
+    body: { status: 'confirmed' },
+    user: { id: 3, type: 'staff', role: 'staff' },
+  }, res);
+
+  assert.equal(res.statusCode, 200);
+  const transition = statements.find(({ sql }) => sql.includes('INSERT INTO appointment_notifications'));
+  assert.deepEqual(transition.params, [41, 8, 'pending', 'confirmed', 'status:41:pending:confirmed']);
+  assert.ok(statements.findIndex(({ sql }) => sql.startsWith('UPDATE appointments'))
+    < statements.findIndex(({ sql }) => sql.includes('INSERT INTO appointment_notifications')));
+
+  statements.length = 0;
+  const rejected = response();
+  await controller.updateAppointmentStatus({
+    params: { id: '41' },
+    body: { status: 'completed' },
+    user: { id: 3, type: 'staff', role: 'staff' },
+  }, rejected);
+  assert.equal(rejected.statusCode, 409);
+  assert.equal(statements.some(({ sql }) => sql.includes('INSERT INTO appointment_notifications')), false);
+});
+
+test('customer cancellation records a status-transition notification in the cancellation transaction', async () => {
+  const statements = [];
+  const client = {
+    async query(sql, params) {
+      statements.push({ sql, params });
+      if (sql.startsWith('SELECT id, brand_id')) return { rows: [{ ...appointment, status: 'confirmed' }] };
+      if (sql.includes("SET status = 'cancelled'")) {
+        return { rows: [{ ...appointment, status: 'cancelled' }] };
+      }
+      return { rows: [] };
+    },
+  };
+  db.withTransaction = async callback => callback(client);
+  const res = response();
+  await controller.cancelAppointment({
+    params: { id: '41' },
+    body: { reason: 'Schedule change' },
+    user: { id: 8, type: 'customer', role: 'customer' },
+  }, res);
+
+  assert.equal(res.statusCode, 200);
+  const event = statements.find(({ sql }) => sql.includes('INSERT INTO appointment_notifications'));
+  assert.deepEqual(event.params, [41, 8, 'confirmed', 'cancelled', 'status:41:confirmed:cancelled']);
 });

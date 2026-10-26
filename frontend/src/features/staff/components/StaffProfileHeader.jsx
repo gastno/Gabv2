@@ -1,7 +1,8 @@
 import React from "react";
 import UserAvatar from "../../../components/common/UserAvatar/UserAvatar";
+import ThemeSelector from "../../../components/common/ThemeSelector/ThemeSelector";
 
-function StaffProfileHeader({ name, description, avatar, onLogout }) {
+function StaffProfileHeader({ name, description, avatar, onLogout, theme, onThemeChange }) {
   return (
     <header className="staff-top-bar">
       <div className="staff-bar-left">
@@ -15,9 +16,12 @@ function StaffProfileHeader({ name, description, avatar, onLogout }) {
         <img src="/gbbco.svg" alt="" aria-hidden="true" />
         <span>gbb &amp; co</span>
       </span>
-      <button type="button" className="staff-admin-logout-btn" onClick={onLogout}>
-        Log Out
-      </button>
+      <div className="staff-header-actions">
+        <ThemeSelector theme={theme} onChange={onThemeChange} />
+        <button type="button" className="staff-admin-logout-btn" onClick={onLogout}>
+          Log Out
+        </button>
+      </div>
     </header>
   );
 }

@@ -4,12 +4,13 @@ const { validateBookingRequest } = require('../services/bookingContract');
 const { BookingError, createBooking } = require('../services/bookingService');
 const { canTransitionAppointment, isAppointmentAccessible } = require('../services/appointmentAccess');
 const { ReferenceImageError, processReferenceImage } = require('../services/appointmentReferenceImage');
+const { enqueueStatusTransition } = require('../services/notificationService');
 
 const appointmentReadQuery = `
   SELECT a.id, a.brand_id, a.service_id, a.staff_id, a.customer_id,
          a.start_time, a.end_time, a.duration_snapshot_minutes, a.price_snapshot_isk,
          a.custom_options, a.status, a.fee_status, a.payment_status, a.cancellation_reason, a.created_at,
-         service.name_en AS service_name, staff.full_name AS staff_name,
+         service.name_en AS service_name, brand.name AS brand_name, staff.full_name AS staff_name,
          customer.full_name AS customer_name, customer.phone_number AS customer_phone,
          customer.email AS customer_email, customer.kennitala AS customer_kennitala,
          customer.health_info AS health_info,
@@ -22,6 +23,7 @@ const appointmentReadQuery = `
            WHERE reference_image.appointment_id = a.id
          ), '[]'::json) AS reference_images
   FROM appointments a
+  JOIN brands brand ON brand.id = a.brand_id
   JOIN services service ON service.id = a.service_id
   JOIN staff staff ON staff.id = a.staff_id
   JOIN customers customer ON customer.id = a.customer_id
@@ -85,12 +87,24 @@ exports.createAppointment = async (req, res) => {
 
 exports.listAppointments = async (req, res) => {
   const actor = req.user;
+  const period = req.query.period;
   const brandId = req.query.brand_id === undefined ? null : parsePositiveId(req.query.brand_id);
   let where;
   let params;
 
+  if (period !== undefined && !['previous', 'upcoming'].includes(period)) {
+    return res.status(400).json({ error: 'period must be previous or upcoming when provided.' });
+  }
+  if (period === 'previous' && actor.type !== 'customer') {
+    return res.status(403).json({ error: 'Previous appointment history is available to customer accounts only.' });
+  }
+
   if (actor.type === 'customer') {
-    where = 'a.customer_id = $1';
+    where = period === 'previous'
+      ? 'a.customer_id = $1 AND a.end_time < NOW()'
+      : period === 'upcoming'
+        ? "a.customer_id = $1 AND a.end_time >= NOW() AND a.status IN ('pending', 'confirmed')"
+        : 'a.customer_id = $1';
     params = [actor.id];
   } else if (actor.type === 'staff' && actor.role === 'staff') {
     where = 'a.staff_id = $1';
@@ -107,7 +121,8 @@ exports.listAppointments = async (req, res) => {
   }
 
   try {
-    const result = await db.query(`${appointmentReadQuery} WHERE ${where} ORDER BY a.start_time LIMIT 200`, params);
+    const order = period === 'previous' ? 'a.start_time DESC' : 'a.start_time';
+    const result = await db.query(`${appointmentReadQuery} WHERE ${where} ORDER BY ${order} LIMIT 200`, params);
     return res.json({ appointments: result.rows });
   } catch (error) {
     console.error('Error retrieving appointments:', error);
@@ -198,6 +213,7 @@ exports.updateAppointmentStatus = async (req, res) => {
         'UPDATE appointments SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
         [nextStatus, appointmentId]
       );
+      await enqueueStatusTransition(client, updated.rows[0], current.status, nextStatus);
       return updated.rows[0];
     });
     return res.json({ appointment });
@@ -310,6 +326,7 @@ exports.cancelAppointment = async (req, res) => {
         WHERE id = $2
         RETURNING *
       `, [reason?.trim() || null, appointmentId]);
+      await enqueueStatusTransition(client, updated.rows[0], current.status, 'cancelled');
       return updated.rows[0];
     });
     return res.json({ appointment });

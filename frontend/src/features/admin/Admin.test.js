@@ -30,11 +30,18 @@ jest.mock("./layout/AdminSidebar", () => {
   };
 });
 
-jest.mock("./layout/AdminTopBar", () => () => null);
+jest.mock("./layout/AdminTopBar", () => {
+  const React = require("react");
+  const ThemeSelector = require("../../components/common/ThemeSelector/ThemeSelector").default;
+  return function MockAdminTopBar({ theme, onThemeChange }) {
+    return React.createElement(ThemeSelector, { theme, onChange: onThemeChange });
+  };
+});
 
 describe("AdminDashboard staff service modal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.localStorage.removeItem("gabv2_workspace_theme");
     brandApi.getAll.mockResolvedValue([{ id: 1, name: "Gabbablu" }]);
     categoryApi.getAll.mockResolvedValue([
       { id: 1, brand_id: 1, brand: "Gabbablu", title: "Beauty" },
@@ -100,5 +107,20 @@ describe("AdminDashboard staff service modal", () => {
     });
     expect(screen.getByText("Assigned Workers for Service")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Save Changes" })).toBeInTheDocument();
+  });
+
+  it("applies the persisted theme to the admin workspace and its dialogs", async () => {
+    render(<AdminDashboard />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Dark" }));
+
+    const themeRoot = document.querySelector(".admin-theme-root");
+    expect(themeRoot).toHaveAttribute("data-theme", "dark");
+    expect(window.localStorage.getItem("gabv2_workspace_theme")).toBe("dark");
+
+    fireEvent.click(screen.getByRole("button", { name: "Staff Services" }));
+    fireEvent.click(await screen.findByText("Service"));
+
+    expect(screen.getByText("Assigned Workers for Service").closest(".admin-theme-root")).toBe(themeRoot);
   });
 });

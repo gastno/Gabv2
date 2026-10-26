@@ -6,7 +6,7 @@ function BrandsTab({ loadingBrands, brandsList, handleOpenBrandModal }) {
     <section className="admin-section">
       <div className="section-header">
         <div>
-          <h3>Brand Information</h3>
+          <h1>Brand Information</h1>
           <p className="subtitle">
             Manage existing brand locations, names, and descriptions
           </p>

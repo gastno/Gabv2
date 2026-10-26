@@ -21,7 +21,7 @@ function ServicesTab({
     <section className="admin-section">
       <div className="section-header">
         <div>
-          <h3>Service Management</h3>
+          <h1>Service Management</h1>
           <p className="subtitle">
             Define services, pricing, duration, and categories
           </p>
@@ -69,6 +69,8 @@ function ServicesTab({
                 <div className="card-top-tags">
                   <span className="brand-tag">{item.brand}</span>
                   <span className="category-tag">{item.category}</span>
+                  {item.is_active === false && <span className="category-tag">Disabled</span>}
+                  {item.sale_price_isk != null && <span className="service-sale-tag">On sale</span>}
                 </div>
               </div>
               <div className="service-card-body">
@@ -76,7 +78,14 @@ function ServicesTab({
                 <p>{item.description}</p>
                 <div className="service-meta-row">
                   <span>⏱ {item.duration}</span>
-                  <span className="price-tag">{item.price}</span>
+                  <span className="price-tag">
+                    {item.sale_price_isk != null ? (
+                      <>
+                        <del>{item.price}</del>{" "}
+                        <strong>{Number(item.sale_price_isk).toLocaleString("is-IS")} kr</strong>
+                      </>
+                    ) : item.price}
+                  </span>
                 </div>
               </div>
             </div>

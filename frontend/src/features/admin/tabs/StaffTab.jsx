@@ -12,7 +12,7 @@ function StaffTab({
     <section className="admin-section">
       <div className="section-header">
         <div>
-          <h3>Staff Accounts & Credentials</h3>
+          <h1>Staff Accounts & Credentials</h1>
           <p className="subtitle">
             Manage system logins, roles, avatars, and assigned brand access
           </p>

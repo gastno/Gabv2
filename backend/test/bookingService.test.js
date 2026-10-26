@@ -20,6 +20,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
   const customers = existingCustomer ? [existingCustomer] : [];
   const appointments = [];
   const availabilityParameters = [];
+  let serviceReadSql = '';
   let nextCustomerId = customers.length ? Math.max(...customers.map(customer => customer.id)) + 1 : 1;
   const lockTails = new Map();
 
@@ -41,7 +42,10 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
           });
           return { rows: [] };
         }
-        if (text.includes('FROM services s')) return { rows: service ? [service] : [] };
+        if (text.includes('FROM services s')) {
+          serviceReadSql = text;
+          return { rows: service ? [service] : [] };
+        }
         if (text.includes('FROM staff_availabilities availability')) {
           availabilityParameters.push(params);
           return { rows: [{ available: true }] };
@@ -81,6 +85,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
     customers,
     appointments,
     availabilityParameters,
+    get serviceReadSql() { return serviceReadSql; },
     database: {
       async withTransaction(callback) {
         const client = createClient();
@@ -95,7 +100,8 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
 };
 
 test('creates appointments with database-owned duration and price snapshots', async () => {
-  const { database, customers, appointments, availabilityParameters } = makeDatabase();
+  const databaseFixture = makeDatabase();
+  const { database, customers, appointments, availabilityParameters } = databaseFixture;
 
   const result = await createBooking(database, { ...booking, duration_minutes: 1, price_isk: 1 });
 
@@ -106,6 +112,15 @@ test('creates appointments with database-owned duration and price snapshots', as
   assert.equal(appointments[0][5].getTime() - appointments[0][4].getTime(), 45 * 60_000);
   assert.deepEqual(availabilityParameters, [[booking.startTime, booking.staffId, 45]]);
   assert.equal(result.id, 1);
+  assert.match(databaseFixture.serviceReadSql, /s\.is_active = TRUE/);
+});
+
+test('snapshots a current promotional price instead of the regular catalog price', async () => {
+  const { database, appointments } = makeDatabase({
+    service: { brand_id: 1, duration_minutes: 45, price_isk: '12000', sale_price_isk: '9500' },
+  });
+  await createBooking(database, { ...booking, price_isk: 1 });
+  assert.equal(appointments[0][7], 9500);
 });
 
 test('stores optional reference images with the new appointment and returns protected URLs', async () => {

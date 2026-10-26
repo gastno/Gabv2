@@ -169,6 +169,35 @@ function CreateServiceModal({
           </div>
 
           <div className="form-group">
+            <label htmlFor="new-service-sale-price">Promotional price (ISK)</label>
+            <input
+              id="new-service-sale-price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Optional"
+              value={newService.sale_price || ""}
+              onChange={(e) => setNewService({ ...newService, sale_price: e.target.value })}
+            />
+            <small>Must be lower than the regular price.</small>
+          </div>
+
+          <div className="form-group">
+            <label className="admin-switch">
+              <span>Available for public booking</span>
+              <span className="admin-switch-control">
+                <input
+                  className="admin-switch-input"
+                  type="checkbox"
+                  checked={newService.is_active !== false}
+                  onChange={(e) => setNewService({ ...newService, is_active: e.target.checked })}
+                />
+                <span className="admin-switch-track" aria-hidden="true" />
+              </span>
+            </label>
+          </div>
+
+          <div className="form-group">
             <label>Cover Image File</label>
             <input type="file" accept="image/*" onChange={handleImageChange} />
             {createServiceImagePreview && (

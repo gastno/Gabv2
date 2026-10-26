@@ -6,6 +6,7 @@ export const STUDIO_DEFAULTS = {
     location: "Reykjavík, Iceland",
     about_description: "",
     logo: "/gabbablulogo.png",
+    coverImage: "/beauty1.jpg",
     portfolio: "gabbablu",
   },
   2: {
@@ -13,6 +14,7 @@ export const STUDIO_DEFAULTS = {
     location: "Reykjavík, Iceland",
     about_description: "",
     logo: "/amortattoo.png",
+    coverImage: "/tattoo1.jpg",
     portfolio: "amortattoo",
   },
 };

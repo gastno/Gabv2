@@ -9,14 +9,19 @@ function Home() {
   return (
     <CustomerLayout pageClassName="home-page">
       <main className="home-content">
-        <section className="gradient-space" aria-labelledby="home-brand-statement">
-          <p className="home-eyebrow">{t("home.location")}</p>
+        <section className="home-hero" aria-labelledby="home-brand-statement">
           <h1 id="home-brand-statement">
             <span className="home-brand-copy">
               <span className="home-brand-name">gbb &amp; co</span>
-              <span className="home-brand-tagline">{t("home.tagline")}</span>
             </span>
           </h1>
+          <div className="home-hero-copy">
+            <p className="home-brand-tagline">{t("home.tagline")}</p>
+            <p className="home-location">{t("home.location")}</p>
+            <a className="home-primary-action" href="#studio-choices">
+              {t("home.chooseStudio")}
+            </a>
+          </div>
         </section>
         <BrandChooser />
       </main>

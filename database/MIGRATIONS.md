@@ -73,3 +73,25 @@ Configure these backend environment variables without committing them:
 - `CLERK_AUTHORIZED_PARTIES`: comma-separated list of exact frontend origins allowed to mint the session tokens, such as `http://localhost:3000` and the production frontend origin.
 
 The frontend should obtain a Clerk session token and send it as `Authorization: Bearer <token>` to `POST /api/auth/customer/clerk/session`. A mapped identity returns `{ "status": "authenticated", "token": "<Gabv2 JWT>", "customer": { "id": 1, "full_name": "...", "email": "..." } }`; an unmapped identity returns `{ "status": "profile_required", "profile": { "full_name": "...", "email": "..." } }`. For the latter, collect `full_name`, `phone_number`, and `kennitala`, then send them with the same Bearer token to `POST /api/auth/customer/clerk/complete-profile`. Success returns the authenticated shape. Treat browser-supplied `full_name` as new profile input only; the backend takes the identity subject and verified email from Clerk and ignores client-supplied email, role, or customer ID. Missing/invalid profile fields return HTTP 400, invalid/unverified sessions return HTTP 401, unavailable Clerk verification returns HTTP 503, and profile conflicts return HTTP 409 with a generic message that does not identify whether the email or Kennitala is already in use. The backend never links an existing customer or guest profile by matching email or Kennitala.
+
+## Promotional Pricing and Appointment Notifications
+
+Apply `migrations/009_promotional_pricing_notifications.sql` to an existing database before deploying promotional pricing or notification features. Back up first, then apply using the migration procedure above with the `009` filename. It is additive and safe to rerun. Fresh databases receive the same columns and tables through `init.sql`.
+
+```powershell
+Get-Content -Raw database/migrations/009_promotional_pricing_notifications.sql | docker compose exec -T postgres_db psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB
+```
+
+Service `sale_price_isk` is nullable and must be non-negative and lower than the regular `price_isk`. Public service reads omit inactive services; authenticated staff and admins can read inactive entries for administration. Booking always reads current prices from PostgreSQL, rejects inactive services, and snapshots the sale price when set (otherwise the regular price) into the existing `appointments.price_snapshot_isk`.
+
+Registered customers can change their email-notification preference and read their own notification history with the authenticated customer API. Email is opt-in and requires a verified deployment/provider configuration. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the backend environment; never place the key in source control. The worker uses Resend's email API and an event-specific idempotency key, records provider errors, and retries transient delivery failures a bounded number of times. If delivery configuration is missing, queued events are marked failed rather than reported as sent.
+
+Appointment status-transition events are inserted in the same database transaction as the successful status change. A scheduled worker scans upcoming appointments and inserts a single 24-hour reminder event per appointment; database uniqueness and row locking make scans safe across multiple API processes. Run the worker as part of the backend process after applying the migration. Delivery is asynchronous; the customer notification history reports queued, sent, failed, or skipped state.
+
+Apply `migrations/010_notification_read_state.sql` to add customer read state to existing notification outbox rows. It is additive and safe to rerun; existing rows start unread. Fresh databases include `is_read` and its unread-customer index in `init.sql`.
+
+```powershell
+Get-Content -Raw database/migrations/010_notification_read_state.sql | docker compose exec -T postgres_db psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB
+```
+
+`GET /api/notifications` returns the authenticated customer's notification rows with `is_read` and an `unread_count`. `PATCH /api/customers/notifications/read` accepts either `{ "notification_ids": [12, 13] }` (1–100 IDs) or `{ "all": true }`; updates are always scoped to the authenticated customer. `GET /api/appointments?period=previous` returns only that customer's appointments whose end time is in the past, newest first; `period=upcoming` returns pending/confirmed appointments that have not ended. Other values of `period` are rejected, and staff cannot use these customer filters.

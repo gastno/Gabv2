@@ -2,11 +2,11 @@
 const express = require('express');
 const router = express.Router();
 const serviceController = require('../controllers/serviceController');
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+const { authenticateToken, optionalAuthenticateToken, requireRole } = require('../middleware/authMiddleware');
 const { uploadAvatar } = require('../middleware/uploadMiddleware');
 
 // Public reading route
-router.get('/', serviceController.getAllServices);
+router.get('/', optionalAuthenticateToken, serviceController.getAllServices);
 
 // Protected routes (Admin / SuperAdmin)
 router.post(

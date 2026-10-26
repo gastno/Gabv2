@@ -1,0 +1,54 @@
+.theme-selector {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--theme-selector-border, #c9d1c9);
+  border-radius: 3px;
+  background: var(--theme-selector-bg, #ffffff);
+  color: var(--theme-selector-text, #39433b);
+}
+
+.theme-selector button {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.theme-selector button[aria-pressed="true"] {
+  background: var(--theme-selector-active-bg, #d5ded5);
+  color: var(--theme-selector-active-text, #202722);
+  font-weight: 600;
+}
+
+.theme-selector button:hover:not([aria-pressed="true"]) {
+  background: var(--theme-selector-hover-bg, #edf1ec);
+}
+
+.theme-selector button:focus-visible {
+  outline: 2px solid var(--theme-selector-focus, #587a68);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .theme-selector {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-selector button {
+    transition: none;
+  }
+}

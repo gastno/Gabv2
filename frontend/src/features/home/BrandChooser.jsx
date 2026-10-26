@@ -2,19 +2,18 @@ import { Link } from "react-router-dom";
 
 function BrandChooser() {
   return (
-    <div className="interactive-container">
+    <div className="interactive-container" id="studio-choices">
       <Link
         to="/studios/gabbablu"
         className="interactive-side beauty-side"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(18, 19, 22, 0.65), rgba(18, 19, 22, 0.85)), url('/beauty1.jpg')",
-        }}
       >
+        <img className="interactive-image" src="/beauty1.jpg" alt="" width="1600" height="1067" />
         <img
           src="/gabbablulogo.png"
-          alt="Gabbablu"
+          alt=""
           className="interactive-logo"
+          width="500"
+          height="500"
         />
         <span className="interactive-subtitle">Gabbablu</span>
       </Link>
@@ -22,15 +21,14 @@ function BrandChooser() {
       <Link
         to="/studios/amortattoo"
         className="interactive-side tattoo-side"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(18, 19, 22, 0.65), rgba(18, 19, 22, 0.85)), url('/tattoo1.jpg')",
-        }}
       >
+        <img className="interactive-image" src="/tattoo1.jpg" alt="" width="1600" height="1067" />
         <img
           src="/amortattoo.png"
-          alt="Amor Tattoo"
+          alt=""
           className="interactive-logo"
+          width="500"
+          height="500"
         />
         <span className="interactive-subtitle">Amor Tattoo</span>
       </Link>

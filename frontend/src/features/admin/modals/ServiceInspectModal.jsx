@@ -153,6 +153,52 @@ function ServiceInspectModal({
             )}
           </div>
 
+          <div className="form-group">
+            <label>Promotional price (ISK)</label>
+            {isEditMode ? (
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="No promotion"
+                value={inspectService.sale_price_isk ?? ""}
+                onChange={(e) => setInspectService({
+                  ...inspectService,
+                  sale_price_isk: e.target.value === "" ? null : e.target.value,
+                })}
+              />
+            ) : (
+              <div className="read-only-field">
+                {inspectService.sale_price_isk == null
+                  ? "No promotion"
+                  : `${Number(inspectService.sale_price_isk).toLocaleString("is-IS")} kr`}
+              </div>
+            )}
+            {isEditMode && <small>Leave blank to remove the promotion; must be lower than the regular price.</small>}
+          </div>
+
+          <div className="form-group">
+            <label className={isEditMode ? "admin-switch" : ""}>
+              {isEditMode ? (
+                <>
+                  <span>Public booking</span>
+                  <span className="admin-switch-control">
+                    <input
+                      className="admin-switch-input"
+                      type="checkbox"
+                      checked={inspectService.is_active !== false}
+                      onChange={(e) => setInspectService({ ...inspectService, is_active: e.target.checked })}
+                    />
+                    <span className="admin-switch-track" aria-hidden="true" />
+                  </span>
+                </>
+              ) : "Public booking"}
+            </label>
+            {!isEditMode && (
+              <div className="read-only-field">{inspectService.is_active === false ? "Disabled" : "Enabled"}</div>
+            )}
+          </div>
+
           <div className="modal-actions-row">
             {!isEditMode ? (
               <button

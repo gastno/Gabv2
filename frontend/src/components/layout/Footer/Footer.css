@@ -1,8 +1,7 @@
 .site-footer {
-  padding: 34px 40px;
+  padding: 48px clamp(20px, 4vw, 56px);
   color: var(--hud-text-primary, #f4f3ef);
-  background: #151619;
-  border-top: 1px solid var(--hud-border-subtle, rgba(255, 255, 255, 0.08));
+  background: #171b18;
 }
 
 .site-footer-content {
@@ -26,10 +25,8 @@
 .site-footer-section h2 {
   margin: 0 0 14px;
   color: var(--hud-text-primary, #f4f3ef);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .site-footer-section ul {
@@ -44,8 +41,8 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  color: var(--hud-text-muted, #8c9099);
-  font-size: 0.82rem;
+  color: var(--hud-text-secondary, #d8ddd6);
+  font-size: 1rem;
   text-decoration: none;
   transition: color 160ms ease;
 }
@@ -105,22 +102,19 @@
 
 .site-footer-tagline {
   color: var(--hud-text-muted, #8c9099);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 1rem;
 }
 
 .site-footer-divider {
-  height: 1px;
-  background: var(--hud-border-subtle, rgba(255, 255, 255, 0.08));
+  height: 0;
   margin-bottom: 18px;
 }
 
 .site-footer-text {
+  max-width: 60ch;
   margin: 0;
-  color: var(--hud-text-muted, #8c9099);
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
+  color: var(--hud-text-secondary, #d8ddd6);
+  font-size: 1rem;
 }
 
 @media (max-width: 768px) {

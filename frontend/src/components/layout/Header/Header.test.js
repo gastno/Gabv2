@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const originalClerkPublishableKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 process.env.REACT_APP_CLERK_PUBLISHABLE_KEY = "pk_test_customer_sign_in";
@@ -21,6 +21,11 @@ jest.mock("../../../services/api", () => ({
   authApi: {
     getMe: jest.fn(),
   },
+  notificationApi: {
+    list: jest.fn(),
+    markRead: jest.fn(),
+    markAllRead: jest.fn(),
+  },
 }));
 
 jest.mock("react-router-dom", () => ({
@@ -29,6 +34,7 @@ jest.mock("react-router-dom", () => ({
 }));
 
 const Header = require("./Header").default;
+const { authApi, notificationApi } = require("../../../services/api");
 
 beforeEach(() => {
   localStorage.clear();
@@ -85,4 +91,34 @@ test("switches between the Clerk sign-in and sign-up modals", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Log In" }));
   expect(await screen.findByTestId("clerk-sign-in")).toBeInTheDocument();
   expect(document.querySelector(".header-clerk-auth")).toHaveClass("auth-form-slide-in-left");
+});
+
+test("customer notification dropdown shows unread count and marks notifications read", async () => {
+  localStorage.setItem("customer_auth_token", "customer-token");
+  authApi.getMe.mockResolvedValue({
+    user: { id: 4, type: "customer", role: "customer", full_name: "Customer" },
+  });
+  notificationApi.list.mockResolvedValue({
+    unread_count: 1,
+    notifications: [{
+      id: 22,
+      notification_type: "reminder_24h",
+      delivery_status: "sent",
+      service_name: "Lash lift",
+      is_read: false,
+    }],
+  });
+  notificationApi.markRead.mockResolvedValue({ unread_count: 0, read_ids: ["22"] });
+
+  render(<Header language="en" />);
+  const bell = await screen.findByRole("button", { name: "Notifications, 1 unread" });
+  fireEvent.click(bell);
+
+  expect(await screen.findByText("Appointment reminder")).toBeInTheDocument();
+  expect(screen.getByText("Lash lift · sent")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Mark Appointment reminder as read" }));
+
+  await waitFor(() => expect(notificationApi.markRead).toHaveBeenCalledWith([22]));
+  expect(await screen.findByRole("button", { name: "Notifications, 0 unread" })).toBeInTheDocument();
+  expect(notificationApi.list).toHaveBeenCalledTimes(1);
 });

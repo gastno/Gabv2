@@ -1,0 +1,204 @@
+.customer-account-page {
+  min-height: 100vh;
+  background: var(--hud-bg-main);
+  color: var(--hud-text-primary);
+}
+
+.customer-account-content {
+  width: min(100% - 40px, 960px);
+  margin: 0 auto;
+  padding: clamp(36px, 7vw, 80px) 0;
+}
+
+.customer-account-heading {
+  margin-bottom: 36px;
+}
+
+.customer-account-heading h1 {
+  margin: 0;
+  font-family: var(--hud-font-heading);
+  font-size: clamp(1.5rem, 2.2vw, 1.75rem);
+  font-weight: 500;
+}
+
+.customer-account-heading p,
+.customer-account-section > p,
+.customer-account-message p {
+  color: var(--hud-text-muted);
+  line-height: 1.6;
+}
+
+.customer-account-previous-link {
+  margin: -4px 0 16px;
+}
+
+.customer-account-previous-link a {
+  color: var(--hud-accent-cyan);
+  text-decoration: none;
+}
+
+.customer-account-previous-link a:hover {
+  text-decoration: underline;
+}
+
+.customer-account-section,
+.customer-account-message {
+  margin-top: 28px;
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 12px;
+  background: var(--hud-bg-surface);
+}
+
+.customer-account-section h2,
+.customer-account-message h2 {
+  margin: 0 0 18px;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.customer-account-section > p {
+  margin-top: 0;
+}
+
+.customer-appointment-list,
+.customer-notification-list {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.customer-appointment,
+.customer-notification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--hud-border-subtle);
+}
+
+.customer-appointment h3,
+.customer-notification h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.customer-appointment p,
+.customer-notification p {
+  margin: 0;
+  color: var(--hud-text-muted);
+  line-height: 1.5;
+}
+
+.customer-appointment-details {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.customer-appointment-status,
+.customer-notification-status {
+  color: var(--hud-accent-cyan);
+  font-size: 0.88rem;
+  text-transform: capitalize;
+}
+
+.customer-notification-status.status-failed {
+  color: var(--hud-rose-dusk);
+}
+
+.customer-notification-status.status-skipped {
+  color: var(--hud-text-muted);
+}
+
+.customer-notification-read-status {
+  min-width: 54px;
+  color: var(--hud-text-muted);
+  font-size: 0.82rem;
+}
+
+.customer-notification.is-unread .customer-notification-read-status {
+  color: var(--hud-accent-cyan);
+}
+
+.customer-notification-note {
+  margin-top: 6px !important;
+  font-size: 0.88rem;
+}
+
+.customer-notification {
+  align-items: flex-start;
+}
+
+.customer-notification-status {
+  white-space: nowrap;
+}
+
+.customer-notification-preference {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.customer-notification-preference label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.customer-notification-preference button,
+.customer-account-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 16px;
+  border: 1px solid var(--hud-accent-cyan);
+  border-radius: 6px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.customer-notification-preference button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.customer-account-empty {
+  margin: 0;
+  color: var(--hud-text-muted);
+}
+
+.customer-account-error {
+  padding: 16px;
+  color: var(--hud-rose-dusk);
+}
+
+.customer-account-error a {
+  color: inherit;
+}
+
+.customer-account-success {
+  color: var(--hud-accent-cyan) !important;
+}
+
+@media (max-width: 600px) {
+  .customer-appointment,
+  .customer-notification {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .customer-appointment-details {
+    justify-items: start;
+  }
+}

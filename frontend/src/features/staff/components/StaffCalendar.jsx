@@ -90,6 +90,7 @@ function StaffCalendar({
             </button>
           </div>
 
+          <p className="calendar-scroll-hint">Swipe horizontally to see all seven days</p>
           <div className="calendar-grid-scroll">
             <div className="calendar-weekdays-header">
               {WEEKDAY_LABELS.map((weekday) => <span key={weekday}>{weekday}</span>)}

@@ -40,9 +40,22 @@ describe("BookingModal reference images", () => {
     jest.clearAllMocks();
   });
 
+  it("renders the booking overlay outside animated page content", async () => {
+    render(
+      <BookingModal
+        service={{ id: 3, name: "Custom design" }}
+        brandName="Amor Tattoo"
+        onClose={jest.fn()}
+      />
+    );
+
+    const portal = await screen.findByRole("dialog");
+    expect(portal.closest(".booking-modal-portal").parentElement).toBe(document.body);
+  });
+
   it("includes the selected reference image in the customer booking request", async () => {
     const image = new File(["image"], "design.png", { type: "image/png" });
-    const { container } = render(
+    render(
       <BookingModal
         service={{
           id: 3,
@@ -57,8 +70,12 @@ describe("BookingModal reference images", () => {
     );
 
     fireEvent.click(await screen.findByRole("button", { name: /Morgan Artist/ }));
-    await waitFor(() => expect(container.querySelector(".calendar-day-cell.available")).toBeInTheDocument());
-    fireEvent.click(container.querySelector(".calendar-day-cell.available"));
+    const availableDay = await waitFor(() => {
+      const day = document.querySelector(".calendar-day-cell.available");
+      expect(day).toBeInTheDocument();
+      return day;
+    });
+    fireEvent.click(availableDay);
     fireEvent.click(screen.getByRole("button", { name: "10:00" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue as Guest" }));

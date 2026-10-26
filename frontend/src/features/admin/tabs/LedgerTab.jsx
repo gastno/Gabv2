@@ -115,7 +115,7 @@ function LedgerTab({ brands, loadingBrand }) {
     <section className="admin-section">
       <div className="section-header">
         <div>
-          <h3>Appointments Ledger</h3>
+          <h1>Appointments Ledger</h1>
           <p className="subtitle">
             Historical completed, cancelled, and no-show appointments across your brands.
           </p>

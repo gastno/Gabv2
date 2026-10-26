@@ -1,0 +1,221 @@
+{
+  "info": {
+    "_postman_id": "e1b82ce4-518d-44e9-9258-36430ec5a748",
+    "name": "Gabv2 Notifications and Promotional Pricing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "customerToken",
+      "value": ""
+    },
+    {
+      "key": "brandId",
+      "value": "1"
+    },
+    {
+      "key": "categoryId",
+      "value": "1"
+    },
+    {
+      "key": "serviceId",
+      "value": "1"
+    },
+    {
+      "key": "notificationId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Public service catalog (active only)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/services"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('catalog request succeeds', () => pm.response.to.have.status(200));",
+              "pm.test('public catalog excludes disabled services', () => {",
+              "  pm.response.json().forEach(service => pm.expect(service.is_active).to.eql(true));",
+              "});",
+              "pm.test('service response contains promotional price field', () => {",
+              "  const services = pm.response.json();",
+              "  if (services.length) pm.expect(services[0]).to.have.property('sale_price_isk');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create service with promotion (admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"brand_id\": {{brandId}},\n  \"category_id\": {{categoryId}},\n  \"name_en\": \"Example service\",\n  \"duration_minutes\": 45,\n  \"price_isk\": 12000,\n  \"sale_price_isk\": 9500,\n  \"is_active\": true\n}"
+        },
+        "url": "{{baseUrl}}/services"
+      }
+    },
+    {
+      "name": "Update promotional price and disable public booking (admin)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price_isk\": 12000,\n  \"sale_price_isk\": 9000,\n  \"is_active\": false\n}"
+        },
+        "url": "{{baseUrl}}/services/{{serviceId}}"
+      }
+    },
+    {
+      "name": "Registered customer appointment history",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/appointments"
+      }
+    },
+    {
+      "name": "Read customer notification preference",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/notifications/preferences"
+      }
+    },
+    {
+      "name": "Enable customer appointment emails",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email_enabled\": true\n}"
+        },
+        "url": "{{baseUrl}}/notifications/preferences"
+      }
+    },
+    {
+      "name": "Customer notification history",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/notifications"
+      }
+    },
+    {
+      "name": "Customer previous appointments",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/appointments?period=previous"
+      }
+    },
+    {
+      "name": "Mark one customer notification read",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"notification_ids\": [{{notificationId}}]\n}"
+        },
+        "url": "{{baseUrl}}/customers/notifications/read"
+      }
+    },
+    {
+      "name": "Mark all customer notifications read",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"all\": true\n}"
+        },
+        "url": "{{baseUrl}}/customers/notifications/read"
+      }
+    }
+  ]
+}

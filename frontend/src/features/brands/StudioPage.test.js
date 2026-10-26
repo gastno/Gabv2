@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import StudioPage, { PortfolioGallery } from "./StudioPage";
 
 jest.mock("react-router-dom", () => ({
@@ -70,10 +70,12 @@ describe("PortfolioGallery", () => {
 
     render(<StudioPage brandId={2} />);
 
-    expect(await screen.findByAltText("Amor Tattoo studio")).toHaveAttribute(
-      "src",
-      "/uploads/brands/amor-cover.webp"
-    );
+    await waitFor(() => {
+      expect(screen.getByAltText("Amor Tattoo studio")).toHaveAttribute(
+        "src",
+        "/uploads/brands/amor-cover.webp"
+      );
+    });
     expect(screen.getByAltText("Amor Tattoo logo")).toHaveAttribute(
       "src",
       "/uploads/brands/amor-logo.webp"
@@ -81,6 +83,21 @@ describe("PortfolioGallery", () => {
     expect(await screen.findByAltText("Amor Tattoo portfolio 1")).toHaveAttribute(
       "src",
       "/uploads/brands/amor-portfolio.webp"
+    );
+  });
+
+  it("uses the bundled studio portfolio when the API has no saved images", async () => {
+    const { brandApi, brandPortfolioApi, categoryApi, serviceApi } = require("../../services/api");
+    brandApi.getAll.mockResolvedValue([{ id: 1, name: "Gabbablu" }]);
+    brandPortfolioApi.get.mockResolvedValue({ layout: "feature", images: [] });
+    categoryApi.getAll.mockResolvedValue([]);
+    serviceApi.getAll.mockResolvedValue([]);
+
+    render(<StudioPage brandId={1} />);
+
+    expect(await screen.findByAltText("Gabbablu portfolio 1")).toHaveAttribute(
+      "src",
+      "/portfolio/gabbablu/1.jpg"
     );
   });
 });

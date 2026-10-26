@@ -7,7 +7,7 @@ class BookingError extends Error {
 
 const createBooking = (database, booking) => database.withTransaction(async client => {
   const serviceResult = await client.query(`
-    SELECT s.brand_id, s.duration_minutes, s.price_isk
+    SELECT s.brand_id, s.duration_minutes, s.price_isk, s.sale_price_isk
     FROM services s
     JOIN staff_services ss ON ss.service_id = s.id
     JOIN staff st ON st.id = ss.staff_id
@@ -31,7 +31,7 @@ const createBooking = (database, booking) => database.withTransaction(async clie
 
   const service = serviceResult.rows[0];
   const durationMinutes = Number(service.duration_minutes);
-  const priceIsk = Number(service.price_isk);
+  const priceIsk = Number(service.sale_price_isk ?? service.price_isk);
   if (!Number.isSafeInteger(durationMinutes) || durationMinutes <= 0 || !Number.isFinite(priceIsk) || priceIsk < 0) {
     throw new BookingError('The selected service has invalid booking details.', 422);
   }

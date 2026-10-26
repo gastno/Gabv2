@@ -1,9 +1,12 @@
 import React from "react";
 import "../Admin.css";
+import ThemeSelector from "../../../components/common/ThemeSelector/ThemeSelector";
 
 function AdminTopBar({
   setMobileSidebarOpen,
   handleLogout,
+  theme,
+  onThemeChange,
 }) {
   return (
     <header className="admin-top-bar">
@@ -20,6 +23,7 @@ function AdminTopBar({
       </div>
 
       <div className="top-bar-right">
+        <ThemeSelector theme={theme} onChange={onThemeChange} />
         <button
           type="button"
           className="admin-logout-btn"

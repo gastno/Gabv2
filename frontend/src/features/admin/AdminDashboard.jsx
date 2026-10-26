@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   staffApi,
@@ -6,25 +6,11 @@ import {
   categoryApi,
   serviceApi,
   staffServiceApi,
-  getAssetUrl,
 } from "../../services/api";
 import "./Admin.css";
 
-// Layout
-import AdminSidebar from "./layout/AdminSidebar";
-import AdminTopBar from "./layout/AdminTopBar";
-
-// Tabs
-import CalendarTab from "./tabs/CalendarTab";
-import BrandsTab from "./tabs/BrandsTab";
-import CategoriesTab from "./tabs/CategoriesTab";
-import ServicesTab from "./tabs/ServicesTab";
-import StaffTab from "./tabs/StaffTab";
-import LedgerTab from "./tabs/LedgerTab";
-import StaffServicesTab from "./tabs/StaffServicesTab";
-import PortfolioTab from "./tabs/PortfolioTab";
-
-// Modals
+import AdminWorkspace from "./layout/AdminWorkspace";
+import useAdminData from "./hooks/useAdminData";
 import BrandModal from "./modals/BrandModal";
 import StaffInspectModal from "./modals/StaffInspectModal";
 import CategoryInspectModal from "./modals/CategoryInspectModal";
@@ -34,28 +20,31 @@ import CreateServiceModal from "./modals/CreateServiceModal";
 import CreateStaffModal from "./modals/CreateStaffModal";
 import ServiceStaffModal from "./modals/ServiceStaffModal";
 import "./AdminBrand.css";
+import useWorkspaceTheme from "../shared/theme/useWorkspaceTheme";
 
 function AdminDashboard() {
   const navigate = useNavigate();
+  const [theme, setTheme] = useWorkspaceTheme();
 
   // Navigation & Layout State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("calendar");
   const [selectedBrand] = useState("Gabbablu");
-
-  // Master Entity Lists
-  const [brandsList, setBrandsList] = useState([]);
-  const [loadingBrands, setLoadingBrands] = useState(false);
-
-  const [staffList, setStaffList] = useState([]);
-  const [loadingStaff, setLoadingStaff] = useState(false);
-
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-
-  const [services, setServices] = useState([]);
-  const [loadingServices, setLoadingServices] = useState(false);
+  const {
+    brandsList,
+    setBrandsList,
+    loadingBrands,
+    staffList,
+    loadingStaff,
+    categories,
+    loadingCategories,
+    services,
+    loadingServices,
+    fetchStaffAccounts,
+    fetchCategories,
+    fetchServices,
+  } = useAdminData();
 
   // File & Image States
   const [createAvatarFile, setCreateAvatarFile] = useState(null);
@@ -103,6 +92,8 @@ function AdminDashboard() {
     description_is: "",
     duration: "60 min",
     price: "",
+    sale_price: "",
+    is_active: true,
   });
 
   const [newStaff, setNewStaff] = useState({
@@ -114,115 +105,6 @@ function AdminDashboard() {
     brands: ["Gabbablu"],
     photo: "",
   });
-
-  const fetchBrands = async () => {
-    setLoadingBrands(true);
-    try {
-      if (brandApi?.getAll) {
-        const data = await brandApi.getAll();
-        if (Array.isArray(data) && data.length > 0) setBrandsList(data);
-      }
-    } catch (err) {
-      console.warn("Error fetching brands:", err);
-    } finally {
-      setLoadingBrands(false);
-    }
-  };
-
-  const fetchStaffAccounts = async () => {
-    setLoadingStaff(true);
-    try {
-      if (staffApi?.getAll) {
-        const data = await staffApi.getAll();
-        const formattedStaff = (data || []).map((s) => ({
-          id: s.id,
-          userId: s.username,
-          password: "••••••••",
-          name: s.name || s.full_name,
-          description: s.description_en || s.description || "Staff Member",
-          description_en: s.description_en || s.description || "",
-          description_is: s.description_is || "",
-          brands:
-            Array.isArray(s.assigned_brands) && s.assigned_brands.length > 0
-              ? s.assigned_brands.map((b) => b.name)
-              : ["Gabbablu"],
-          brandIds: Array.isArray(s.assigned_brands)
-            ? s.assigned_brands.map((brand) => String(brand.id))
-            : [],
-          photo: getAssetUrl(s.avatar_url),
-          rawAvatarUrl: s.avatar_url,
-        }));
-        setStaffList(formattedStaff);
-      }
-    } catch (err) {
-      console.warn("Failed loading staff from API:", err);
-    } finally {
-      setLoadingStaff(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    setLoadingCategories(true);
-    try {
-      if (categoryApi?.getAll) {
-        const data = await categoryApi.getAll();
-        const formatted = (data || []).map((c) => ({
-          id: c.id,
-          brand_id: c.brand_id,
-          brand: c.brand || "Gabbablu",
-          title: c.title || c.name,
-          subtitle: c.subtitle || c.description || "",
-          name_en: c.name_en || c.title || c.name || "",
-          name_is: c.name_is || "",
-          description_en: c.description_en || c.subtitle || c.description || "",
-          description_is: c.description_is || "",
-        }));
-        setCategories(formatted);
-      }
-    } catch (err) {
-      console.warn("Failed loading categories from API:", err);
-    } finally {
-      setLoadingCategories(false);
-    }
-  };
-
-  const fetchServices = async () => {
-    setLoadingServices(true);
-    try {
-      if (serviceApi?.getAll) {
-        const data = await serviceApi.getAll();
-        const formatted = (data || []).map((s) => ({
-          id: s.id,
-          brand_id: s.brand_id,
-          category_id: s.category_id,
-          brand: s.brand || "Gabbablu",
-          category: s.category || "General",
-          name: s.name_en || s.name,
-          name_en: s.name_en || s.name || "",
-          name_is: s.name_is || "",
-          description: s.description_en || s.description || "",
-          description_en: s.description_en || s.description || "",
-          description_is: s.description_is || "",
-          duration: s.duration || `${s.duration_minutes || 60} min`,
-          price: s.price || `${s.price_isk || 0} kr`,
-          image: getAssetUrl(s.image_url),
-          rawImageUrl: s.image_url,
-        }));
-        setServices(formatted);
-      }
-    } catch (err) {
-      console.warn("Failed loading services from API:", err);
-    } finally {
-      setLoadingServices(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchBrands();
-    fetchStaffAccounts();
-    fetchCategories();
-    fetchServices();
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -238,7 +120,7 @@ function AdminDashboard() {
     editServiceImagePreview,
   ]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("staff_auth_token");
     localStorage.removeItem("auth_token");
     localStorage.removeItem("staff_role");
@@ -246,7 +128,7 @@ function AdminDashboard() {
     localStorage.removeItem("auth_user_name");
     localStorage.removeItem("auth_user_description");
     navigate("/staff-login");
-  };
+  }, [navigate]);
 
   const closeInspectModal = () => {
     setInspectBrand(null);
@@ -313,6 +195,8 @@ function AdminDashboard() {
           description_is: newService.description_is,
           duration: newService.duration,
           price: newService.price,
+          sale_price_isk: newService.sale_price,
+          is_active: newService.is_active,
         });
         createdServiceId = response?.service?.id || response?.id;
       }
@@ -338,6 +222,8 @@ function AdminDashboard() {
         description_is: "",
         duration: "60 min",
         price: "",
+        sale_price: "",
+        is_active: true,
       });
     } catch (err) {
       alert(err.message || "Failed to create service.");
@@ -368,6 +254,8 @@ function AdminDashboard() {
           description_is: inspectService.description_is,
           duration: inspectService.duration,
           price: inspectService.price,
+          sale_price_isk: inspectService.sale_price_isk ?? "",
+          is_active: inspectService.is_active,
         });
       }
 
@@ -437,7 +325,7 @@ function AdminDashboard() {
   };
 
   // ================= BRAND HANDLERS =================
-  const handleOpenBrandModal = (brand) => {
+  const handleOpenBrandModal = useCallback((brand) => {
     const localizedBrand = {
       ...brand,
       description_en: brand.description_en ?? brand.about_description ?? "",
@@ -446,7 +334,7 @@ function AdminDashboard() {
     setInspectBrand(localizedBrand);
     setTempInspectBrand(localizedBrand);
     setIsEditMode(false);
-  };
+  }, []);
 
   const handleDiscardBrandChanges = () => {
     setTempInspectBrand({ ...inspectBrand });
@@ -481,7 +369,7 @@ function AdminDashboard() {
   };
 
   // ================= STAFF HANDLERS =================
-  const handleOpenStaffModal = async (emp) => {
+  const handleOpenStaffModal = useCallback(async (emp) => {
     setInspectStaff({ ...emp });
     setTempInspectStaff({ ...emp });
     setIsEditMode(false);
@@ -498,7 +386,7 @@ function AdminDashboard() {
       console.warn("Could not fetch staff services:", err);
       setAssignedServiceIds([]);
     }
-  };
+  }, []);
 
   const handleDiscardStaffChanges = () => {
     setTempInspectStaff({ ...inspectStaff });
@@ -632,122 +520,64 @@ function AdminDashboard() {
     }
   };
 
-  const handleTabSelect = (tab) => {
-    setActiveTab(tab);
+  const handleTabSelect = useCallback((tab) => {
+    React.startTransition(() => setActiveTab(tab));
     setMobileSidebarOpen(false);
-  };
+  }, []);
 
   const currentStaffId = localStorage.getItem("staff_id");
   const staffRole = localStorage.getItem("staff_role");
   const currentAdmin = staffList.find((staff) => String(staff.id) === String(currentStaffId));
-  const manageableBrands = staffRole === "super_admin"
-    ? brandsList
-    : staffRole === "admin"
-      ? brandsList.filter((brand) => currentAdmin?.brandIds.includes(String(brand.id)))
-      : [];
+  const manageableBrands = useMemo(() => (
+    staffRole === "super_admin"
+      ? brandsList
+      : staffRole === "admin"
+        ? brandsList.filter((brand) => currentAdmin?.brandIds.includes(String(brand.id)))
+        : []
+  ), [brandsList, currentAdmin, staffRole]);
+  const handleSelectStaffService = useCallback(
+    (service) => setSelectedServiceForModal(service),
+    []
+  );
+  const handleBrandUpdate = useCallback((brandId, changes) => {
+    setBrandsList((currentBrands) => currentBrands.map((brand) => (
+      String(brand.id) === String(brandId) ? { ...brand, ...changes } : brand
+    )));
+  }, [setBrandsList]);
 
   return (
-    <div
-      className={`admin-container ${sidebarCollapsed ? "sidebar-collapsed" : ""} ${
-        mobileSidebarOpen ? "mobile-sidebar-active" : ""
-      }`}
-    >
-      <AdminSidebar
+    <div className="admin-theme-root" data-theme={theme}>
+      <AdminWorkspace
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
         mobileSidebarOpen={mobileSidebarOpen}
         setMobileSidebarOpen={setMobileSidebarOpen}
         activeTab={activeTab}
         handleTabSelect={handleTabSelect}
+        handleLogout={handleLogout}
+        theme={theme}
+        onThemeChange={setTheme}
+        brandsList={brandsList}
+        loadingBrands={loadingBrands}
+        staffList={staffList}
+        loadingStaff={loadingStaff}
+        categories={categories}
+        loadingCategories={loadingCategories}
+        services={services}
+        loadingServices={loadingServices}
+        manageableBrands={manageableBrands}
+        staffRole={staffRole}
+        handleOpenBrandModal={handleOpenBrandModal}
+        setCategoryModalOpen={setCategoryModalOpen}
+        setInspectCategory={setInspectCategory}
+        setServiceModalOpen={setServiceModalOpen}
+        setInspectService={setInspectService}
+        setIsEditMode={setIsEditMode}
+        onSelectStaffService={handleSelectStaffService}
+        setStaffModalOpen={setStaffModalOpen}
+        handleOpenStaffModal={handleOpenStaffModal}
+        onBrandUpdate={handleBrandUpdate}
       />
-
-      <main className="admin-main">
-        <AdminTopBar
-          setMobileSidebarOpen={setMobileSidebarOpen}
-          handleLogout={handleLogout}
-        />
-
-        <div className="admin-tab-content" key={activeTab}>
-          {activeTab === "calendar" && (
-            <CalendarTab
-              brands={brandsList}
-              loadingBrand={loadingBrands}
-              staffList={staffList}
-              loadingStaff={loadingStaff}
-            />
-          )}
-
-          {activeTab === "brands" && (
-            <BrandsTab
-              loadingBrands={loadingBrands}
-              brandsList={brandsList}
-              handleOpenBrandModal={handleOpenBrandModal}
-            />
-          )}
-
-          {activeTab === "portfolio" && (
-            <PortfolioTab
-              brands={manageableBrands}
-              loadingBrands={loadingBrands || (staffRole === "admin" && loadingStaff)}
-              onBrandUpdate={(brandId, changes) => {
-                setBrandsList((currentBrands) => currentBrands.map((brand) => (
-                  String(brand.id) === String(brandId) ? { ...brand, ...changes } : brand
-                )));
-              }}
-            />
-          )}
-
-          {activeTab === "categories" && (
-            <CategoriesTab
-              brands={brandsList}
-              categories={categories}
-              services={services}
-              loadingCategories={loadingCategories}
-              setCategoryModalOpen={setCategoryModalOpen}
-              setInspectCategory={setInspectCategory}
-              setIsEditMode={setIsEditMode}
-            />
-          )}
-
-          {activeTab === "services" && (
-            <ServicesTab
-              brands={brandsList}
-              services={services}
-              loadingServices={loadingServices}
-              setServiceModalOpen={setServiceModalOpen}
-              setInspectService={setInspectService}
-              setIsEditMode={setIsEditMode}
-            />
-          )}
-
-          {/* NEW STAFF SERVICES TAB RENDER */}
-          {activeTab === "staff_services" && (
-            <StaffServicesTab
-              brandsList={brandsList}
-              categories={categories}
-              services={services}
-              loadingServices={loadingServices}
-              onSelectService={(service) => setSelectedServiceForModal(service)}
-            />
-          )}
-
-          {activeTab === "staff" && (
-            <StaffTab
-              loadingStaff={loadingStaff}
-              staffList={staffList}
-              setStaffModalOpen={setStaffModalOpen}
-              handleOpenStaffModal={handleOpenStaffModal}
-            />
-          )}
-
-          {activeTab === "ledger" && (
-            <LedgerTab
-              brands={brandsList}
-              loadingBrand={loadingBrands}
-            />
-          )}
-        </div>
-      </main>
 
       {/* NEW SERVICE WORKERS SYNC MODAL OVERLAY */}
       {selectedServiceForModal && (

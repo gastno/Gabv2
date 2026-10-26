@@ -1,12 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import CustomerLayout from "../../components/layout/CustomerLayout/CustomerLayout";
 import {
-  brandApi,
   brandPortfolioApi,
-  categoryApi,
   getAssetUrl,
-  getLocalizedValue,
-  serviceApi,
   staffServiceApi,
 } from "../../services/api";
 import AboutTab from "./components/AboutTab";
@@ -14,6 +10,7 @@ import BookingModal from "./modals/BookingModal";
 import ServicesTab from "./components/ServicesTab";
 import TeamTab from "./components/TeamTab";
 import { STUDIO_DEFAULTS, toTeamMember } from "./data/studioData";
+import useStudioCatalog from "./hooks/useStudioCatalog";
 import { useLanguage } from "../../components/i18n/LanguageContext";
 import "./brands.css";
 
@@ -21,82 +18,17 @@ function StudioPage({ brandId }) {
   const { language, t } = useLanguage();
   const studioDefaults = STUDIO_DEFAULTS[brandId] || STUDIO_DEFAULTS[1];
   const [activeTab, setActiveTab] = useState("services");
-  const [brand, setBrand] = useState(studioDefaults);
-  const [categories, setCategories] = useState([]);
+  const { brand, categories, isLoading, contentError } = useStudioCatalog(
+    brandId,
+    language,
+    studioDefaults,
+    t
+  );
   const [employees, setEmployees] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [portfolio, setPortfolio] = useState(null);
   const [portfolioError, setPortfolioError] = useState("");
   const [teamLoading, setTeamLoading] = useState(false);
-  const [contentError, setContentError] = useState("");
-
-  useEffect(() => {
-    let isCurrent = true;
-
-    const loadStudio = async () => {
-      setIsLoading(true);
-      setContentError("");
-
-      const [brandsResult, categoriesResult, servicesResult] = await Promise.allSettled([
-        brandApi.getAll(),
-        categoryApi.getAll(),
-        serviceApi.getAll(),
-      ]);
-
-      if (!isCurrent) return;
-
-      const brands = brandsResult.status === "fulfilled" ? brandsResult.value : [];
-      const categoryRows = categoriesResult.status === "fulfilled" ? categoriesResult.value : [];
-      const serviceRows = servicesResult.status === "fulfilled" ? servicesResult.value : [];
-      const brandRecord = Array.isArray(brands)
-        ? brands.find((item) => Number(item.id) === Number(brandId))
-        : null;
-      const brandCategories = Array.isArray(categoryRows)
-        ? categoryRows.filter((item) => Number(item.brand_id) === Number(brandId))
-        : [];
-      const brandServices = Array.isArray(serviceRows)
-        ? serviceRows.filter((item) => Number(item.brand_id) === Number(brandId))
-        : [];
-
-      setBrand({
-        ...studioDefaults,
-        ...(brandRecord || {}),
-        name: brandRecord?.name || studioDefaults.name,
-        location: brandRecord?.location || studioDefaults.location,
-        about_description: brandRecord?.about_description || studioDefaults.about_description,
-      });
-      setCategories(brandCategories.map((category) => ({
-        id: category.id,
-        title: getLocalizedValue(category, "name", language) || category.title || t("studio.categoryUnavailable"),
-        subtitle: getLocalizedValue(category, "description", language) || category.subtitle || "",
-        services: brandServices
-          .filter((service) => Number(service.category_id) === Number(category.id))
-          .map((service) => ({
-            ...service,
-            name: getLocalizedValue(service, "name", language) || t("studio.serviceUnavailable"),
-            description: getLocalizedValue(service, "description", language),
-            duration: service.duration_minutes
-              ? `${service.duration_minutes} ${t("studio.minuteUnit")}`
-              : service.duration || t("studio.durationUnavailable"),
-            price: service.price_isk != null && Number.isFinite(Number(service.price_isk))
-              ? `${Number(service.price_isk).toLocaleString(language === "is" ? "is-IS" : "en-IS")} ${t("studio.currencyUnit")}`
-              : service.price || t("studio.priceUnavailable"),
-            image: getAssetUrl(service.image_url),
-          })),
-      })));
-
-      if ([brandsResult, categoriesResult, servicesResult].every((result) => result.status === "rejected")) {
-        setContentError(t("studio.contentUnavailable"));
-      }
-      setIsLoading(false);
-    };
-
-    loadStudio();
-    return () => {
-      isCurrent = false;
-    };
-  }, [brandId, language, studioDefaults, t]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -163,17 +95,47 @@ function StudioPage({ brandId }) {
       image_url: `/portfolio/${studioDefaults.portfolio}/${imageNumber}.jpg`,
     }))
   ), [studioDefaults]);
-  const portfolioImages = portfolio
+  const portfolioImages = Array.isArray(portfolio?.images) && portfolio.images.length > 0
     ? portfolio.images
     : legacyPortfolioImages;
   const logoUrl = getAssetUrl(brand.logo_url) || studioDefaults.logo;
+  const coverImageUrl = getAssetUrl(brand.cover_image_url) || studioDefaults.coverImage;
+  const selectTab = (tabId) => {
+    startTransition(() => setActiveTab(tabId));
+  };
 
   return (
     <CustomerLayout pageClassName="brand-page studio-page">
       <main className="brand-content">
-        {brand.cover_image_url && (
+        <section className="store-information">
+          <div className="store-details">
+            <div className="store-icon">
+              <img src={logoUrl} alt={`${brand.name} logo`} width="60" height="60" />
+            </div>
+            <div className="store-text">
+              <h1 className="store-name">{brand.name}</h1>
+              <p className="store-descriptor">
+                {brand.about_description || t(
+                  brandId === 2 ? "studio.brandDescriptorTattoo" : "studio.brandDescriptorBeauty"
+                )}
+              </p>
+              <p className="store-address">
+                <span className="store-location-pin" aria-hidden="true" />
+                {brand.location}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {coverImageUrl && (
           <section className="studio-cover-image">
-            <img src={getAssetUrl(brand.cover_image_url)} alt={`${brand.name} studio`} />
+            <img
+              src={coverImageUrl}
+              alt={`${brand.name} studio`}
+              width="1600"
+              height="700"
+              fetchPriority="high"
+            />
           </section>
         )}
 
@@ -190,22 +152,11 @@ function StudioPage({ brandId }) {
           </section>
         )}
 
-        <section className="store-information">
-          <div className="store-details">
-            <div className="store-icon">
-              <img src={logoUrl} alt={`${brand.name} logo`} />
-            </div>
-            <div className="store-text">
-              <h1 className="store-name">{brand.name}</h1>
-              <p className="store-address">
-                <span className="store-location-pin" aria-hidden="true" />
-                {brand.location}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <nav className="store-tabs" aria-label={t("studio.information", { brand: brand.name })}>
+        <nav
+          className="store-tabs"
+          role="tablist"
+          aria-label={t("studio.information", { brand: brand.name })}
+        >
           {[
             ["services", t("studio.services")],
             ["team", t("studio.team")],
@@ -214,16 +165,24 @@ function StudioPage({ brandId }) {
             <button
               type="button"
               key={tabId}
+              id={`studio-tab-${tabId}`}
+              role="tab"
               className={`tab-button ${activeTab === tabId ? "active" : ""}`}
-              aria-current={activeTab === tabId ? "page" : undefined}
-              onClick={() => setActiveTab(tabId)}
+              aria-selected={activeTab === tabId}
+              aria-controls="studio-tab-panel"
+              onClick={() => selectTab(tabId)}
             >
               {label}
             </button>
           ))}
         </nav>
 
-        <section className="tab-content">
+        <section
+          className="tab-content"
+          id="studio-tab-panel"
+          role="tabpanel"
+          aria-labelledby={`studio-tab-${activeTab}`}
+        >
           {activeTab === "services" && (
             <ServicesTab
               categories={categories}
@@ -268,7 +227,13 @@ function PortfolioGallery({ images, layout, brandName, error }) {
   );
   const renderImage = (image, index, className = "portfolio-image") => (
     <div className={className} key={image.id}>
-      <img src={imageUrl(image)} alt={`${brandName} portfolio ${index + 1}`} />
+    <img
+      src={imageUrl(image)}
+      alt={`${brandName} portfolio ${index + 1}`}
+      width="1200"
+      height="800"
+      loading="lazy"
+    />
     </div>
   );
 

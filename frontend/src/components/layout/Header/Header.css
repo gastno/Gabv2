@@ -6,12 +6,10 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: rgba(18, 19, 22, 0.94);
+  background-color: var(--hud-bg-main);
   display: flex;
   align-items: center;
-  padding: 15px clamp(18px, 4vw, 56px);
-  border-bottom: 1px solid var(--hud-border-subtle);
-  backdrop-filter: blur(12px);
+  padding: 14px clamp(18px, 4vw, 56px);
 }
 
 .main-header .logo-space {
@@ -41,6 +39,11 @@
   align-items: center;
 }
 
+.main-header button,
+.main-header select {
+  font-family: var(--hud-font-body);
+}
+
 /* User Logged-In Bar State */
 .user-profile-controls {
   display: flex;
@@ -55,8 +58,157 @@
 
 .user-welcome-text {
   color: #eee;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 500;
+}
+
+.customer-account-link {
+  color: var(--hud-accent-cyan);
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.customer-account-link:hover {
+  text-decoration: underline;
+}
+
+.header-notification-menu {
+  position: relative;
+}
+
+.main-header .header-notification-toggle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 6px;
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-primary);
+  cursor: pointer;
+}
+
+.main-header .header-notification-toggle:focus-visible,
+.header-notification-dropdown button:focus-visible,
+.header-notification-dropdown a:focus-visible {
+  outline: 2px solid var(--hud-accent-cyan);
+  outline-offset: 3px;
+}
+
+.header-notification-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.header-notification-count {
+  position: absolute;
+  top: -6px;
+  right: -7px;
+  min-width: 18px;
+  padding: 2px 4px;
+  border-radius: 10px;
+  background: var(--hud-accent-cyan);
+  color: var(--hud-bg-main);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.header-notification-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 1100;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 10px;
+  background: var(--hud-bg-surface);
+  color: var(--hud-text-primary);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+
+.header-notification-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.header-notification-heading h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.main-header .header-notification-heading button,
+.header-notification-dropdown > a {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--hud-accent-cyan);
+  font-size: 0.86rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.header-notification-dropdown ul {
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-notification-dropdown li {
+  border-top: 1px solid var(--hud-border-subtle);
+}
+
+.main-header .header-notification-dropdown li button {
+  display: grid;
+  width: 100%;
+  gap: 5px;
+  padding: 12px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--hud-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.main-header .header-notification-dropdown li.is-unread button {
+  border-left: 3px solid var(--hud-accent-cyan);
+  padding-left: 9px;
+}
+
+.main-header .header-notification-dropdown li.is-read button {
+  color: var(--hud-text-muted);
+  cursor: default;
+}
+
+.header-notification-dropdown li span,
+.header-notification-empty {
+  margin: 0;
+  color: var(--hud-text-muted);
+  font-size: 0.86rem;
+}
+
+.header-notification-error {
+  color: var(--hud-rose-dusk);
+  font-size: 0.86rem;
+}
+
+.header-notification-dropdown > a {
+  display: inline-block;
+  margin-top: 12px;
 }
 
 .logout-button {
@@ -65,10 +217,10 @@
   border: 1px solid var(--hud-border-subtle);
   padding: 6px 14px;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .logout-button:hover {
@@ -84,6 +236,7 @@
   border-radius: 6px;
   cursor: pointer;
   outline: none;
+  font-size: 1rem;
 }
 
 .main-header .login-button {
@@ -91,7 +244,9 @@
   color: var(--hud-bg-main);
   border: 1px solid var(--hud-accent-cyan);
   padding: 6px 16px;
+  min-height: 42px;
   border-radius: 6px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -348,12 +503,34 @@
     letter-spacing: 0.08em;
   }
 
+  .main-header .controls {
+    gap: 8px;
+  }
+
   .user-welcome-text {
+    display: none;
+  }
+
+  .user-profile-controls {
+    gap: 8px;
+  }
+
+  .customer-account-link {
     font-size: 0.8rem;
-    max-width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  }
+
+  .logout-button {
+    padding: 6px 8px;
+    font-size: 0.84rem;
+  }
+
+  .main-header .language-dropdown {
+    padding: 6px;
+    font-size: 0.84rem;
+  }
+
+  .header-notification-dropdown {
+    right: -42px;
   }
 
   .header-auth-backdrop {

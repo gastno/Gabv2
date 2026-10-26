@@ -30,6 +30,7 @@ test.afterEach(() => {
 test('category creation stores and returns English and Icelandic names and descriptions', async () => {
   let insert;
   db.query = async (sql, params) => {
+    if (sql.includes('FROM categories WHERE id = $1')) return { rows: [{ id: 4 }] };
     insert = { sql, params };
     return {
       rows: [{
@@ -68,6 +69,7 @@ test('category creation stores and returns English and Icelandic names and descr
 test('service creation stores and returns English and Icelandic names and descriptions', async () => {
   let insert;
   db.query = async (sql, params) => {
+    if (sql.includes('FROM categories WHERE id = $1')) return { rows: [{ id: 4 }] };
     insert = { sql, params };
     return {
       rows: [{
@@ -87,6 +89,7 @@ test('service creation stores and returns English and Icelandic names and descri
       }],
     };
   };
+  db.withTransaction = callback => callback({ query: db.query });
 
   const res = response();
   await serviceController.createService({
@@ -100,11 +103,12 @@ test('service creation stores and returns English and Icelandic names and descri
       duration_minutes: 45,
       price_isk: 12000,
     },
+    user: { id: 1, type: 'staff', role: 'super_admin' },
   }, res);
 
   assert.match(insert.sql, /name_en, name_is, description_en, description_is/);
   assert.deepEqual(insert.params, [
-    2, 4, 'Lash lift', 'Augnháralyfting', 'English details', 'Íslensk lýsing', 45, 12000, null,
+    2, 4, 'Lash lift', 'Augnháralyfting', 'English details', 'Íslensk lýsing', 45, 12000, null, null, null,
   ]);
   assert.equal(res.statusCode, 201);
   assert.equal(res.body.service.name_is, 'Augnháralyfting');
@@ -175,11 +179,15 @@ test('category, service, and staff updates write both locale fields', async () =
   assert.match(categoryUpdate, /description_is = COALESCE/);
 
   let serviceUpdate;
-  db.query = async sql => {
-    if (/SELECT \* FROM services/.test(sql)) return { rows: [{ id: 3 }] };
+  db.query = async (sql, params) => {
+    if (/SELECT id, brand_id, category_id, price_isk, sale_price_isk\s+FROM services/.test(sql)) {
+      return { rows: [{ id: 3, brand_id: 2, category_id: 4, price_isk: '12000', sale_price_isk: null }] };
+    }
+    if (sql.includes('FROM categories WHERE id = $1')) return { rows: [{ id: 4 }] };
     serviceUpdate = sql;
     return { rows: [] };
   };
+  db.withTransaction = callback => callback({ query: db.query });
   await serviceController.updateService({
     params: { id: '3' },
     body: {
@@ -188,6 +196,7 @@ test('category, service, and staff updates write both locale fields', async () =
       description_en: 'English details',
       description_is: 'Íslensk lýsing',
     },
+    user: { id: 1, type: 'staff', role: 'super_admin' },
   }, response());
   assert.match(serviceUpdate, /name_en = COALESCE/);
   assert.match(serviceUpdate, /name_is = COALESCE/);

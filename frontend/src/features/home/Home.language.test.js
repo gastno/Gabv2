@@ -15,12 +15,12 @@ test("the header language selector changes page copy and persists the selected l
     </LanguageProvider>
   );
 
-  expect(screen.getByText("Independent beauty & tattoo studios")).toBeInTheDocument();
+  expect(screen.getByText("Beauty and tattoo studios rooted in Reykjavík.")).toBeInTheDocument();
   fireEvent.change(screen.getByRole("combobox", { name: "Select language" }), {
     target: { value: "is" },
   });
 
-  expect(screen.getByText("Sjálfstæðar snyrti- og húðflúrstofur")).toBeInTheDocument();
+  expect(screen.getByText("Snyrti- og húðflúrstofur með rætur í Reykjavík.")).toBeInTheDocument();
   expect(localStorage.getItem("site_language")).toBe("is");
   expect(document.documentElement).toHaveAttribute("lang", "is");
 });

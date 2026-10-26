@@ -22,7 +22,7 @@ function StaffServicesTab({
     <section className="admin-section staff-services-gabbablu-theme">
       <div className="section-header">
         <div>
-          <h3>Staff Services Matrix</h3>
+          <h1>Staff Services Matrix</h1>
           <p className="subtitle">
             Assign staff practitioners to specific services by brand & category
           </p>

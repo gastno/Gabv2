@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { startTransition, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apptApi, getAssetUrl, staffAvailabilityApi, staffServiceApi } from "../../services/api";
 import AppointmentDetailsModal from "./modals/AppointmentDetailsModal";
@@ -6,6 +6,7 @@ import AvailabilityEditor from "./components/AvailabilityEditor";
 import CalendarBlockModal from "./modals/CalendarBlockModal";
 import StaffCalendar from "./components/StaffCalendar";
 import StaffProfileHeader from "./components/StaffProfileHeader";
+import useWorkspaceTheme from "../shared/theme/useWorkspaceTheme";
 import {
   dateKeyFromParts,
   formatStudioDate,
@@ -28,6 +29,7 @@ function dateKeysInRange(startDate, endDate) {
 
 function StaffPortal() {
   const navigate = useNavigate();
+  const [theme, setTheme] = useWorkspaceTheme();
   const staffName = localStorage.getItem("auth_user_name") || "Staff";
   const [staffDescription, setStaffDescription] = useState(
     localStorage.getItem("auth_user_description") || ""
@@ -149,7 +151,7 @@ function StaffPortal() {
       .then((results) => {
         if (!isMounted) return;
         const updates = {};
-        const errors = [];
+        const errorsByMessage = new Map();
         results.forEach((result, index) => {
           const dateKey = missingDates[index];
           if (result.status === "fulfilled") {
@@ -159,11 +161,32 @@ function StaffPortal() {
             };
           } else {
             updates[dateKey] = { availability: [], unavailabilities: [], loadError: result.reason?.message };
-            errors.push(`${dateKey}: ${result.reason?.message || "Could not load availability."}`);
+            const message = result.reason?.message || "Could not load availability.";
+            const failedDates = errorsByMessage.get(message) || [];
+            failedDates.push(dateKey);
+            errorsByMessage.set(message, failedDates);
           }
         });
         setAvailabilityByDate((previous) => ({ ...previous, ...updates }));
-        if (errors.length) setPageError((previous) => [previous, ...errors].filter(Boolean).join(" "));
+        const availabilityErrors = Array.from(errorsByMessage, ([message, failedDates]) => ({
+          message,
+          count: failedDates.length,
+          date: failedDates[0],
+          summary: failedDates.length === 1
+            ? `${failedDates[0]}: ${message}`
+            : `Availability could not be loaded for ${failedDates.length} dates: ${message}`,
+        }));
+        if (availabilityErrors.length) {
+          setPageError((previous) => {
+            const summaries = availabilityErrors.map(({ message, count, date, summary }) => {
+              if (!previous.includes(message)) return summary;
+              return count === 1
+                ? `${date}: Availability could not be loaded.`
+                : `Availability could not be loaded for ${count} dates.`;
+            });
+            return [previous, ...summaries].filter(Boolean).join(" ");
+          });
+        }
       })
       .finally(() => {
         if (isMounted) setAvailabilityLoading(false);
@@ -618,16 +641,19 @@ function StaffPortal() {
     localStorage.removeItem("staff_id");
     navigate("/staff-login");
   };
+  const requiresReauthentication = /access denied|invalid or expired token|unauthorized/i.test(pageError);
 
   const onPageErrorDismiss = () => setPageError("");
 
   return (
-    <div className="staff-page">
+    <div className="staff-page" data-theme={theme}>
       <StaffProfileHeader
         name={staffName}
         description={staffDescription}
         avatar={staffAvatar}
         onLogout={handleLogout}
+        theme={theme}
+        onThemeChange={setTheme}
       />
       <main className="staff-content">
         <div className="schedule-header-controls">
@@ -647,7 +673,7 @@ function StaffPortal() {
                 role="tab"
                 aria-selected={calendarView === view}
                 className={`toggle-btn ${calendarView === view ? "active" : ""}`}
-                onClick={() => setCalendarView(view)}
+                onClick={() => startTransition(() => setCalendarView(view))}
               >
                 {label}
               </button>
@@ -660,7 +686,7 @@ function StaffPortal() {
             <span>{pageError}</span>
             <button type="button" onClick={onPageErrorDismiss} aria-label="Dismiss error">×</button>
             <button type="button" onClick={handleRefreshPage}>Retry</button>
-            {pageError.includes("Access denied") && (
+            {requiresReauthentication && (
               <button type="button" onClick={handleLoginRedirectOnAuthFailure}>Log in again</button>
             )}
           </div>

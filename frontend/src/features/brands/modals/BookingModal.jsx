@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import UserAvatar from "../../../components/common/UserAvatar/UserAvatar";
 import { useLanguage } from "../../../components/i18n/LanguageContext";
 import { apptApi, staffServiceApi } from "../../../services/api";
@@ -210,7 +211,7 @@ function GuestDetailsStep({
           <div className="summary-body">
             <div className="summary-row"><span className="summary-label">{t("booking.service")}</span><span className="summary-value">{service.name}</span></div>
             <div className="summary-row"><span className="summary-label">{t("booking.duration")}</span><span className="summary-value">⏱ {service.duration}</span></div>
-            <div className="summary-row"><span className="summary-label">{t("booking.price")}</span><span className="summary-value highlight">{service.price}</span></div>
+            <div className="summary-row"><span className="summary-label">{t("booking.price")}</span><span className="summary-value highlight">{service.salePrice ? <><del className="service-regular-price">{service.regularPrice}</del> {service.salePrice}</> : service.price}</span></div>
             <div className="summary-row"><span className="summary-label">{t("booking.specialist")}</span><span className="summary-value">{employee?.name}</span></div>
             <div className="summary-row"><span className="summary-label">{t("booking.dateAndTime")}</span><span className="summary-value highlight">{dateLabel} {t("booking.at")} {timeLabel}</span></div>
           </div>
@@ -488,9 +489,10 @@ function BookingModal({ service, brandName, onClose }) {
     }
   };
 
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title" onClick={(event) => event.stopPropagation()}>
+  return createPortal(
+    <div className="brand-page booking-modal-portal">
+      <div className="modal-backdrop" onClick={onClose}>
+        <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title" onClick={(event) => event.stopPropagation()}>
         <button type="button" className="modal-close-btn" onClick={onClose} aria-label={t("booking.close")}>✕</button>
         <h1 className="visually-hidden" id="booking-modal-title">{t("booking.service")} {service.name}</h1>
 
@@ -583,8 +585,10 @@ function BookingModal({ service, brandName, onClose }) {
             </button>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

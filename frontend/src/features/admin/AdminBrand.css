@@ -99,9 +99,7 @@
 
 .admin-container .admin-main {
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse at 92% 0%, rgba(117, 187, 193, 0.035), transparent 32%),
-    var(--hud-bg-main);
+  background: var(--hud-bg-main);
 }
 
 .admin-container .admin-top-bar {
@@ -111,8 +109,7 @@
   min-height: 68px;
   padding: 12px clamp(18px, 3vw, 38px);
   border-bottom-color: var(--hud-border-subtle);
-  background: rgba(18, 19, 22, 0.94);
-  backdrop-filter: blur(12px);
+  background: var(--hud-bg-main);
 }
 
 .admin-container .admin-top-bar h2 {
@@ -137,6 +134,7 @@
   border-bottom: 1px solid var(--hud-border-subtle);
 }
 
+.admin-container .section-header h1,
 .admin-container .section-header h3 {
   margin: 0 0 6px;
   font-size: clamp(1.35rem, 2.5vw, 1.8rem);
@@ -197,7 +195,6 @@
   transform: translateY(-2px);
   border-color: rgba(117, 187, 193, 0.55) !important;
   background: var(--hud-bg-surface-hover);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
 }
 
 .admin-container .accordion-category {
@@ -508,12 +505,10 @@
 
 .admin-container .interactive-staff-row:hover {
   background: rgba(117, 187, 193, 0.06) !important;
-  box-shadow: inset 2px 0 0 var(--hud-accent-cyan);
 }
 
 .admin-container .admin-modal-backdrop {
   background: rgba(8, 9, 11, 0.78);
-  backdrop-filter: blur(8px);
 }
 
 .admin-container .admin-modal-box {
@@ -568,8 +563,8 @@
 .admin-container input:focus-visible,
 .admin-container textarea:focus-visible {
   border-color: var(--hud-accent-cyan);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(117, 187, 193, 0.1);
+  outline: 2px solid var(--hud-accent-cyan);
+  outline-offset: 1px;
 }
 
 .admin-container .read-only-field {
@@ -665,7 +660,8 @@
 .admin-container .portfolio-layout-option:hover,
 .admin-container .portfolio-layout-option.selected {
   border-color: var(--hud-accent-cyan);
-  box-shadow: 0 0 0 1px var(--hud-accent-cyan);
+  outline: 1px solid var(--hud-accent-cyan);
+  outline-offset: 1px;
   color: var(--hud-text-primary);
 }
 
@@ -743,4 +739,1009 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.admin-container {
+  --hud-bg-main: #e9ece7;
+  --hud-bg-surface: #ffffff;
+  --hud-bg-surface-hover: #edf1ec;
+  --hud-border-subtle: #d9dfd8;
+  --hud-border-active: #658170;
+  --hud-accent-cyan: #587a68;
+  --hud-accent-green: #68836e;
+  --hud-text-primary: #202722;
+  --hud-text-secondary: #39433b;
+  --hud-text-muted: #626e65;
+  --hud-rose-dusk: #8c5854;
+  --hud-warning-amber: #8b6944;
+  background: #e9ece7;
+  color: var(--hud-text-primary);
+}
+
+.admin-container .admin-sidebar {
+  background: #e2e7e1;
+  border: 0;
+}
+
+.admin-container .sidebar-header {
+  border: 0;
+}
+
+.admin-container .brand-logo-text,
+.admin-container .admin-top-bar h2,
+.admin-container h1,
+.admin-container h2,
+.admin-container h3,
+.admin-container h4 {
+  color: var(--hud-text-primary);
+}
+
+.admin-container .nav-item {
+  min-height: 44px;
+  border-radius: 3px;
+  color: #566159;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+
+.admin-container .nav-item:hover,
+.admin-container .nav-item.active {
+  border-color: transparent;
+  background: #d5ded5;
+  color: #26362c;
+}
+
+.admin-container .nav-item.active {
+  font-weight: 600;
+}
+
+.admin-container .admin-main {
+  min-height: calc(100vh - 8px);
+  margin: 0 8px 8px 0;
+  overflow: hidden;
+  border: 1px solid #dce1db;
+  border-radius: 0 0 14px 14px;
+  background: #ffffff;
+}
+
+.admin-container .admin-top-bar {
+  min-height: 48px;
+  padding: 8px 24px;
+  border: 0;
+  background: #e2e7e1;
+}
+
+.admin-container .admin-top-bar h2 {
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.admin-container .admin-tab-content {
+  background: #ffffff;
+  color: var(--hud-text-primary);
+}
+
+.admin-container .section-header {
+  padding-bottom: 0;
+  border: 0;
+}
+
+.admin-container .section-header h1,
+.admin-container .section-header h3 {
+  font-size: 1.55rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-container .subtitle,
+.admin-container .brand-about,
+.admin-container .admin-category-card p,
+.admin-container .service-card-body p,
+.admin-container .staff-role,
+.admin-container .admin-calendar-filter,
+.admin-container .admin-calendar-legend-item {
+  color: #526057;
+  font-size: 0.9rem;
+}
+
+.admin-container .primary-action-btn,
+.admin-container .save-submit-btn,
+.admin-container .admin-calendar-modal-done {
+  min-height: 42px;
+  border-color: #587a68;
+  border-radius: 2px;
+  background: #587a68;
+  color: #ffffff;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.admin-container .primary-action-btn:hover,
+.admin-container .save-submit-btn:hover,
+.admin-container .admin-calendar-modal-done:hover {
+  border-color: #3e6350;
+  background: #3e6350;
+  color: #ffffff;
+  transform: none;
+}
+
+.admin-container .admin-brand-card,
+.admin-container .admin-category-card,
+.admin-container .admin-service-card,
+.admin-container .staff-account-card,
+.admin-container .staff-column,
+.admin-container .admin-global-calendar,
+.admin-container .admin-global-day-view,
+.admin-container .table-responsive-wrapper {
+  border-color: #d9dfd8;
+  border-radius: 3px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.admin-container .admin-brand-card.clickable:hover,
+.admin-container .admin-category-card.clickable:hover,
+.admin-container .admin-service-card.clickable:hover {
+  transform: translateY(-1px);
+  border-color: #9dad9e !important;
+  background: #f4f6f3;
+  box-shadow: none;
+}
+
+.admin-container .admin-modal-backdrop {
+  background: rgba(27, 33, 29, 0.58);
+}
+
+.admin-container .admin-modal-box {
+  border-color: #d9dfd8;
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 18px 54px rgba(25, 33, 28, 0.18);
+}
+
+.admin-container .admin-form input,
+.admin-container .admin-form select,
+.admin-container .admin-form textarea,
+.admin-container .calendar-modal-field input,
+.admin-container .admin-calendar-filter select,
+.admin-container .admin-calendar-day-nav input,
+.admin-container .services-brand-filter select,
+.admin-container .categories-brand-filter select,
+.admin-container .ledger-brand-filter select,
+.admin-container .status-select,
+.admin-container .brand-select {
+  min-height: 42px;
+  border-color: #c9d1c9;
+  border-radius: 2px;
+  background: #ffffff;
+  color: #202722;
+  font-size: 1rem;
+}
+
+.admin-container button:focus-visible,
+.admin-container a:focus-visible,
+.admin-container input:focus-visible,
+.admin-container select:focus-visible,
+.admin-container textarea:focus-visible {
+  outline: 2px solid #587a68;
+  outline-offset: 3px;
+}
+
+.admin-container .status-pill,
+.admin-container .ledger-status {
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+.admin-container .admin-calendar-weekdays,
+.admin-container .admin-ledger-table th,
+.admin-container .staff-table-interactive th {
+  color: #566159;
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media (max-width: 768px) {
+  .admin-container .admin-main {
+    min-height: 100vh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .admin-container .admin-top-bar {
+    min-height: 56px;
+    padding: 8px 16px;
+  }
+
+  .admin-container .admin-tab-content {
+    padding: 20px 16px 32px;
+  }
+}
+
+.admin-theme-root[data-theme="light"] {
+  color-scheme: light;
+  --theme-selector-border: #c9d1c9;
+  --theme-selector-bg: #ffffff;
+  --theme-selector-text: #39433b;
+  --theme-selector-hover-bg: #edf1ec;
+  --theme-selector-active-bg: #d5ded5;
+  --theme-selector-active-text: #202722;
+  --theme-selector-focus: #587a68;
+  --workspace-ground: #e9ece7;
+  --workspace-surface: #ffffff;
+  --workspace-border: #d9dfd8;
+  --workspace-ink: #202722;
+  --workspace-muted: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .admin-modal-backdrop,
+.admin-theme-root[data-theme="light"] .admin-calendar-modal-backdrop {
+  background: rgba(27, 33, 29, 0.58);
+}
+
+.admin-theme-root[data-theme="light"] .admin-modal-box,
+.admin-theme-root[data-theme="light"] .admin-calendar-details-modal {
+  border: 1px solid var(--workspace-border);
+  border-radius: 4px;
+  background: var(--workspace-surface);
+  color: var(--workspace-ink);
+  box-shadow: 0 18px 54px rgba(25, 33, 28, 0.18);
+}
+
+.admin-theme-root[data-theme="light"] .admin-modal-box .save-submit-btn,
+.admin-theme-root[data-theme="light"] .admin-calendar-modal-done {
+  border-color: #587a68;
+  background: #587a68;
+  color: #ffffff;
+}
+
+.admin-theme-root[data-theme="light"] .admin-modal-box h1,
+.admin-theme-root[data-theme="light"] .admin-modal-box h2,
+.admin-theme-root[data-theme="light"] .admin-modal-box h3,
+.admin-theme-root[data-theme="light"] .admin-modal-box h4,
+.admin-theme-root[data-theme="light"] .admin-calendar-details-modal h2 {
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="light"] .admin-form label,
+.admin-theme-root[data-theme="light"] .admin-calendar-details-list dt,
+.admin-theme-root[data-theme="light"] .service-card-title,
+.admin-theme-root[data-theme="light"] .staff-card-title,
+.admin-theme-root[data-theme="light"] .empty-text,
+.admin-theme-root[data-theme="light"] .loading-text {
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="light"] .admin-form input,
+.admin-theme-root[data-theme="light"] .admin-form select,
+.admin-theme-root[data-theme="light"] .admin-form textarea,
+.admin-theme-root[data-theme="light"] .read-only-field,
+.admin-theme-root[data-theme="light"] .brand-select-pill,
+.admin-theme-root[data-theme="light"] .service-staff-modal-box .workers-cards-container {
+  border-color: #c9d1c9;
+  background: #ffffff;
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="light"] .modal-close,
+.admin-theme-root[data-theme="light"] .admin-calendar-modal-close {
+  border-color: #c9d1c9;
+  background: #ffffff;
+  color: #39433b;
+}
+
+.admin-theme-root[data-theme="light"] .edit-toggle-btn,
+.admin-theme-root[data-theme="light"] .discard-cancel-btn,
+.admin-theme-root[data-theme="light"] .service-staff-modal-box .modal-actions-row .discard-cancel-btn {
+  border-color: #c9d1c9;
+  background: #edf1ec;
+  color: #39433b;
+}
+
+.admin-theme-root[data-theme="light"] .edit-toggle-btn:hover,
+.admin-theme-root[data-theme="light"] .discard-cancel-btn:hover {
+  background: #e2e7e1;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .brand-select-pill {
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .brand-select-pill.selected {
+  border-color: #587a68;
+  background: #587a68;
+  color: #ffffff;
+}
+
+.admin-theme-root[data-theme="light"] .staff-mini-card {
+  border-color: #d9dfd8;
+  background: #ffffff;
+}
+
+.admin-theme-root[data-theme="light"] .staff-mini-card.selected {
+  border-color: #587a68;
+  background: #edf3ee;
+}
+
+.admin-theme-root[data-theme="light"] .staff-card-avatar {
+  border-color: #d9dfd8;
+  background: #edf1ec;
+}
+
+.admin-theme-root[data-theme="light"] .staff-card-name {
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .card-status-tag.active {
+  background: #587a68;
+  color: #ffffff;
+}
+
+.admin-theme-root[data-theme="light"] .card-status-tag.inactive {
+  background: #edf1ec;
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .admin-global-calendar .calendar-month-bar,
+.admin-theme-root[data-theme="light"] .admin-global-calendar .calendar-month-bar h2 {
+  background: #e2e7e1;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .admin-global-calendar .month-nav-btn,
+.admin-theme-root[data-theme="light"] .admin-calendar-day-nav button {
+  border: 1px solid #c9d1c9;
+  background: #ffffff;
+  color: #39433b;
+}
+
+.admin-theme-root[data-theme="light"] .admin-global-calendar .month-nav-btn:hover,
+.admin-theme-root[data-theme="light"] .admin-calendar-day-nav button:hover {
+  border-color: #587a68;
+  color: #3e6350;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-staff-card {
+  border-color: #d9dfd8;
+  background: #ffffff;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-staff-card h4 {
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-staff-card .staff-role,
+.admin-theme-root[data-theme="light"] .admin-calendar-event-title,
+.admin-theme-root[data-theme="light"] .admin-calendar-event-status,
+.admin-theme-root[data-theme="light"] .admin-calendar-message {
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .category-meta {
+  border-color: #d9dfd8;
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-event {
+  border-color: #d9dfd8;
+  background: #f4f6f3;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-event.event-available {
+  background: #e8f0e8;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-event.event-unavailable {
+  background: #f2ece4;
+}
+
+.admin-theme-root[data-theme="light"] .admin-calendar-details-list > div {
+  border-color: #d9dfd8;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-brand-field,
+.admin-theme-root[data-theme="light"] .portfolio-image-actions,
+.admin-theme-root[data-theme="light"] .portfolio-image-copy h4,
+.admin-theme-root[data-theme="light"] .portfolio-layout-heading h4,
+.admin-theme-root[data-theme="light"] .portfolio-image-heading h4 {
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-brand-field select {
+  border-color: #c9d1c9;
+  background: #ffffff;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-brand-image-card,
+.admin-theme-root[data-theme="light"] .portfolio-layout-option,
+.admin-theme-root[data-theme="light"] .portfolio-image-card,
+.admin-theme-root[data-theme="light"] .portfolio-image-actions button {
+  border-color: #d9dfd8;
+  background: #ffffff;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-brand-image-preview,
+.admin-theme-root[data-theme="light"] .portfolio-image-card > img {
+  background: #edf1ec;
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-brand-image-copy p,
+.admin-theme-root[data-theme="light"] .portfolio-image-actions,
+.admin-theme-root[data-theme="light"] .portfolio-empty,
+.admin-theme-root[data-theme="light"] .portfolio-state {
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .service-sale-tag {
+  background: #c62828;
+  color: #fff;
+}
+
+.admin-theme-root[data-theme="light"] .admin-form .admin-switch {
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="light"] .admin-switch-track {
+  border-color: #aeb8ae;
+  background: #d9dfd8;
+}
+
+.admin-theme-root[data-theme="light"] .admin-switch-input:checked + .admin-switch-track {
+  border-color: #587a68;
+  background: #587a68;
+}
+
+.admin-theme-root[data-theme="light"] .admin-switch-input:focus-visible + .admin-switch-track {
+  outline-color: #587a68;
+}
+
+.admin-theme-root[data-theme="dark"] .service-sale-tag {
+  background: #ffe04a;
+  color: #111;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-form .admin-switch {
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-switch-track {
+  border-color: #667066;
+  background: #3b423b;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-switch-input:checked + .admin-switch-track {
+  border-color: #78957e;
+  background: #78957e;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-switch-input:focus-visible + .admin-switch-track {
+  outline-color: #a6c2aa;
+}
+
+.admin-theme-root .admin-form .admin-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.admin-theme-root .admin-switch-control {
+  position: relative;
+  display: block;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 24px;
+}
+
+.admin-theme-root .admin-switch-input {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.admin-theme-root .admin-switch-track {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #5c655d;
+  border-radius: 999px;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.admin-theme-root .admin-switch-track::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.admin-theme-root .admin-switch-input:checked + .admin-switch-track::after {
+  transform: translateX(20px);
+}
+
+.admin-theme-root .admin-switch-input:focus-visible + .admin-switch-track {
+  outline: 2px solid #8acbd0;
+  outline-offset: 2px;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-save-row > span {
+  color: #79552b;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-feedback {
+  color: #286542;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-feedback-error {
+  color: #8c3439;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-layout-option.selected {
+  border-color: #587a68;
+  box-shadow: 0 0 0 1px #587a68;
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .portfolio-layout-heading,
+.admin-theme-root[data-theme="light"] .portfolio-save-row,
+.admin-theme-root[data-theme="light"] .portfolio-image-actions button {
+  border-color: #d9dfd8;
+}
+
+.admin-theme-root[data-theme="light"] .accordion-category,
+.admin-theme-root[data-theme="light"] .accordion-content,
+.admin-theme-root[data-theme="light"] .service-row-item,
+.admin-theme-root[data-theme="light"] .category-icon-circle {
+  border-color: #d9dfd8;
+  background: #ffffff;
+}
+
+.admin-theme-root[data-theme="light"] .brand-group-title,
+.admin-theme-root[data-theme="light"] .category-header-text h3,
+.admin-theme-root[data-theme="light"] .service-row-title,
+.admin-theme-root[data-theme="light"] .service-row-price {
+  color: #202722;
+}
+
+.admin-theme-root[data-theme="light"] .brand-group-title,
+.admin-theme-root[data-theme="light"] .accordion-content,
+.admin-theme-root[data-theme="light"] .service-row-item {
+  border-color: #d9dfd8;
+}
+
+.admin-theme-root[data-theme="light"] .category-header-text p,
+.admin-theme-root[data-theme="light"] .service-duration-badge,
+.admin-theme-root[data-theme="light"] .empty-row {
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .accordion-header:hover,
+.admin-theme-root[data-theme="light"] .service-row-item.clickable-assign-row:hover {
+  background: #f4f6f3;
+  box-shadow: inset 3px 0 0 #587a68;
+}
+
+.admin-theme-root[data-theme="light"] .category-icon-circle,
+.admin-theme-root[data-theme="light"] .service-thumb-placeholder {
+  color: #526057;
+}
+
+.admin-theme-root[data-theme="light"] .category-tag,
+.admin-theme-root[data-theme="light"] .assign-btn-pill {
+  background: #587a68;
+  color: #ffffff;
+}
+
+.admin-theme-root[data-theme="light"] .admin-container .card-top-tags .brand-tag {
+  border-color: #cbd8ce;
+  background: #e8f0e8;
+  color: #294b37;
+  backdrop-filter: none;
+}
+
+.admin-theme-root[data-theme="light"] .staff-table-interactive th,
+.admin-theme-root[data-theme="light"] .staff-table-interactive td {
+  border-bottom-color: #d9dfd8;
+}
+
+.admin-theme-root[data-theme="light"] .brand-tag-table {
+  border-color: #cbd8ce;
+  background: #e8f0e8;
+  color: #294b37;
+}
+
+.admin-theme-root[data-theme="light"] .interactive-staff-row:hover {
+  background: #f4f6f3 !important;
+  box-shadow: inset 3px 0 0 #587a68;
+}
+
+.admin-theme-root[data-theme="dark"] {
+  color-scheme: dark;
+  --theme-selector-border: #454b45;
+  --theme-selector-bg: #202420;
+  --theme-selector-text: #c4cbc3;
+  --theme-selector-hover-bg: #303630;
+  --theme-selector-active-bg: #39443b;
+  --theme-selector-active-text: #f1f4f0;
+  --theme-selector-focus: #95b19b;
+  --workspace-ground: #171a17;
+  --workspace-surface: #202420;
+  --workspace-border: #394039;
+  --workspace-ink: #edf1ec;
+  --workspace-muted: #b0b9b0;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container {
+  --hud-bg-main: #171a17;
+  --hud-bg-surface: #202420;
+  --hud-bg-surface-hover: #282d28;
+  --hud-border-subtle: #394039;
+  --hud-border-active: #7d9983;
+  --hud-accent-cyan: #86a48d;
+  --hud-accent-green: #93a890;
+  --hud-text-primary: #edf1ec;
+  --hud-text-secondary: #d0d7cf;
+  --hud-text-muted: #aeb8ae;
+  background: var(--workspace-ground);
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .admin-sidebar,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-top-bar,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-main,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-tab-content {
+  border-color: var(--workspace-border);
+  background: var(--workspace-ground);
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .admin-main {
+  background: #1b1f1b;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .admin-tab-content {
+  background: #1b1f1b;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .nav-item {
+  color: #b0b9b0;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .nav-item:hover,
+.admin-theme-root[data-theme="dark"] .admin-container .nav-item.active {
+  background: #303831;
+  color: #f1f4f0;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container h1,
+.admin-theme-root[data-theme="dark"] .admin-container h2,
+.admin-theme-root[data-theme="dark"] .admin-container h3,
+.admin-theme-root[data-theme="dark"] .admin-container h4,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-top-bar h2,
+.admin-theme-root[data-theme="dark"] .admin-container .brand-logo-text {
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .subtitle,
+.admin-theme-root[data-theme="dark"] .admin-container .brand-about,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-category-card p,
+.admin-theme-root[data-theme="dark"] .admin-container .service-card-body p,
+.admin-theme-root[data-theme="dark"] .admin-container .staff-role,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-calendar-filter,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-calendar-legend-item,
+.admin-theme-root[data-theme="dark"] .admin-container .ledger-detail,
+.admin-theme-root[data-theme="dark"] .admin-container .role,
+.admin-theme-root[data-theme="dark"] .admin-container .password-mask {
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .admin-brand-card,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-category-card,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-service-card,
+.admin-theme-root[data-theme="dark"] .admin-container .staff-account-card,
+.admin-theme-root[data-theme="dark"] .admin-container .staff-column,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-global-calendar,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-global-day-view,
+.admin-theme-root[data-theme="dark"] .admin-container .table-responsive-wrapper,
+.admin-theme-root[data-theme="dark"] .admin-container .accordion-category {
+  border-color: var(--workspace-border);
+  background: var(--workspace-surface);
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .admin-brand-card.clickable:hover,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-category-card.clickable:hover,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-service-card.clickable:hover {
+  border-color: #667b69 !important;
+  background: #282d28;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .primary-action-btn,
+.admin-theme-root[data-theme="dark"] .admin-container .save-submit-btn,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-calendar-modal-done {
+  border-color: #78957e;
+  background: #78957e;
+  color: #101510;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container .admin-form input,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-form select,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-form textarea,
+.admin-theme-root[data-theme="dark"] .admin-container .calendar-modal-field input,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-calendar-filter select,
+.admin-theme-root[data-theme="dark"] .admin-container .admin-calendar-day-nav input,
+.admin-theme-root[data-theme="dark"] .admin-container .services-brand-filter select,
+.admin-theme-root[data-theme="dark"] .admin-container .categories-brand-filter select,
+.admin-theme-root[data-theme="dark"] .admin-container .ledger-brand-filter select,
+.admin-theme-root[data-theme="dark"] .admin-container .status-select,
+.admin-theme-root[data-theme="dark"] .admin-container .brand-select {
+  border-color: #485148;
+  background: #171a17;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-modal-backdrop,
+.admin-theme-root[data-theme="dark"] .admin-calendar-modal-backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-modal-box,
+.admin-theme-root[data-theme="dark"] .admin-calendar-details-modal {
+  border-color: var(--workspace-border);
+  background: var(--workspace-surface);
+  color: var(--workspace-ink);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.42);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-modal-box .save-submit-btn,
+.admin-theme-root[data-theme="dark"] .admin-calendar-modal-done {
+  border-color: #78957e;
+  background: #78957e;
+  color: #101510;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-modal-box h1,
+.admin-theme-root[data-theme="dark"] .admin-modal-box h2,
+.admin-theme-root[data-theme="dark"] .admin-modal-box h3,
+.admin-theme-root[data-theme="dark"] .admin-modal-box h4,
+.admin-theme-root[data-theme="dark"] .admin-calendar-details-modal h2,
+.admin-theme-root[data-theme="dark"] .admin-calendar-details-list dd {
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-form label,
+.admin-theme-root[data-theme="dark"] .admin-calendar-details-list dt,
+.admin-theme-root[data-theme="dark"] .staff-card-title,
+.admin-theme-root[data-theme="dark"] .empty-text {
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-modal-box input,
+.admin-theme-root[data-theme="dark"] .admin-modal-box select,
+.admin-theme-root[data-theme="dark"] .admin-modal-box textarea,
+.admin-theme-root[data-theme="dark"] .admin-modal-box .read-only-field,
+.admin-theme-root[data-theme="dark"] .brand-select-pill {
+  border-color: #485148;
+  background: #171a17;
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .modal-close,
+.admin-theme-root[data-theme="dark"] .admin-calendar-modal-close {
+  border-color: #485148;
+  background: #282d28;
+  color: #d0d7cf;
+}
+
+.admin-theme-root[data-theme="dark"] .edit-toggle-btn,
+.admin-theme-root[data-theme="dark"] .discard-cancel-btn,
+.admin-theme-root[data-theme="dark"] .service-staff-modal-box .modal-actions-row .discard-cancel-btn {
+  border-color: #485148;
+  background: #303630;
+  color: #d0d7cf;
+}
+
+.admin-theme-root[data-theme="dark"] .brand-select-pill.selected,
+.admin-theme-root[data-theme="dark"] .card-status-tag.active {
+  border-color: #78957e;
+  background: #78957e;
+  color: #101510;
+}
+
+.admin-theme-root[data-theme="dark"] .staff-mini-card,
+.admin-theme-root[data-theme="dark"] .admin-calendar-staff-card {
+  border-color: var(--workspace-border);
+  background: #252a25;
+  color: var(--workspace-ink);
+}
+
+.admin-theme-root[data-theme="dark"] .staff-mini-card.selected {
+  border-color: #78957e;
+  background: #2d392f;
+}
+
+.admin-theme-root[data-theme="dark"] .staff-card-name,
+.admin-theme-root[data-theme="dark"] .admin-calendar-staff-card h4 {
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-global-calendar .calendar-month-bar,
+.admin-theme-root[data-theme="dark"] .admin-global-calendar .calendar-month-bar h2,
+.admin-theme-root[data-theme="dark"] .admin-global-calendar .month-nav-btn,
+.admin-theme-root[data-theme="dark"] .admin-calendar-day-nav button {
+  border-color: var(--workspace-border);
+  background: #252a25;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-day {
+  border-color: var(--workspace-border);
+  background: #202420;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-day-number {
+  color: #d0d7cf;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-day-number.is-today,
+.admin-theme-root[data-theme="dark"] .admin-calendar-view-toggle button.active {
+  background: #39443b;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-weekdays,
+.admin-theme-root[data-theme="dark"] .admin-calendar-staff-card .staff-role,
+.admin-theme-root[data-theme="dark"] .admin-calendar-event-title,
+.admin-theme-root[data-theme="dark"] .admin-calendar-event-status,
+.admin-theme-root[data-theme="dark"] .admin-calendar-message {
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-event {
+  border-color: var(--workspace-border);
+  background: #171a17;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-event.event-available {
+  background: #202c22;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-calendar-event.event-unavailable {
+  background: #302725;
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-brand-field,
+.admin-theme-root[data-theme="dark"] .portfolio-image-actions,
+.admin-theme-root[data-theme="dark"] .portfolio-image-copy h4,
+.admin-theme-root[data-theme="dark"] .portfolio-layout-heading h4,
+.admin-theme-root[data-theme="dark"] .portfolio-image-heading h4,
+.admin-theme-root[data-theme="dark"] .brand-group-title {
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-brand-field select,
+.admin-theme-root[data-theme="dark"] .portfolio-brand-image-card,
+.admin-theme-root[data-theme="dark"] .portfolio-layout-option,
+.admin-theme-root[data-theme="dark"] .portfolio-image-card,
+.admin-theme-root[data-theme="dark"] .portfolio-image-actions button {
+  border-color: var(--workspace-border);
+  background: #252a25;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-brand-image-preview,
+.admin-theme-root[data-theme="dark"] .portfolio-image-card > img {
+  background: #171a17;
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-brand-image-copy p,
+.admin-theme-root[data-theme="dark"] .portfolio-empty,
+.admin-theme-root[data-theme="dark"] .portfolio-state {
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-feedback {
+  color: #9fcca7;
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-feedback-error {
+  color: #f0a4a4;
+}
+
+.admin-theme-root[data-theme="dark"] .portfolio-layout-heading,
+.admin-theme-root[data-theme="dark"] .portfolio-save-row,
+.admin-theme-root[data-theme="dark"] .portfolio-image-actions button,
+.admin-theme-root[data-theme="dark"] .brand-group-title,
+.admin-theme-root[data-theme="dark"] .accordion-content,
+.admin-theme-root[data-theme="dark"] .service-row-item {
+  border-color: var(--workspace-border);
+}
+
+.admin-theme-root[data-theme="dark"] .accordion-category,
+.admin-theme-root[data-theme="dark"] .accordion-content,
+.admin-theme-root[data-theme="dark"] .service-row-item,
+.admin-theme-root[data-theme="dark"] .category-icon-circle {
+  background: #252a25;
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .accordion-header:hover,
+.admin-theme-root[data-theme="dark"] .service-row-item.clickable-assign-row:hover {
+  background: #303831;
+  box-shadow: inset 3px 0 0 #78957e;
+}
+
+.admin-theme-root[data-theme="dark"] .category-header-text h3,
+.admin-theme-root[data-theme="dark"] .service-row-title,
+.admin-theme-root[data-theme="dark"] .service-row-price {
+  color: #edf1ec;
+}
+
+.admin-theme-root[data-theme="dark"] .category-header-text p,
+.admin-theme-root[data-theme="dark"] .service-duration-badge,
+.admin-theme-root[data-theme="dark"] .empty-row {
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .category-meta {
+  border-color: var(--workspace-border);
+  color: var(--workspace-muted);
+}
+
+.admin-theme-root[data-theme="dark"] .category-tag,
+.admin-theme-root[data-theme="dark"] .assign-btn-pill {
+  background: #78957e;
+  color: #101510;
+}
+
+.admin-theme-root[data-theme="dark"] .staff-table-interactive th,
+.admin-theme-root[data-theme="dark"] .staff-table-interactive td {
+  border-bottom-color: var(--workspace-border);
+}
+
+.admin-theme-root[data-theme="dark"] .brand-tag-table {
+  border-color: #4c5c4e;
+  background: #2d392f;
+  color: #d4e1d5;
+}
+
+.admin-theme-root[data-theme="dark"] .interactive-staff-row:hover {
+  background: #303831 !important;
+  box-shadow: inset 3px 0 0 #78957e;
+}
+
+.admin-theme-root[data-theme="dark"] .admin-container button:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-container a:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-container input:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-container select:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-container textarea:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-modal-box button:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-modal-box input:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-modal-box select:focus-visible,
+.admin-theme-root[data-theme="dark"] .admin-modal-box textarea:focus-visible {
+  outline-color: #95b19b;
 }
