@@ -10,10 +10,10 @@ Gabv2 is a multi-brand booking system for the Gabbablu beauty studio and Amor Ta
 - `frontend/src/services/api.js` is the shared fetch/API client. Reuse it for frontend requests and keep multipart uploads consistent with its existing upload methods.
 - `backend/src/routes/` maps Express endpoints to `controllers/`; `middleware/` owns authentication, role checks and upload filtering. Backend modules use CommonJS.
 - `backend/src/config/db.js` wraps the PostgreSQL pool. Use parameterized SQL through `db.query`; keep database access in controllers.
-- `database/init.sql` defines the PostgreSQL schema, including catalog, staff assignments, appointments, recurring schedules and one-off unavailabilities. `database/seed_db.py` seeds roles, brands and an initial admin.
+- `database/init.sql` defines the PostgreSQL schema, including catalog, staff assignments, appointments, date-specific staff availability and one-off unavailabilities. `database/seed_db.py` seeds roles, brands and an initial admin using explicit environment credentials.
 - `uploads/` holds processed media served by the backend. Frontend assets and brand portfolios live in `frontend/public/`.
 
-The frontend README is the standard Create React App guide, not a product specification. There is no backend test suite yet; the current frontend test is still the Create React App starter test.
+The frontend README is the standard Create React App guide, not a product specification. The backend has a `node:test` suite with opt-in PostgreSQL integration coverage; the frontend has a Jest/React Testing Library suite.
 
 ## Development Commands
 
@@ -23,9 +23,9 @@ Run commands from the indicated directory:
 - Backend: `npm run dev` in `backend/` (or `npm start`). Configure database/JWT values in `backend/.env`; do not commit or expose secrets.
 - Frontend: `npm start` in `frontend/`; set `REACT_APP_API_URL` in `frontend/.env` when the API is not at its default local URL.
 - Frontend production build: `npm run build` in `frontend/`.
-- Frontend tests: `npm test -- --watchAll=false` in `frontend/`. Replace the starter test with behavior-focused tests as features are implemented.
-- Seed a local database: install `database/requirements.txt`, then run `python database/seed_db.py` from the repository root. The Compose database initialization script runs only when PostgreSQL initializes an empty data volume; avoid deleting that volume unless its data can be discarded.
-- `npm test` in `backend/` is a placeholder that exits with an error; do not report it as a functioning test suite.
+- Frontend tests: `npm test -- --watchAll=false` in `frontend/`; add behavior-focused tests as features are implemented.
+- Seed a local database: set `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `ADMIN_USERNAME`, and an `ADMIN_PASSWORD` of at least 12 characters, install `database/requirements.txt`, then run `python database/seed_db.py` from the repository root. The Compose database initialization script runs only when PostgreSQL initializes an empty data volume; avoid deleting that volume unless its data can be discarded.
+- Backend tests: `npm test` in `backend/`; PostgreSQL overlap integration tests require a disposable `BOOKING_TEST_DATABASE_URL` (see `database/MIGRATIONS.md`).
 
 ## Current Gaps and Development Roadmap
 
@@ -58,8 +58,12 @@ Treat these as a working backlog, not claims that a feature is already implement
 
 - [ ] Replace the starter test with frontend workflow coverage and add backend test infrastructure; include database-backed integration coverage for critical booking paths.
 - [ ] Validate request schemas and consistent error responses, review authentication/token storage and customer sensitive-data handling, and move development credentials out of tracked defaults.
-- [ ] Make schema changes repeatable for existing databases (migrations or a documented migration process); `init.sql` alone only initializes a fresh Compose volume.
-- [ ] Document deployment configuration, backups, logging and operational recovery before using real customer data.
+- [x] Track numbered schema migrations with checksums and transactional application; `init.sql` remains a fresh-volume baseline only.
+- [x] Add separate production containers, startup/readiness checks, persistent data volumes, and a deployment/recovery runbook.
+- [x] Add CI coverage for backend/frontend/mobile tests and builds, Expo diagnostics, Compose migrations, and container health.
+- [x] Add Expo Android/iOS customer catalog, booking, and account flows; device/store release checks remain outstanding.
+- [ ] Resolve the current high-severity Expo CLI dependency advisories with an SDK-compatible upstream patch before native store release.
+- [ ] Configure production hosting/TLS, backups/restore drills, monitoring, rate limits, customer-data policy, and verified provider credentials.
 
 ## Working Practices
 

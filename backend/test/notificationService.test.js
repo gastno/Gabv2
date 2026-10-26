@@ -70,9 +70,11 @@ test('notification content describes the correct event using the studio timezone
   assert.match(transition.text, /pending to confirmed/);
 });
 
-test('Resend delivery fails explicitly without configuration and sends with a stable idempotency key', async () => {
+test('Resend SDK delivery requires configuration and sends with a stable idempotency key', async () => {
   await assert.rejects(
-    sendWithResend(notification, {}, async () => { throw new Error('Provider must not be called.'); }),
+    sendWithResend(notification, {}, { emails: { send: async () => {
+      throw new Error('Provider must not be called.');
+    } } }),
     error => error instanceof NotificationConfigurationError
   );
 
@@ -80,14 +82,37 @@ test('Resend delivery fails explicitly without configuration and sends with a st
   const response = await sendWithResend(notification, {
     RESEND_API_KEY: 'test-key',
     RESEND_FROM_EMAIL: 'appointments@example.com',
-  }, async (url, options) => {
-    request = { url, options };
-    return { ok: true, json: async () => ({ id: 'provider-message-1' }) };
-  });
-  assert.equal(request.url, 'https://api.resend.com/emails');
-  assert.equal(request.options.headers['Idempotency-Key'], notification.event_key);
-  assert.equal(JSON.parse(request.options.body).to[0], notification.email);
+  }, { emails: { send: async (payload, options) => {
+    request = { payload, options };
+    return { data: { id: 'provider-message-1' }, error: null };
+  } } });
+  assert.equal(request.payload.to[0], notification.email);
+  assert.equal(request.payload.from, 'appointments@example.com');
+  assert.equal(request.options.idempotencyKey, notification.event_key);
   assert.deepEqual(response, { id: 'provider-message-1' });
+});
+
+test('Resend SDK delivery surfaces provider errors and their status for retry decisions', async () => {
+  await assert.rejects(
+    sendWithResend(notification, {
+      RESEND_API_KEY: 'test-key',
+      RESEND_FROM_EMAIL: 'appointments@example.com',
+    }, { emails: { send: async () => ({
+      data: null,
+      error: { message: 'Rate limit exceeded.', statusCode: 429 },
+    }) } }),
+    error => error.message === 'Rate limit exceeded.' && error.status === 429
+  );
+});
+
+test('Resend SDK delivery rejects a success response without a message ID', async () => {
+  await assert.rejects(
+    sendWithResend(notification, {
+      RESEND_API_KEY: 'test-key',
+      RESEND_FROM_EMAIL: 'appointments@example.com',
+    }, { emails: { send: async () => ({ data: null, error: null }) } }),
+    /did not return a message ID/
+  );
 });
 
 test('delivery claims each queued event once and records the provider outcome', async () => {

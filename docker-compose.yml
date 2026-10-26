@@ -2,17 +2,22 @@ services:
 
   postgres_db:
     image: postgres:16-alpine
-    container_name: appointment_system_db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: appointment_db
       POSTGRES_USER: db_user
       POSTGRES_PASSWORD: db_password_123
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   postgres_data:

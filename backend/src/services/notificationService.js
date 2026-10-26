@@ -1,3 +1,5 @@
+const { Resend } = require('resend');
+
 const MAX_ATTEMPTS = 6;
 const MAX_IDEMPOTENCY_AGE_MS = 23 * 60 * 60 * 1000;
 
@@ -24,43 +26,28 @@ const buildEmail = notification => {
   };
 };
 
-const sendWithResend = async (notification, environment = process.env, fetchImpl = global.fetch) => {
+const sendWithResend = async (notification, environment = process.env, resendClient) => {
   if (!environment.RESEND_API_KEY || !environment.RESEND_FROM_EMAIL) {
     throw new NotificationConfigurationError('Email notification provider is not configured.');
   }
-  if (typeof fetchImpl !== 'function') {
-    throw new Error('Email delivery is unavailable in this runtime.');
-  }
+  const resend = resendClient || new Resend(environment.RESEND_API_KEY);
   const email = buildEmail(notification);
-  const abortController = new AbortController();
-  const timeout = setTimeout(() => abortController.abort(), 10_000);
-  try {
-    const response = await fetchImpl('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${environment.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Idempotency-Key': notification.event_key,
-      },
-      body: JSON.stringify({
-        from: environment.RESEND_FROM_EMAIL,
-        to: [notification.email],
-        subject: email.subject,
-        text: email.text,
-      }),
-      signal: abortController.signal,
-    });
-    if (!response.ok) {
-      const error = new Error(`Email provider returned HTTP ${response.status}.`);
-      error.status = response.status;
-      throw error;
-    }
-    const result = await response.json();
-    if (!result?.id) throw new Error('Email provider did not return a message ID.');
-    return { id: result.id };
-  } finally {
-    clearTimeout(timeout);
+  const { data, error } = await resend.emails.send({
+    from: environment.RESEND_FROM_EMAIL,
+    to: [notification.email],
+    subject: email.subject,
+    text: email.text,
+  }, {
+    idempotencyKey: notification.event_key,
+  });
+
+  if (error) {
+    const deliveryError = new Error(error.message || 'Email provider request failed.');
+    deliveryError.status = error.statusCode;
+    throw deliveryError;
   }
+  if (!data?.id) throw new Error('Email provider did not return a message ID.');
+  return { id: data.id };
 };
 
 const enqueueDueReminders = async (database, now = new Date()) => {

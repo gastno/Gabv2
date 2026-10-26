@@ -40,6 +40,11 @@ jest.mock("../services/api", () => ({
     customerClerkCompleteProfile: jest.fn(),
     getMe: jest.fn(),
   },
+  notificationApi: {
+    list: () => Promise.resolve({ notifications: [], unread_count: 0 }),
+    markRead: jest.fn(),
+    markAllRead: jest.fn(),
+  },
 }));
 
 function renderSignIn(initialEntry = "/customer/sign-in") {

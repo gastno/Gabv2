@@ -112,7 +112,7 @@ describe("AdminDashboard staff service modal", () => {
   it("applies the persisted theme to the admin workspace and its dialogs", async () => {
     render(<AdminDashboard />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Dark" }));
+    fireEvent.click(screen.getByRole("button", { name: "Switch to dark mode" }));
 
     const themeRoot = document.querySelector(".admin-theme-root");
     expect(themeRoot).toHaveAttribute("data-theme", "dark");

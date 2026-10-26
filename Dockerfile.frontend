@@ -1,0 +1,16 @@
+FROM node:24-alpine AS build
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend/ ./
+ARG REACT_APP_API_URL
+ENV REACT_APP_API_URL=${REACT_APP_API_URL}
+RUN node -e "const value = process.env.REACT_APP_API_URL; let url; try { url = new URL(value); } catch { throw new Error('REACT_APP_API_URL must be an absolute HTTPS API URL ending in /api.'); } if (url.protocol !== 'https:' || !url.pathname.endsWith('/api')) throw new Error('REACT_APP_API_URL must be an absolute HTTPS API URL ending in /api.');"
+RUN npm run build
+
+FROM nginxinc/nginx-unprivileged:1.28-alpine AS runtime
+COPY deploy/nginx.conf /etc/nginx/nginx.conf
+COPY --from=build --chown=101:101 /app/frontend/build /usr/share/nginx/html
+EXPOSE 8080
+HEALTHCHECK --interval=20s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1

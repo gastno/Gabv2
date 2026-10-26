@@ -2,6 +2,12 @@
 
 PostgreSQL runs as Docker Compose service `postgres_db` and stores data in a persistent volume. Never remove that volume to apply a schema change.
 
+## Tracked migration runner
+
+Use `npm run migrate --prefix backend` for local databases or the `migrate` service in `compose.production.yml` for deployment. The runner applies numbered files from `database/migrations/` in lexical order, records each file's checksum in `schema_migrations`, serializes concurrent runners with an advisory lock, and applies each file plus its tracking row in one transaction. It recognizes the current `init.sql` schema as a fresh baseline and records the existing migration checksums without replaying legacy-only checks. Once a migration has been applied, do not edit it; create a new numbered migration. Back up production data and review the migration-specific preflight notes before applying changes.
+
+The runner can adopt a database whose migrations were previously run manually if those files are safe to rerun. It deliberately reports preflight/data-integrity errors instead of bypassing them. `database/init.sql` remains the one-time initializer for a new empty volume; it is not an upgrade path for an existing volume.
+
 ## Booking Integrity Migration
 
 Apply `migrations/001_booking_integrity.sql` to an existing installation before deploying the booking API changes. Back up the database first, review its preflight findings, and run it during a maintenance window: timestamp type changes and exclusion/index creation can lock tables.
@@ -84,7 +90,7 @@ Get-Content -Raw database/migrations/009_promotional_pricing_notifications.sql |
 
 Service `sale_price_isk` is nullable and must be non-negative and lower than the regular `price_isk`. Public service reads omit inactive services; authenticated staff and admins can read inactive entries for administration. Booking always reads current prices from PostgreSQL, rejects inactive services, and snapshots the sale price when set (otherwise the regular price) into the existing `appointments.price_snapshot_isk`.
 
-Registered customers can change their email-notification preference and read their own notification history with the authenticated customer API. Email is opt-in and requires a verified deployment/provider configuration. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the backend environment; never place the key in source control. The worker uses Resend's email API and an event-specific idempotency key, records provider errors, and retries transient delivery failures a bounded number of times. If delivery configuration is missing, queued events are marked failed rather than reported as sent.
+Registered customers can change their email-notification preference and read their own notification history with the authenticated customer API. Email is opt-in and requires a verified sender domain. Configure `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in the backend environment; set the sender to an address on that verified domain and never place the key in source control. The worker uses the Resend Node.js SDK and an event-specific idempotency key, records provider errors, and retries transient delivery failures a bounded number of times. If delivery configuration is missing, queued events are marked failed rather than reported as sent.
 
 Appointment status-transition events are inserted in the same database transaction as the successful status change. A scheduled worker scans upcoming appointments and inserts a single 24-hour reminder event per appointment; database uniqueness and row locking make scans safe across multiple API processes. Run the worker as part of the backend process after applying the migration. Delivery is asynchronous; the customer notification history reports queued, sent, failed, or skipped state.
 

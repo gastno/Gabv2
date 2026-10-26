@@ -1,17 +1,22 @@
 // src/config/db.js
 const { Pool } = require('pg');
 require('dotenv').config();
+const { parsePoolSize } = require('./environment');
 
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT) || 5432,
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 30000,
+  max: parsePoolSize(process.env.DB_POOL_MAX),
 });
 
 const createDatabase = poolInstance => ({
   query: (text, params) => poolInstance.query(text, params),
+  end: () => poolInstance.end(),
   withTransaction: async callback => {
     const client = await poolInstance.connect();
     try {

@@ -76,6 +76,9 @@ function Footer() {
         </div>
         <div className="site-footer-divider" />
         <p className="site-footer-text">{t("footer.description")}</p>
+        <a className="site-footer-staff-link" href="/staff-login">
+          Staff
+        </a>
       </div>
     </footer>
   );

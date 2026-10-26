@@ -1,0 +1,138 @@
+services:
+  postgres_db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - backend
+
+  api:
+    image: gabv2-backend:production
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres_db
+      DB_NAME: ${POSTGRES_DB:?Set POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      DB_PASSWORD_FILE: /run/secrets/postgres_password
+      DB_PORT: 5432
+      DB_POOL_MAX: ${DB_POOL_MAX:-10}
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      CORS_ORIGINS: ${CORS_ORIGINS:?Set CORS_ORIGINS to HTTPS web origins}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:-}
+      CLERK_ISSUER: ${CLERK_ISSUER:-}
+      CLERK_AUTHORIZED_PARTIES: ${CLERK_AUTHORIZED_PARTIES:-}
+    secrets:
+      - postgres_password
+      - jwt_secret
+    ports:
+      - "${API_BIND_ADDRESS:-127.0.0.1}:${API_PORT:-5000}:5000"
+    volumes:
+      - appointment_uploads:/app/uploads
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5000/health/ready').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - backend
+
+  migrate:
+    image: gabv2-backend:production
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    profiles:
+      - maintenance
+    command: ["node", "src/scripts/migrate.js"]
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      DB_HOST: postgres_db
+      DB_NAME: ${POSTGRES_DB:?Set POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      DB_PASSWORD_FILE: /run/secrets/postgres_password
+      DB_PORT: 5432
+    secrets:
+      - postgres_password
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - backend
+
+  web:
+    image: gabv2-frontend:production
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        REACT_APP_API_URL: ${PUBLIC_API_URL:?Set PUBLIC_API_URL to an HTTPS URL ending in /api}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    ports:
+      - "${WEB_BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres_data:
+  appointment_uploads:
+
+networks:
+  backend:
+
+secrets:
+  postgres_password:
+    file: ${POSTGRES_PASSWORD_FILE:?Set POSTGRES_PASSWORD_FILE to a protected file path}
+  jwt_secret:
+    file: ${JWT_SECRET_FILE:?Set JWT_SECRET_FILE to a protected file path}

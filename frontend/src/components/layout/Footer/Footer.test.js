@@ -25,4 +25,8 @@ test("renders the studio social links and legal pages", () => {
     "href",
     "/cookie-settings"
   );
+  expect(screen.getByRole("link", { name: "Staff" })).toHaveAttribute(
+    "href",
+    "/staff-login"
+  );
 });

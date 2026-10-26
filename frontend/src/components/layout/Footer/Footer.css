@@ -117,6 +117,25 @@
   font-size: 1rem;
 }
 
+.site-footer-staff-link {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--hud-text-secondary, #d8ddd6);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.site-footer-staff-link:hover,
+.site-footer-staff-link:focus-visible {
+  color: var(--hud-text-primary, #f4f3ef);
+}
+
+.site-footer-staff-link:focus-visible {
+  outline: 2px solid var(--hud-accent-cyan, #75bbc1);
+  outline-offset: 4px;
+}
+
 @media (max-width: 768px) {
   .site-footer {
     padding: 28px 20px;

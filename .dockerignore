@@ -1,0 +1,16 @@
+.git
+.agents
+.claude
+.github
+.vscode
+**/node_modules
+**/build
+**/coverage
+**/.expo
+**/dist
+**/.env
+**/.env.*
+**/npm-debug.log*
+uploads
+mobile
+postman

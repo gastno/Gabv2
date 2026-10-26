@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test",
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "migrate": "node src/scripts/migrate.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.4.0",
     "pg": "^8.23.0",
+    "resend": "^6.34.1",
     "sharp": "^0.35.4",
     "uuid": "^14.0.2"
   },

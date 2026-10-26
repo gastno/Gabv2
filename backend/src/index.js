@@ -1,50 +1,73 @@
-const express = require('express');
-const cors = require('cors');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../.env.local') });
 require('dotenv').config();
 
-const authRoutes = require('./routes/authRoutes');
-const apptRoutes = require('./routes/apptRoutes');
-const staffRoutes = require('./routes/staffRoutes');
-const staffAvailabilityRoutes = require('./routes/staffAvailabilityRoutes');
-const staffServicesRoutes = require('./routes/staffServicesRoutes');
-const brandRoutes = require('./routes/brandRoutes');
-const serviceRoutes = require('./routes/serviceRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const notificationRoutes = require('./routes/notificationRoutes');
-const customerNotificationRoutes = require('./routes/customerNotificationRoutes');
+const { loadConfig } = require('./config/environment');
+const config = loadConfig();
+process.env.DB_PASSWORD = config.db.password;
+process.env.JWT_SECRET = config.jwtSecret;
+process.env.DB_POOL_MAX = String(config.db.max);
+const database = require('./config/db');
+const { createApp } = require('./app');
 const { startNotificationWorker } = require('./services/notificationService');
+const app = createApp({ database, config });
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+const start = async () => {
+  try {
+    await database.query('SELECT 1');
+  } catch (error) {
+    console.error('API startup failed: database is unavailable.', error.message);
+    try {
+      await database.end();
+    } catch (shutdownError) {
+      console.error('Database pool shutdown failed:', shutdownError.message);
+    }
+    process.exitCode = 1;
+    return null;
+  }
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+  const server = app.listen(config.port, () => {
+    console.log(`API listening on port ${config.port}`);
+  });
+  const stopNotificationWorker = startNotificationWorker(database);
+  let shuttingDown = false;
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/appointments', apptRoutes);
-app.use('/api/staff', staffRoutes);
-app.use('/api/staff-availability', staffAvailabilityRoutes);
-app.use('/api/staffservices', staffServicesRoutes);
-app.use('/api/brands', brandRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/customers/notifications', customerNotificationRoutes);
+  const shutdown = signal => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`Received ${signal}; shutting down.`);
+    stopNotificationWorker();
 
-// Serve static assets from <root>/uploads
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+    const forceShutdown = setTimeout(() => {
+      console.error('Graceful shutdown timed out.');
+      process.exit(1);
+    }, 10000);
+    forceShutdown.unref();
 
-// Health Check
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date() });
-});
+    server.close(async error => {
+      if (error) {
+        console.error('HTTP server shutdown failed:', error.message);
+        process.exitCode = 1;
+      }
+      try {
+        await database.end();
+      } catch (databaseError) {
+        console.error('Database pool shutdown failed:', databaseError.message);
+        process.exitCode = 1;
+      }
+      clearTimeout(forceShutdown);
+    });
+  };
 
-app.listen(PORT, () => {
-  console.log(`🚀 API Server running on http://localhost:${PORT}`);
-});
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
+  server.once('error', error => {
+    console.error('HTTP server failed:', error.message);
+    process.exitCode = 1;
+  });
+  return server;
+};
 
-startNotificationWorker(require('./config/db'));
+if (require.main === module) void start();
+
+module.exports = { app, start };
