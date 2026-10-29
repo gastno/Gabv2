@@ -98,6 +98,7 @@ function AdminDashboard() {
 
   const [newStaff, setNewStaff] = useState({
     userId: "",
+    email: "",
     password: "",
     name: "",
     description: "",
@@ -436,6 +437,7 @@ function AdminDashboard() {
         const response = await staffApi.create({
           username: newStaff.userId,
           userId: newStaff.userId,
+          email: newStaff.email,
           password: newStaff.password,
           full_name: newStaff.name,
           name: newStaff.name,
@@ -457,6 +459,7 @@ function AdminDashboard() {
       setCreateAvatarFile(null);
       setNewStaff({
         userId: "",
+        email: "",
         password: "",
         name: "",
         description: "",
@@ -492,6 +495,7 @@ function AdminDashboard() {
           description_is: tempInspectStaff.description_is,
           userId: tempInspectStaff.userId,
           username: tempInspectStaff.userId,
+          email: tempInspectStaff.email,
           password: tempInspectStaff.password,
           brand_ids: brandIdsToSave,
         });

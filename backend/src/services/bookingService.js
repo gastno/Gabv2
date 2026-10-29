@@ -1,3 +1,5 @@
+const { enqueueStaffBooking } = require('./notificationService');
+
 class BookingError extends Error {
   constructor(message, status) {
     super(message);
@@ -11,6 +13,7 @@ const createBooking = (database, booking) => database.withTransaction(async clie
     FROM services s
     JOIN staff_services ss ON ss.service_id = s.id
     JOIN staff st ON st.id = ss.staff_id
+    JOIN roles staff_role ON staff_role.id = st.role_id AND staff_role.name = 'staff'
     JOIN staff_brands sb ON sb.staff_id = st.id AND sb.brand_id = s.brand_id
     WHERE s.id = $1
       AND s.brand_id = $2
@@ -43,7 +46,8 @@ const createBooking = (database, booking) => database.withTransaction(async clie
              $1::timestamptz AT TIME ZONE 'Atlantic/Reykjavik' AS local_start,
               ($1::timestamptz + make_interval(mins => $3)) AT TIME ZONE 'Atlantic/Reykjavik' AS local_end
     )
-    SELECT EXISTS (
+    SELECT booking_window.local_start::date > (NOW() AT TIME ZONE 'Atlantic/Reykjavik')::date AS booking_date_allowed,
+      EXISTS (
       SELECT 1
       FROM staff_availabilities availability
       CROSS JOIN requested booking_window
@@ -69,7 +73,12 @@ const createBooking = (database, booking) => database.withTransaction(async clie
             AND existing.end_time > booking_window.start_time
         )
     ) AS available
+    FROM requested booking_window
   `, [booking.startTime, booking.staffId, durationMinutes]);
+
+  if (!availabilityResult.rows[0]?.booking_date_allowed) {
+    throw new BookingError('Bookings must be made by 23:59 Iceland time on the day before the appointment; same-day bookings are not accepted.', 400);
+  }
 
   if (!availabilityResult.rows[0]?.available) {
     throw new BookingError('The selected time is not available in the staff schedule.', 409);
@@ -136,6 +145,7 @@ const createBooking = (database, booking) => database.withTransaction(async clie
   ]);
 
   const appointment = appointmentResult.rows[0];
+  await enqueueStaffBooking(client, { ...appointment, staff_id: booking.staffId });
   const referenceImages = [];
   for (const image of booking.referenceImages || []) {
     const imageResult = await client.query(`

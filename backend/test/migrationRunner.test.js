@@ -98,3 +98,45 @@ test('migration runner recognizes the latest init.sql baseline without replaying
     fs.rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test('migration runner upgrades the previous baseline without replaying its migrations', async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'gabv2-migrations-'));
+  fs.writeFileSync(path.join(directory, '010_notification_read_state.sql'), 'SELECT 10;\n');
+  fs.writeFileSync(path.join(directory, '011_staff_booking_notifications.sql'), 'SELECT 11;\n');
+  const versions = new Map();
+  const statements = [];
+  const database = {
+    query: async sql => {
+      statements.push(sql.trim());
+      return { rows: [] };
+    },
+    withTransaction: callback => callback({
+      query: async (sql, params = []) => {
+        statements.push(sql.trim());
+        if (sql.includes('SELECT version FROM schema_migrations')) return { rows: [] };
+        if (sql.includes('SELECT checksum FROM schema_migrations')) {
+          const checksum = versions.get(params[0]);
+          return { rows: checksum ? [{ checksum }] : [] };
+        }
+        if (sql.includes('AS has_staff_appointment_notifications')) {
+          return { rows: [{
+            is_current_baseline: true,
+            has_staff_appointment_notifications: false,
+          }] };
+        }
+        if (sql.includes('INSERT INTO schema_migrations')) versions.set(params[0], params[1]);
+        return { rows: [] };
+      },
+    }),
+  };
+
+  try {
+    assert.deepEqual(await applyMigrations(database, directory), ['011_staff_booking_notifications.sql']);
+    assert.equal(versions.has('010_notification_read_state.sql'), true);
+    assert.equal(versions.has('011_staff_booking_notifications.sql'), true);
+    assert.ok(!statements.includes('SELECT 10;'));
+    assert.ok(statements.includes('SELECT 11;'));
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});

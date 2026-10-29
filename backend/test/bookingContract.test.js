@@ -10,7 +10,7 @@ const validRequest = () => ({
   email: ' customer@example.com ',
   phone_number: '+354 555 1234',
   kennitala: '010190-1234',
-  start_time: '2026-10-01T10:00:00Z',
+  start_time: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) + 'T10:00:00Z',
   consent_privacy: true,
 });
 
@@ -24,7 +24,7 @@ test('accepts a well-formed guest request and normalizes identity', () => {
   assert.equal(result.error, undefined);
   assert.equal(result.value.kennitala, '010190-1234');
   assert.equal(result.value.email, 'customer@example.com');
-  assert.equal(result.value.startTime.toISOString(), '2026-10-01T10:00:00.000Z');
+  assert.equal(result.value.startTime.toISOString(), new Date(validRequest().start_time).toISOString());
 });
 
 test('accepts multipart booking fields and decodes custom options', () => {
@@ -69,6 +69,23 @@ test('rejects timestamps without offsets and invalid calendar dates', () => {
   }
 });
 
+test('rejects same-day bookings using the Iceland-local appointment date', () => {
+  const now = new Date('2026-10-29T23:59:00Z');
+
+  assert.match(validateBookingRequest({
+    ...validRequest(),
+    start_time: '2026-10-29T23:59:59Z',
+  }, null, now).error, /same-day bookings are not accepted/i);
+  assert.equal(validateBookingRequest({
+    ...validRequest(),
+    start_time: '2026-10-30T00:00:00Z',
+  }, null, now).error, undefined);
+  assert.match(validateBookingRequest({
+    ...validRequest(),
+    start_time: '2026-10-30T00:30:00+02:00',
+  }, null, now).error, /same-day bookings are not accepted/i);
+});
+
 test('does not use client-supplied duration or price as authoritative values', () => {
   const result = validateBookingRequest({ ...validRequest(), duration_minutes: -20, price_isk: -1 });
 
@@ -82,7 +99,7 @@ test('accepts a registered customer identity without trusting guest profile fiel
     brand_id: 1,
     service_id: 2,
     staff_id: 3,
-    start_time: '2026-10-01T10:00:00Z',
+    start_time: validRequest().start_time,
     consent_privacy: true,
     kennitala: 'client-supplied-value-is-ignored',
   }, { id: 7, type: 'customer' });

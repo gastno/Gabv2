@@ -399,6 +399,22 @@ export const notificationApi = {
     }, CUSTOMER_TOKEN_KEY),
 };
 
+export const staffNotificationApi = {
+  list: () => request("/staff/notifications", { method: "GET" }),
+
+  markRead: (notificationIds) =>
+    request("/staff/notifications/read", {
+      method: "PATCH",
+      body: JSON.stringify({ notification_ids: notificationIds }),
+    }),
+
+  markAllRead: () =>
+    request("/staff/notifications/read", {
+      method: "PATCH",
+      body: JSON.stringify({ all: true }),
+    }),
+};
+
 export const staffServiceApi = {
   // GET /api/staffservices/by-staff/:staffId - Get services assigned to a specific staff member
   getByStaffId: (staffId) => request(`/staffservices/by-staff/${staffId}`),

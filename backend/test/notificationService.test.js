@@ -4,7 +4,9 @@ const {
   NotificationConfigurationError,
   buildEmail,
   deliverOne,
+  deliverOneStaff,
   enqueueDueReminders,
+  enqueueStaffBooking,
   enqueueStatusTransition,
   sendWithResend,
 } = require('../src/services/notificationService');
@@ -43,6 +45,20 @@ test('status event key captures only the actual prior and next appointment state
   );
 });
 
+test('new bookings enqueue a deduplicated staff notification inside the booking transaction', async () => {
+  let query;
+  await enqueueStaffBooking({
+    query: async (text, params) => {
+      query = { text, params };
+      return { rows: [] };
+    },
+  }, { id: 41, staff_id: 3 });
+
+  assert.match(query.text, /INSERT INTO staff_appointment_notifications/);
+  assert.match(query.text, /ON CONFLICT \(event_key\) DO NOTHING/);
+  assert.deepEqual(query.params, [41, 3, 'booking:41']);
+});
+
 test('reminder scan is bounded to upcoming appointments and database-deduplicated', async () => {
   let query;
   const now = new Date('2026-10-26T12:00:00Z');
@@ -68,6 +84,14 @@ test('notification content describes the correct event using the studio timezone
   const transition = buildEmail(notification);
   assert.match(transition.subject, /confirmed/);
   assert.match(transition.text, /pending to confirmed/);
+
+  const staffBooking = buildEmail({
+    ...notification,
+    notification_type: 'service_booked',
+    customer_name: 'Taylor Customer',
+  });
+  assert.match(staffBooking.subject, /New service booking.*Lash lift/);
+  assert.match(staffBooking.text, /Taylor Customer/);
 });
 
 test('Resend SDK delivery requires configuration and sends with a stable idempotency key', async () => {
@@ -185,4 +209,43 @@ test('delivery skips events when the customer has not opted in', async () => {
   }), false);
   assert.equal(status, 'skipped');
   assert.equal(providerCalled, false);
+});
+
+test('staff booking email delivery is claimed and recorded with the provider result', async () => {
+  let status = 'queued';
+  let request;
+  const staffNotification = {
+    ...notification,
+    id: 24,
+    staff_id: 3,
+    notification_type: 'service_booked',
+    email: 'staff@example.com',
+  };
+  const database = {
+    async withTransaction(callback) {
+      return callback({
+        async query(text) {
+          if (text.includes('FROM staff_appointment_notifications n')) {
+            return { rows: status === 'queued' ? [staffNotification] : [] };
+          }
+          if (text.includes("SET delivery_status = 'sending'")) status = 'sending';
+          return { rows: [] };
+        },
+      });
+    },
+    async query(text, params) {
+      request = { text, params };
+      if (text.includes("SET delivery_status = 'sent'")) status = 'sent';
+      return { rows: [] };
+    },
+  };
+
+  assert.equal(await deliverOneStaff(database, async notificationToSend => {
+    assert.equal(notificationToSend.notification_type, 'service_booked');
+    assert.equal(notificationToSend.email, 'staff@example.com');
+    return { id: 'staff-message-1' };
+  }), true);
+  assert.equal(status, 'sent');
+  assert.match(request.text, /UPDATE staff_appointment_notifications/);
+  assert.deepEqual(request.params, ['staff-message-1', 24]);
 });

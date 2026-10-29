@@ -27,8 +27,10 @@ test('queries slots against schedules, unavailability, service assignments, and 
   assert.match(queryText, /staff_availabilities/);
   assert.match(queryText, /staff_unavailabilities/);
   assert.match(queryText, /staff_services/);
+  assert.match(queryText, /staff_role\.name = 'staff'/);
   assert.match(queryText, /appointments existing/);
   assert.match(queryText, /INTERVAL '15 minutes'/);
   assert.match(queryText, /Atlantic\/Reykjavik/);
   assert.match(queryText, /availability_date = \$2::date/);
+  assert.match(queryText, /availability\.availability_date > \(NOW\(\) AT TIME ZONE 'Atlantic\/Reykjavik'\)::date/);
 });

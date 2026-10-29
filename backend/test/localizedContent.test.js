@@ -150,6 +150,7 @@ test('staff creation stores and returns English and Icelandic descriptions', asy
   }, res);
 
   assert.match(insert.sql, /description_en, description_is/);
+  assert.equal(insert.params[3], null);
   assert.equal(insert.params[4], 'English bio');
   assert.equal(insert.params[5], 'Íslensk æviágrip');
   assert.equal(res.statusCode, 201);

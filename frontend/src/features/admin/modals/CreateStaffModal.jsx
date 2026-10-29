@@ -65,6 +65,17 @@ function CreateStaffModal({
           </div>
 
           <div className="form-group">
+            <label>Staff email for booking notifications (optional)</label>
+            <input
+              type="email"
+              autoComplete="email"
+              placeholder="solveig@example.com"
+              value={newStaff.email}
+              onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
             <label>Initial Password</label>
             <input
               type="password"

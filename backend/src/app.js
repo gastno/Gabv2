@@ -12,6 +12,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const customerNotificationRoutes = require('./routes/customerNotificationRoutes');
+const staffNotificationRoutes = require('./routes/staffNotificationRoutes');
 
 const createApp = ({ database, config }) => {
   const app = express();
@@ -44,6 +45,7 @@ const createApp = ({ database, config }) => {
   app.use('/api/categories', categoryRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/customers/notifications', customerNotificationRoutes);
+  app.use('/api/staff/notifications', staffNotificationRoutes);
 
   app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 

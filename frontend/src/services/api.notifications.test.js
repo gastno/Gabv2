@@ -1,8 +1,9 @@
-import { apptApi, notificationApi } from "./api";
+import { apptApi, notificationApi, staffNotificationApi } from "./api";
 
 describe("customer appointment and notification APIs", () => {
   const originalFetch = global.fetch;
   const previousToken = localStorage.getItem("customer_auth_token");
+  const previousStaffToken = localStorage.getItem("staff_auth_token");
 
   beforeEach(() => {
     localStorage.setItem("customer_auth_token", "customer-session");
@@ -13,6 +14,8 @@ describe("customer appointment and notification APIs", () => {
     global.fetch = originalFetch;
     if (previousToken === null) localStorage.removeItem("customer_auth_token");
     else localStorage.setItem("customer_auth_token", previousToken);
+    if (previousStaffToken === null) localStorage.removeItem("staff_auth_token");
+    else localStorage.setItem("staff_auth_token", previousStaffToken);
   });
 
   it("uses the registered customer token for appointment history", async () => {
@@ -77,6 +80,39 @@ describe("customer appointment and notification APIs", () => {
           Authorization: expect.any(String),
           "Content-Type": "application/json",
         }),
+      })
+    );
+  });
+
+  it("uses the staff token and staff-scoped endpoints for the staff inbox", async () => {
+    localStorage.setItem("staff_auth_token", "staff-session");
+    await staffNotificationApi.list();
+    await staffNotificationApi.markRead([17]);
+    await staffNotificationApi.markAllRead();
+
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      1,
+      "http://localhost:5000/api/staff/notifications",
+      expect.objectContaining({
+        headers: expect.objectContaining({ Authorization: expect.any(String) }),
+      })
+    );
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      "http://localhost:5000/api/staff/notifications/read",
+      expect.objectContaining({
+        method: "PATCH",
+        body: JSON.stringify({ notification_ids: [17] }),
+        headers: expect.objectContaining({ Authorization: expect.any(String) }),
+      })
+    );
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      3,
+      "http://localhost:5000/api/staff/notifications/read",
+      expect.objectContaining({
+        method: "PATCH",
+        body: JSON.stringify({ all: true }),
+        headers: expect.objectContaining({ Authorization: expect.any(String) }),
       })
     );
   });

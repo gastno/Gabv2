@@ -12,13 +12,18 @@ const booking = validateBookingRequest({
   email: 'customer@example.com',
   phone_number: '+354 555 1234',
   kennitala: '010190-1234',
-  start_time: '2026-10-01T10:00:00Z',
+  start_time: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10) + 'T10:00:00Z',
   consent_privacy: true,
 }).value;
 
-const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk: '12000' }, existingCustomer = null } = {}) => {
+const makeDatabase = ({
+  service = { brand_id: 1, duration_minutes: 45, price_isk: '12000' },
+  existingCustomer = null,
+  bookingDateAllowed = true,
+} = {}) => {
   const customers = existingCustomer ? [existingCustomer] : [];
   const appointments = [];
+  const staffNotifications = [];
   const availabilityParameters = [];
   let serviceReadSql = '';
   let nextCustomerId = customers.length ? Math.max(...customers.map(customer => customer.id)) + 1 : 1;
@@ -48,7 +53,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
         }
         if (text.includes('FROM staff_availabilities availability')) {
           availabilityParameters.push(params);
-          return { rows: [{ available: true }] };
+          return { rows: [{ booking_date_allowed: bookingDateAllowed, available: true }] };
         }
         if (text.includes('FROM customers')) {
           if (text.includes('WHERE id = $1')) {
@@ -70,6 +75,10 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
           appointments.push(params);
           return { rows: [{ id: appointments.length, params }] };
         }
+        if (text.includes('INSERT INTO staff_appointment_notifications')) {
+          staffNotifications.push(params);
+          return { rows: [{ id: appointments.length }] };
+        }
         if (text.includes('INSERT INTO appointment_reference_images')) {
           return { rows: [{ id: 23 }] };
         }
@@ -84,6 +93,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
   return {
     customers,
     appointments,
+    staffNotifications,
     availabilityParameters,
     get serviceReadSql() { return serviceReadSql; },
     database: {
@@ -101,7 +111,7 @@ const makeDatabase = ({ service = { brand_id: 1, duration_minutes: 45, price_isk
 
 test('creates appointments with database-owned duration and price snapshots', async () => {
   const databaseFixture = makeDatabase();
-  const { database, customers, appointments, availabilityParameters } = databaseFixture;
+  const { database, customers, appointments, staffNotifications, availabilityParameters } = databaseFixture;
 
   const result = await createBooking(database, { ...booking, duration_minutes: 1, price_isk: 1 });
 
@@ -112,7 +122,10 @@ test('creates appointments with database-owned duration and price snapshots', as
   assert.equal(appointments[0][5].getTime() - appointments[0][4].getTime(), 45 * 60_000);
   assert.deepEqual(availabilityParameters, [[booking.startTime, booking.staffId, 45]]);
   assert.equal(result.id, 1);
+  assert.deepEqual(staffNotifications, [[1, booking.staffId, 'booking:1']]);
+  assert.ok(databaseFixture.appointments.length);
   assert.match(databaseFixture.serviceReadSql, /s\.is_active = TRUE/);
+  assert.match(databaseFixture.serviceReadSql, /staff_role\.name = 'staff'/);
 });
 
 test('snapshots a current promotional price instead of the regular catalog price', async () => {
@@ -152,6 +165,18 @@ test('rejects unavailable, inactive, unassigned, or brand-mismatched selections'
 
   await assert.rejects(createBooking(database, booking), error => error instanceof BookingError && error.status === 422);
   assert.equal(customers.length, 0);
+  assert.equal(appointments.length, 0);
+});
+
+test('rejects bookings when the Iceland-local appointment date is today', async () => {
+  const { database, appointments } = makeDatabase({ bookingDateAllowed: false });
+
+  await assert.rejects(
+    createBooking(database, booking),
+    error => error instanceof BookingError
+      && error.status === 400
+      && /same-day bookings are not accepted/i.test(error.message)
+  );
   assert.equal(appointments.length, 0);
 });
 

@@ -31,6 +31,7 @@ const getAvailability = (database, { serviceId, staffId, date }) => database.que
   FROM services target
   JOIN staff_services assignment ON assignment.service_id = target.id
   JOIN staff staff_member ON staff_member.id = assignment.staff_id AND staff_member.is_active = TRUE
+  JOIN roles staff_role ON staff_role.id = staff_member.role_id AND staff_role.name = 'staff'
   JOIN staff_brands brand_assignment
     ON brand_assignment.staff_id = staff_member.id AND brand_assignment.brand_id = target.brand_id
   JOIN staff_availabilities availability
@@ -46,6 +47,7 @@ const getAvailability = (database, { serviceId, staffId, date }) => database.que
   WHERE target.id = $1
     AND target.is_active = TRUE
     AND target.duration_minutes > 0
+    AND availability.availability_date > (NOW() AT TIME ZONE 'Atlantic/Reykjavik')::date
     AND ($3::bigint IS NULL OR staff_member.id = $3)
     AND slot.start_time >= NOW()
     AND NOT EXISTS (

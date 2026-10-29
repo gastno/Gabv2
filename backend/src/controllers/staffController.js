@@ -52,6 +52,7 @@ exports.getAllStaff = async (req, res) => {
         s.id,
         s.username,
         s.full_name AS name,
+        s.email,
         s.description_en,
         s.description_is,
         s.description_en AS description,
@@ -69,6 +70,7 @@ exports.getAllStaff = async (req, res) => {
       LEFT JOIN staff_brands sb ON s.id = sb.staff_id
       LEFT JOIN brands b ON sb.brand_id = b.id
       WHERE s.is_active = TRUE
+        AND r.name = 'staff'
       GROUP BY s.id, r.name
       ORDER BY s.id ASC;
     `;
@@ -89,24 +91,26 @@ exports.createStaff = async (req, res) => {
     password, 
     full_name, 
     name, 
+    email,
     description, 
     description_en,
     description_is,
     brand_ids, 
-    role_id,
     photo 
   } = req.body;
 
   const targetUsername = username || userId;
   const staffName = full_name || name;
-
-  const parsedRoleId = role_id ? parseInt(role_id, 10) : 3;
-  if (isNaN(parsedRoleId)) {
-    return res.status(400).json({ error: 'role_id must be a valid integer.' });
+  if (email != null && typeof email !== 'string') {
+    return res.status(400).json({ error: 'A valid staff email address is required when provided.' });
   }
+  const staffEmail = email == null || email.trim() === '' ? null : email.trim();
 
   if (!targetUsername || !password || !staffName) {
     return res.status(400).json({ error: 'Username, password, and full name are required.' });
+  }
+  if (staffEmail && (staffEmail.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(staffEmail))) {
+    return res.status(400).json({ error: 'A valid staff email address is required when provided.' });
   }
 
   try {
@@ -118,23 +122,31 @@ exports.createStaff = async (req, res) => {
     }
 
     const insertStaffQuery = `
-      INSERT INTO staff (role_id, username, password_hash, full_name, description_en, description_is, avatar_url)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, role_id, username, full_name, description_en, description_is, avatar_url;
+      INSERT INTO staff (role_id, username, password_hash, full_name, email, description_en, description_is, avatar_url)
+      SELECT r.id, $1, $2, $3, $4, $5, $6, $7
+      FROM roles r
+      WHERE r.name = 'staff'
+      RETURNING id, role_id, username, full_name, email, description_en, description_is, avatar_url;
     `;
 
     const newStaff = await db.withTransaction(async client => {
       const staffResult = await client.query(insertStaffQuery, [
-        parsedRoleId,
         targetUsername,
         hashedPassword,
         staffName,
+        staffEmail,
         description_en ?? description ?? null,
         description_is || null,
         avatarUrl
       ]);
 
       const createdStaff = staffResult.rows[0];
+      if (!createdStaff) {
+        const error = new Error('Staff role is not configured.');
+        error.code = 'STAFF_ROLE_NOT_CONFIGURED';
+        throw error;
+      }
+
       let parsedBrandIds = [];
       if (typeof brand_ids === 'string') {
         try { parsedBrandIds = JSON.parse(brand_ids); } catch (e) { parsedBrandIds = [1]; }
@@ -161,6 +173,7 @@ exports.createStaff = async (req, res) => {
         role_id: newStaff.role_id,
         username: newStaff.username,
         full_name: newStaff.full_name,
+        email: newStaff.email,
         description_en: newStaff.description_en,
         description_is: newStaff.description_is,
         description: newStaff.description_en,
@@ -170,6 +183,10 @@ exports.createStaff = async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating staff account:', error);
+
+    if (error.code === 'STAFF_ROLE_NOT_CONFIGURED') {
+      return res.status(500).json({ error: 'Staff role is not configured.' });
+    }
 
     if (error.code === '23505' && error.detail && error.detail.includes('username')) {
       return res.status(409).json({ error: 'Username already exists.' });
@@ -188,18 +205,33 @@ exports.updateStaff = async (req, res) => {
     password, 
     full_name, 
     name, 
+    email,
     description, 
     description_en,
     description_is,
-    role_id, 
     brand_ids 
   } = req.body;
 
   const targetUsername = username || userId;
   const staffName = full_name || name;
+  const emailProvided = Object.prototype.hasOwnProperty.call(req.body || {}, 'email');
+  if (emailProvided && email != null && typeof email !== 'string') {
+    return res.status(400).json({ error: 'A valid staff email address is required when provided.' });
+  }
+  const staffEmail = email == null || email.trim() === '' ? null : email.trim();
+  if (emailProvided && staffEmail
+      && (staffEmail.length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(staffEmail))) {
+    return res.status(400).json({ error: 'A valid staff email address is required when provided.' });
+  }
 
   try {
-    const checkResult = await db.query('SELECT * FROM staff WHERE id = $1', [id]);
+    const checkResult = await db.query(
+      `SELECT s.*
+       FROM staff s
+       JOIN roles r ON r.id = s.role_id
+       WHERE s.id = $1 AND r.name = 'staff'`,
+      [id]
+    );
     if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: 'Staff member not found.' });
     }
@@ -224,11 +256,12 @@ exports.updateStaff = async (req, res) => {
                full_name = COALESCE($2, full_name),
                description_en = COALESCE($3, description_en),
                description_is = COALESCE($4, description_is),
-               role_id = COALESCE($5, role_id),
-               avatar_url = $6,
-               password_hash = $7
-           WHERE id = $8`,
-          [targetUsername, staffName, englishDescription, description_is, role_id || currentStaff.role_id, newAvatarUrl, hashedPassword, id]
+               avatar_url = $5,
+               password_hash = $6,
+               email = CASE WHEN $7 THEN $8 ELSE email END
+           WHERE id = $9
+             AND role_id = (SELECT id FROM roles WHERE name = 'staff')`,
+          [targetUsername, staffName, englishDescription, description_is, newAvatarUrl, hashedPassword, emailProvided, staffEmail, id]
         );
       } else {
         await client.query(
@@ -237,10 +270,11 @@ exports.updateStaff = async (req, res) => {
                full_name = COALESCE($2, full_name),
                description_en = COALESCE($3, description_en),
                description_is = COALESCE($4, description_is),
-               role_id = COALESCE($5, role_id),
-               avatar_url = $6
-           WHERE id = $7`,
-          [targetUsername, staffName, englishDescription, description_is, role_id || currentStaff.role_id, newAvatarUrl, id]
+               avatar_url = $5,
+               email = CASE WHEN $6 THEN $7 ELSE email END
+           WHERE id = $8
+             AND role_id = (SELECT id FROM roles WHERE name = 'staff')`,
+          [targetUsername, staffName, englishDescription, description_is, newAvatarUrl, emailProvided, staffEmail, id]
         );
       }
 
@@ -276,7 +310,13 @@ exports.uploadAvatar = async (req, res) => {
       return res.status(400).json({ error: 'No image file uploaded.' });
     }
 
-    const currentStaffResult = await db.query('SELECT avatar_url FROM staff WHERE id = $1', [staffId]);
+    const currentStaffResult = await db.query(
+      `SELECT s.avatar_url
+       FROM staff s
+       JOIN roles r ON r.id = s.role_id
+       WHERE s.id = $1 AND r.name = 'staff'`,
+      [staffId]
+    );
 
     if (currentStaffResult.rows.length === 0) {
       return res.status(404).json({ error: 'Staff member not found.' });
@@ -286,7 +326,11 @@ exports.uploadAvatar = async (req, res) => {
     const dbRelativeUrl = await processAndSaveAvatar(req.file.buffer);
 
     const updateResult = await db.query(
-      'UPDATE staff SET avatar_url = $1 WHERE id = $2 RETURNING id, username, full_name, description_en, description_is, avatar_url',
+      `UPDATE staff
+       SET avatar_url = $1
+       WHERE id = $2
+         AND role_id = (SELECT id FROM roles WHERE name = 'staff')
+       RETURNING id, username, full_name, description_en, description_is, avatar_url`,
       [dbRelativeUrl, staffId]
     );
 

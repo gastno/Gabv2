@@ -24,12 +24,23 @@ const validTimestamp = value => {
     && Number.isFinite(Date.parse(value));
 };
 
+const getLocalDate = value => {
+  const dateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Atlantic/Reykjavik',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(value);
+  const parts = Object.fromEntries(dateParts.map(({ type, value: part }) => [type, part]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+};
+
 const normalizeKennitala = value => {
   if (typeof value !== 'string' || !/^\d{6}-?\d{4}$/.test(value.trim())) return null;
   return value.trim().replace(/^(\d{6})-?(\d{4})$/, '$1-$2');
 };
 
-const validateBookingRequest = (body, identity = null) => {
+const validateBookingRequest = (body, identity = null, now = new Date()) => {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return { error: 'A booking request body is required.' };
   }
@@ -65,6 +76,9 @@ const validateBookingRequest = (body, identity = null) => {
 
   if (!validTimestamp(body.start_time)) {
     return { error: 'start_time must be a valid ISO 8601 timestamp with an explicit timezone offset.' };
+  }
+  if (getLocalDate(new Date(body.start_time)) <= getLocalDate(now)) {
+    return { error: 'Bookings must be made by 23:59 Iceland time on the day before the appointment; same-day bookings are not accepted.' };
   }
 
   let customOptions = body.custom_options ?? null;

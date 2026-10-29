@@ -52,7 +52,8 @@ Treat these as a working backlog, not claims that a feature is already implement
 - [ ] Build the missing Amor Tattoo route/page and make brand pages load brand, category, service and eligible staff data from the API instead of embedded arrays.
 - [ ] Drive booking dates and time slots from the availability API, submit bookings to the backend, and handle loading, validation, conflicts and success states.
 - [ ] Add customer registration/login UI and session handling; connect registered identity/profile data to bookings and allow customer appointment history and cancellation.
-- [ ] Decide and implement customer notifications (confirmation, reminder, cancellation), including provider/configuration and failure handling; no notification delivery is present yet.
+- [x] Deliver staff booking alerts in the staff portal and enqueue optional email to the configured staff address through the Resend worker.
+- [ ] Decide and implement customer notifications (confirmation, reminder, cancellation), including customer-facing provider preferences and failure handling.
 
 ### 4. Add production readiness
 

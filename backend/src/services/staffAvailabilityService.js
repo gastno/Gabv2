@@ -74,7 +74,12 @@ const validateUnavailablePeriod = body => {
 };
 
 const assertActiveStaff = async (client, staffId) => {
-  const result = await client.query('SELECT id FROM staff WHERE id = $1 AND is_active = TRUE', [staffId]);
+  const result = await client.query(`
+    SELECT member.id
+    FROM staff member
+    JOIN roles staff_role ON staff_role.id = member.role_id AND staff_role.name = 'staff'
+    WHERE member.id = $1 AND member.is_active = TRUE
+  `, [staffId]);
   if (!result.rows.length) throw new BookingError('Staff member is not active.', 404);
 };
 
@@ -110,6 +115,10 @@ const isStaffInAdminScope = async (database, staffId, brandId, actor) => {
     FROM staff member
     WHERE member.id = $1
       AND member.is_active = TRUE
+      AND EXISTS (
+        SELECT 1 FROM roles staff_role
+        WHERE staff_role.id = member.role_id AND staff_role.name = 'staff'
+      )
       AND ($2::bigint IS NULL OR EXISTS (
         SELECT 1 FROM staff_brands staff_scope
         WHERE staff_scope.staff_id = member.id AND staff_scope.brand_id = $2

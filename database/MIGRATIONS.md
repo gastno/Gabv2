@@ -101,3 +101,9 @@ Get-Content -Raw database/migrations/010_notification_read_state.sql | docker co
 ```
 
 `GET /api/notifications` returns the authenticated customer's notification rows with `is_read` and an `unread_count`. `PATCH /api/customers/notifications/read` accepts either `{ "notification_ids": [12, 13] }` (1–100 IDs) or `{ "all": true }`; updates are always scoped to the authenticated customer. `GET /api/appointments?period=previous` returns only that customer's appointments whose end time is in the past, newest first; `period=upcoming` returns pending/confirmed appointments that have not ended. Other values of `period` are rejected, and staff cannot use these customer filters.
+
+Apply `migrations/011_staff_booking_notifications.sql` to add optional staff email addresses and the staff booking-notification outbox. New bookings enqueue one in-app notification for the assigned staff member within the booking transaction. The staff portal bell reads `GET /api/staff/notifications` and `PATCH /api/staff/notifications/read`; both endpoints are scoped to the authenticated staff account. Admins can add or update the recipient email in staff account details. Email delivery uses the existing Resend worker and the `RESEND_API_KEY` / `RESEND_FROM_EMAIL` configuration above. Staff booking emails remain queued until both a recipient email and provider configuration are available; provider errors use bounded retries.
+
+```powershell
+Get-Content -Raw database/migrations/011_staff_booking_notifications.sql | docker compose exec -T postgres_db psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB
+```

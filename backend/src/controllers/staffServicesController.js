@@ -24,9 +24,11 @@ exports.getStaffServices = async (req, res) => {
         b.name AS brand_name
       FROM staff_services ss
       JOIN services s ON ss.service_id = s.id
+      JOIN staff staff_member ON staff_member.id = ss.staff_id
+      JOIN roles r ON r.id = staff_member.role_id AND r.name = 'staff'
       JOIN categories c ON s.category_id = c.id
       JOIN brands b ON s.brand_id = b.id
-      WHERE ss.staff_id = $1 AND s.is_active = TRUE
+      WHERE ss.staff_id = $1 AND staff_member.is_active = TRUE AND s.is_active = TRUE
       ORDER BY s.id ASC;
     `;
     const result = await db.query(queryText, [staffId]);
@@ -58,7 +60,7 @@ exports.getStaffByService = async (req, res) => {
       FROM staff_services ss
       JOIN staff s ON ss.staff_id = s.id
       JOIN roles r ON s.role_id = r.id
-      WHERE ss.service_id = $1 AND s.is_active = TRUE
+      WHERE ss.service_id = $1 AND s.is_active = TRUE AND r.name = 'staff'
       ORDER BY s.id ASC;
     `;
     const result = await db.query(queryText, [serviceId]);

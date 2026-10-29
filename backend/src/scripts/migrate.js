@@ -50,19 +50,25 @@ const applyMigrations = async (database, directory = path.join(__dirname, '../..
             WHERE table_schema = 'public'
               AND table_name = 'appointment_notifications'
               AND column_name = 'is_read'
-          ) AS is_current_baseline
+          ) AS is_current_baseline,
+        to_regclass('public.staff_appointment_notifications') IS NOT NULL
+          AS has_staff_appointment_notifications
     `);
     if (!result.rows[0]?.is_current_baseline) return false;
 
-    for (const migration of migrations) {
+    const hasStaffNotifications = result.rows[0].has_staff_appointment_notifications ?? true;
+    const baselineMigrations = hasStaffNotifications
+      ? migrations
+      : migrations.filter(migration => migration.version < '011_staff_booking_notifications.sql');
+    for (const migration of baselineMigrations) {
       await client.query(
         'INSERT INTO schema_migrations (version, checksum) VALUES ($1, $2) ON CONFLICT (version) DO NOTHING',
         [migration.version, migration.checksum]
       );
     }
-    return true;
+    return hasStaffNotifications ? 'current' : 'legacy';
   });
-  if (isCurrentBaseline) return [];
+  if (isCurrentBaseline === 'current') return [];
 
   const applied = [];
   for (const migration of migrations) {

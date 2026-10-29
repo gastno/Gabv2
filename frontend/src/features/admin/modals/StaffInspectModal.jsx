@@ -109,6 +109,20 @@ function StaffInspectModal({
           </div>
 
           <div className="form-group">
+            <label>Staff email for booking notifications</label>
+            {isEditMode ? (
+              <input
+                type="email"
+                autoComplete="email"
+                value={tempInspectStaff.email || ""}
+                onChange={(e) => setTempInspectStaff({ ...tempInspectStaff, email: e.target.value })}
+              />
+            ) : (
+              <div className="read-only-field">{tempInspectStaff.email || "Not configured"}</div>
+            )}
+          </div>
+
+          <div className="form-group">
             <label>Password</label>
             {isEditMode ? (
               <input

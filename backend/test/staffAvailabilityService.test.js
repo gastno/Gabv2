@@ -48,7 +48,7 @@ test('replaces availability for only the requested date in one transaction', asy
   const client = {
     async query(text, params) {
       statements.push({ text, params });
-      if (text.includes('SELECT id FROM staff')) return { rows: [{ id: 3 }] };
+      if (text.includes('FROM staff member')) return { rows: [{ id: 3 }] };
       if (text.includes('FROM appointments')) return { rows: [] };
       if (text.includes('FROM staff_availabilities')) return { rows: [] };
       if (text.includes('SELECT id, block_start')) return { rows: [] };
@@ -64,6 +64,7 @@ test('replaces availability for only the requested date in one transaction', asy
   assert.ok(statements.some(statement => statement.text.includes('DELETE FROM staff_availabilities')));
   assert.ok(statements.some(statement => statement.text.includes('INSERT INTO staff_availabilities')));
   assert.ok(statements.some(statement => statement.params.includes('2026-10-05')));
+  assert.match(statements[0].text, /staff_role\.name = 'staff'/);
 });
 
 test('does not remove availability that contains a booked appointment', async () => {
@@ -72,7 +73,7 @@ test('does not remove availability that contains a booked appointment', async ()
     async withTransaction(callback) {
       return callback({
         async query(text) {
-          if (text.includes('SELECT id FROM staff')) return { rows: [{ id: 3 }] };
+          if (text.includes('FROM staff member')) return { rows: [{ id: 3 }] };
           if (text.includes('FROM appointments')) return { rows: [{ id: 21 }] };
           if (text.includes('DELETE FROM staff_availabilities')) deleted = true;
           return { rows: [] };
@@ -91,7 +92,7 @@ test('rejects unavailable periods that conflict with an active appointment', asy
     async withTransaction(callback) {
       return callback({
         async query(text) {
-          if (text.includes('SELECT id FROM staff')) return { rows: [{ id: 3 }] };
+          if (text.includes('FROM staff member')) return { rows: [{ id: 3 }] };
           if (text.includes('FROM appointments')) return { rows: [{ '?column?': 1 }] };
           if (text.includes('INSERT INTO staff_unavailabilities')) inserted = true;
           return { rows: [] };
@@ -124,4 +125,5 @@ test('admin schedule reads scope both the requested staff and the requesting adm
   assert.equal(accessible, false);
   assert.deepEqual(params, [12, 4, 9, false]);
   assert.match(queryText, /admin_scope\.staff_id = \$3/);
+  assert.match(queryText, /staff_role\.name = 'staff'/);
 });

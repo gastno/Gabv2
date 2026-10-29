@@ -1,6 +1,7 @@
 import React from "react";
 import UserAvatar from "../../../components/common/UserAvatar/UserAvatar";
 import ThemeSelector from "../../../components/common/ThemeSelector/ThemeSelector";
+import StaffNotifications from "./StaffNotifications";
 
 function StaffProfileHeader({ name, description, avatar, onLogout, theme, onThemeChange }) {
   return (
@@ -17,6 +18,7 @@ function StaffProfileHeader({ name, description, avatar, onLogout, theme, onThem
         <span>gbb &amp; co</span>
       </span>
       <div className="staff-header-actions">
+        <StaffNotifications />
         <ThemeSelector theme={theme} onChange={onThemeChange} />
         <button type="button" className="staff-admin-logout-btn" onClick={onLogout}>
           Log Out

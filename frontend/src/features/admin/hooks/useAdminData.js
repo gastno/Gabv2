@@ -39,6 +39,7 @@ function useAdminData() {
         const formattedStaff = (data || []).map((staff) => ({
           id: staff.id,
           userId: staff.username,
+          email: staff.email || "",
           password: "••••••••",
           name: staff.name || staff.full_name,
           description: staff.description_en || staff.description || "Staff Member",
