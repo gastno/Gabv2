@@ -27,6 +27,8 @@ test('queries slots against schedules, unavailability, service assignments, and 
   assert.match(queryText, /staff_availabilities/);
   assert.match(queryText, /staff_unavailabilities/);
   assert.match(queryText, /staff_services/);
+  assert.match(queryText, /COALESCE\(availability\.location, brand\.location\) AS location/);
+  assert.match(queryText, /AS is_alternate_location/);
   assert.match(queryText, /staff_role\.name = 'staff'/);
   assert.match(queryText, /appointments existing/);
   assert.match(queryText, /INTERVAL '15 minutes'/);

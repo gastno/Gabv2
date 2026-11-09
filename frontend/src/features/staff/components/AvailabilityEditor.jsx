@@ -59,6 +59,16 @@ function AvailabilityEditor({
                   required
                 />
               </label>
+              <label className="availability-location-field">
+                <span>Alternate location (optional)</span>
+                <input
+                  type="text"
+                  maxLength="500"
+                  value={shift.location}
+                  placeholder="Leave blank for the usual studio"
+                  onChange={(event) => onUpdateShift(shift.key, "location", event.target.value)}
+                />
+              </label>
               <button
                 type="button"
                 className="remove-shift-btn"

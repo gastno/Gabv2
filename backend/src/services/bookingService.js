@@ -9,8 +9,9 @@ class BookingError extends Error {
 
 const createBooking = (database, booking) => database.withTransaction(async client => {
   const serviceResult = await client.query(`
-    SELECT s.brand_id, s.duration_minutes, s.price_isk, s.sale_price_isk
+    SELECT s.brand_id, s.duration_minutes, s.price_isk, s.sale_price_isk, brand.location AS brand_location
     FROM services s
+    JOIN brands brand ON brand.id = s.brand_id
     JOIN staff_services ss ON ss.service_id = s.id
     JOIN staff st ON st.id = ss.staff_id
     JOIN roles staff_role ON staff_role.id = st.role_id AND staff_role.name = 'staff'
@@ -23,7 +24,7 @@ const createBooking = (database, booking) => database.withTransaction(async clie
       AND s.duration_minutes > 0
       AND s.price_isk >= 0
     LIMIT 1
-    FOR SHARE OF s, ss, st, sb
+    FOR SHARE OF s, ss, st, sb, brand
   `, [booking.serviceId, booking.brandId, booking.staffId]);
 
   if (serviceResult.rows.length === 0) {
@@ -72,7 +73,18 @@ const createBooking = (database, booking) => database.withTransaction(async clie
             AND existing.start_time < booking_window.end_time
             AND existing.end_time > booking_window.start_time
         )
-    ) AS available
+    ) AS available,
+    (
+      SELECT availability.location
+      FROM staff_availabilities availability
+      WHERE availability.staff_id = $2
+        AND availability.availability_date = booking_window.local_start::date
+        AND availability.is_active = TRUE
+        AND booking_window.local_start::time >= availability.start_time
+        AND booking_window.local_end::date = booking_window.local_start::date
+        AND booking_window.local_end::time <= availability.end_time
+      LIMIT 1
+    ) AS location_override
     FROM requested booking_window
   `, [booking.startTime, booking.staffId, durationMinutes]);
 
@@ -82,6 +94,13 @@ const createBooking = (database, booking) => database.withTransaction(async clie
 
   if (!availabilityResult.rows[0]?.available) {
     throw new BookingError('The selected time is not available in the staff schedule.', 409);
+  }
+
+  const location = availabilityResult.rows[0].location_override ?? service.brand_location;
+  const isAlternateLocation = availabilityResult.rows[0].location_override != null
+    && location !== service.brand_location;
+  if ((isAlternateLocation || booking.expectedLocation !== undefined) && booking.expectedLocation !== location) {
+    throw new BookingError('The appointment location must be confirmed. Refresh availability and review the location.', 409);
   }
 
   let customerId;
@@ -129,8 +148,8 @@ const createBooking = (database, booking) => database.withTransaction(async clie
   const appointmentResult = await client.query(`
     INSERT INTO appointments
       (brand_id, service_id, staff_id, customer_id, start_time, end_time,
-       duration_snapshot_minutes, price_snapshot_isk, custom_options)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       duration_snapshot_minutes, price_snapshot_isk, custom_options, location, is_alternate_location)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING *
   `, [
     service.brand_id,
@@ -142,6 +161,8 @@ const createBooking = (database, booking) => database.withTransaction(async clie
     durationMinutes,
     priceIsk,
     booking.customOptions === null ? null : JSON.stringify(booking.customOptions),
+    location,
+    isAlternateLocation,
   ]);
 
   const appointment = appointmentResult.rows[0];

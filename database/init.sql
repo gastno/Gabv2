@@ -158,6 +158,8 @@ CREATE TABLE appointments (
     end_time TIMESTAMPTZ NOT NULL,
     duration_snapshot_minutes INT NOT NULL,
     price_snapshot_isk DECIMAL(12,2) NOT NULL,
+    location TEXT NOT NULL,
+    is_alternate_location BOOLEAN NOT NULL DEFAULT FALSE,
     custom_options JSONB,
     status appointment_status NOT NULL DEFAULT 'pending',
     fee_status fee_status NOT NULL DEFAULT 'none',
@@ -270,6 +272,7 @@ CREATE TABLE staff_availabilities (
     availability_date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
+    location TEXT CHECK (location IS NULL OR (length(btrim(location)) BETWEEN 1 AND 500)),
     CONSTRAINT staff_availabilities_valid_window CHECK (end_time > start_time),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT staff_availabilities_no_overlapping_shifts EXCLUDE USING gist (

@@ -17,9 +17,10 @@ const booking = validateBookingRequest({
 }).value;
 
 const makeDatabase = ({
-  service = { brand_id: 1, duration_minutes: 45, price_isk: '12000' },
+  service = { brand_id: 1, duration_minutes: 45, price_isk: '12000', brand_location: 'Main studio' },
   existingCustomer = null,
   bookingDateAllowed = true,
+  locationOverride = null,
 } = {}) => {
   const customers = existingCustomer ? [existingCustomer] : [];
   const appointments = [];
@@ -53,7 +54,7 @@ const makeDatabase = ({
         }
         if (text.includes('FROM staff_availabilities availability')) {
           availabilityParameters.push(params);
-          return { rows: [{ booking_date_allowed: bookingDateAllowed, available: true }] };
+          return { rows: [{ booking_date_allowed: bookingDateAllowed, available: true, location_override: locationOverride }] };
         }
         if (text.includes('FROM customers')) {
           if (text.includes('WHERE id = $1')) {
@@ -73,7 +74,7 @@ const makeDatabase = ({
         }
         if (text.includes('INSERT INTO appointments')) {
           appointments.push(params);
-          return { rows: [{ id: appointments.length, params }] };
+          return { rows: [{ id: appointments.length, location: params[9], is_alternate_location: params[10], params }] };
         }
         if (text.includes('INSERT INTO staff_appointment_notifications')) {
           staffNotifications.push(params);
@@ -122,6 +123,8 @@ test('creates appointments with database-owned duration and price snapshots', as
   assert.equal(appointments[0][5].getTime() - appointments[0][4].getTime(), 45 * 60_000);
   assert.deepEqual(availabilityParameters, [[booking.startTime, booking.staffId, 45]]);
   assert.equal(result.id, 1);
+  assert.equal(result.location, 'Main studio');
+  assert.equal(result.is_alternate_location, false);
   assert.deepEqual(staffNotifications, [[1, booking.staffId, 'booking:1']]);
   assert.ok(databaseFixture.appointments.length);
   assert.match(databaseFixture.serviceReadSql, /s\.is_active = TRUE/);
@@ -130,10 +133,32 @@ test('creates appointments with database-owned duration and price snapshots', as
 
 test('snapshots a current promotional price instead of the regular catalog price', async () => {
   const { database, appointments } = makeDatabase({
-    service: { brand_id: 1, duration_minutes: 45, price_isk: '12000', sale_price_isk: '9500' },
+    service: { brand_id: 1, duration_minutes: 45, price_isk: '12000', sale_price_isk: '9500', brand_location: 'Main studio' },
   });
   await createBooking(database, { ...booking, price_isk: 1 });
   assert.equal(appointments[0][7], 9500);
+});
+
+test('requires confirmation of the authoritative alternate location and snapshots it', async () => {
+  const { database, appointments, customers } = makeDatabase({ locationOverride: 'Other studio' });
+  for (const expectedLocation of [undefined, 'Old address']) {
+    await assert.rejects(createBooking(database, { ...booking, expectedLocation }),
+      error => error instanceof BookingError && error.status === 409 && /location/i.test(error.message));
+  }
+  assert.equal(appointments.length, 0);
+  assert.equal(customers.length, 0);
+  const result = await createBooking(database, { ...booking, expectedLocation: 'Other studio' });
+  assert.equal(result.location, 'Other studio');
+  assert.equal(result.is_alternate_location, true);
+  assert.equal(appointments[0][9], 'Other studio');
+  assert.equal(appointments[0][10], true);
+});
+
+test('rejects stale confirmation when a slot is now at its normal location', async () => {
+  const { database, appointments } = makeDatabase();
+  await assert.rejects(createBooking(database, { ...booking, expectedLocation: 'Other studio' }),
+    error => error instanceof BookingError && error.status === 409);
+  assert.equal(appointments.length, 0);
 });
 
 test('stores optional reference images with the new appointment and returns protected URLs', async () => {

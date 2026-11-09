@@ -14,6 +14,8 @@ const appointment = {
   status: 'confirmed',
   fee_status: 'none',
   payment_status: 'pending',
+  location: 'Other studio',
+  is_alternate_location: true,
   customer_name: 'Customer Name',
   customer_phone: '+3540000000',
   customer_email: 'customer@example.com',
@@ -113,6 +115,8 @@ test('appointment list and detail responses include customer contact and health 
   assert.equal(detailResponse.body.appointment.customer_kennitala, '0000000000');
   assert.equal(detailResponse.body.appointment.health_info, 'Allergic to fragrance');
   assert.equal(detailResponse.body.appointment.payment_status, 'pending');
+  assert.equal(listResponse.body.appointments[0].location, 'Other studio');
+  assert.equal(detailResponse.body.appointment.is_alternate_location, true);
   assert.deepEqual(detailResponse.body.appointment.reference_images, appointment.reference_images);
   assert.equal(queries.length, 2);
   for (const { sql } of queries) {
@@ -120,6 +124,7 @@ test('appointment list and detail responses include customer contact and health 
     assert.match(sql, /customer\.kennitala AS customer_kennitala/);
     assert.match(sql, /customer\.health_info AS health_info/);
     assert.match(sql, /a\.payment_status/);
+    assert.match(sql, /a\.location, a\.is_alternate_location/);
     assert.match(sql, /appointment_reference_images/);
   }
   assert.deepEqual(queries[0].params, [3]);

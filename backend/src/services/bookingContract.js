@@ -97,6 +97,11 @@ const validateBookingRequest = (body, identity = null, now = new Date()) => {
   if (body.health_info !== undefined && body.health_info !== null && typeof body.health_info !== 'string') {
     return { error: 'health_info must be a string.' };
   }
+  if (body.expected_location !== undefined
+      && (typeof body.expected_location !== 'string' || !body.expected_location.trim()
+        || body.expected_location.length > 2000)) {
+    return { error: 'expected_location must be a non-empty location of at most 2000 characters.' };
+  }
 
   return {
     value: {
@@ -111,6 +116,7 @@ const validateBookingRequest = (body, identity = null, now = new Date()) => {
       startTime: new Date(body.start_time),
       customOptions,
       healthInfo: body.health_info ?? null,
+      expectedLocation: body.expected_location,
       consentPrivacy: true,
     },
   };

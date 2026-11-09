@@ -15,6 +15,7 @@ const COLUMNS = [
   { key: "service_name", label: "Service" },
   { key: "staff_name", label: "Staff Member" },
   { key: "start_time", label: "Appointment Date / Time" },
+  { key: "location", label: "Location" },
   { key: "price_snapshot_isk", label: "Price" },
   { key: "payment_status", label: "Payment" },
   { key: "fee_status", label: "Fee" },
@@ -193,6 +194,10 @@ function LedgerTab({ brands, loadingBrand }) {
                     <span className="ledger-detail">
                       {formatStudioTime(appointment.start_time)}–{formatStudioTime(appointment.end_time)}
                     </span>
+                  </td>
+                  <td>
+                    {appointment.location || "Unavailable"}
+                    {appointment.is_alternate_location && <span className="ledger-detail">Different from the usual studio</span>}
                   </td>
                   <td>{formatPrice(appointment.price_snapshot_isk)}</td>
                   <td>{appointment.payment_status?.replace(/_/g, " ") || "Unknown"}</td>

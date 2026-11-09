@@ -32,6 +32,15 @@ test('validates explicit dates and rejects overlapping shifts for that date', ()
   ]).error, /selected date.*overlap/i);
 });
 
+test('normalizes alternate shift locations and rejects blank or oversized addresses', () => {
+  const shift = { start_time: '09:00', end_time: '17:00' };
+  assert.equal(normalizeAvailabilityShifts([shift]).value[0].location, null);
+  assert.equal(normalizeAvailabilityShifts([{ ...shift, location: ' Other studio ' }]).value[0].location, 'Other studio');
+  for (const location of ['', '   ', 42, 'x'.repeat(501)]) {
+    assert.match(normalizeAvailabilityShifts([{ ...shift, location }]).error, /location/i);
+  }
+});
+
 test('requires explicit-offset timestamps for one-off unavailability', () => {
   const valid = validateUnavailablePeriod({
     start_time: '2026-10-05T09:00:00Z',
@@ -56,13 +65,19 @@ test('replaces availability for only the requested date in one transaction', asy
     },
   };
   const database = { async withTransaction(callback) { return callback(client); } };
-  const shifts = normalizeAvailabilityShifts([{ start_time: '09:00', end_time: '17:00' }]).value;
+  const shifts = normalizeAvailabilityShifts([{ start_time: '09:00', end_time: '17:00', location: 'Other studio' }]).value;
 
   await replaceStaffAvailability(database, 3, '2026-10-05', shifts);
 
   assert.match(statements[1].text, /pg_advisory_xact_lock/);
   assert.ok(statements.some(statement => statement.text.includes('DELETE FROM staff_availabilities')));
   assert.ok(statements.some(statement => statement.text.includes('INSERT INTO staff_availabilities')));
+  const conflictCheck = statements.find(statement => statement.text.includes('FROM appointments'));
+  assert.match(conflictCheck.text, /shift\."startTime"/);
+  assert.match(conflictCheck.text, /appointment\.location = COALESCE\(shift\.location, brand\.location\)/);
+  assert.deepEqual(JSON.parse(conflictCheck.params[2]), shifts);
+  const insert = statements.find(statement => statement.text.includes('INSERT INTO staff_availabilities'));
+  assert.equal(insert.params[5], 'Other studio');
   assert.ok(statements.some(statement => statement.params.includes('2026-10-05')));
   assert.match(statements[0].text, /staff_role\.name = 'staff'/);
 });

@@ -51,8 +51,8 @@ beforeEach(() => {
   ]);
   apptApi.getAvailability.mockResolvedValue({
     slots: [
-      { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T09:00:00.000Z', end_time: '2099-01-01T10:30:00.000Z' },
-      { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T11:00:00.000Z', end_time: '2099-01-01T12:30:00.000Z' },
+      { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T09:00:00.000Z', end_time: '2099-01-01T10:30:00.000Z', location: 'Gabbablu address', is_alternate_location: false },
+      { staff_id: 7, staff_name: 'Artist One', start_time: '2099-01-01T11:00:00.000Z', end_time: '2099-01-01T12:30:00.000Z', location: 'Gabbablu address', is_alternate_location: false },
     ],
   });
 

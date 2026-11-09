@@ -8,7 +8,7 @@ const { enqueueStatusTransition } = require('../services/notificationService');
 
 const appointmentReadQuery = `
   SELECT a.id, a.brand_id, a.service_id, a.staff_id, a.customer_id,
-         a.start_time, a.end_time, a.duration_snapshot_minutes, a.price_snapshot_isk,
+         a.start_time, a.end_time, a.duration_snapshot_minutes, a.price_snapshot_isk, a.location, a.is_alternate_location,
          a.custom_options, a.status, a.fee_status, a.payment_status, a.cancellation_reason, a.created_at,
          service.name_en AS service_name, brand.name AS brand_name, staff.full_name AS staff_name,
          customer.full_name AS customer_name, customer.phone_number AS customer_phone,

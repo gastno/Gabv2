@@ -26,12 +26,14 @@ describe("appointment reference image API", () => {
       consent_privacy: true,
       custom_options: { cancellation_policy_accepted: true },
       service_id: 4,
+      expected_location: "Other studio",
     }, [image]);
 
     expect(requestOptions.body).toBeInstanceOf(FormData);
     expect(requestOptions.body.get("consent_privacy")).toBe("true");
     expect(requestOptions.body.get("custom_options")).toBe('{"cancellation_policy_accepted":true}');
     expect(requestOptions.body.get("service_id")).toBe("4");
+    expect(requestOptions.body.get("expected_location")).toBe("Other studio");
     expect(requestOptions.body.getAll("reference_images")).toEqual([image]);
     expect(requestOptions.headers["Content-Type"]).toBeUndefined();
     expect(requestOptions.headers.Authorization).toBe("Bearer customer-token");

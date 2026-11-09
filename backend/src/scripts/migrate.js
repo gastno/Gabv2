@@ -52,21 +52,28 @@ const applyMigrations = async (database, directory = path.join(__dirname, '../..
               AND column_name = 'is_read'
           ) AS is_current_baseline,
         to_regclass('public.staff_appointment_notifications') IS NOT NULL
-          AS has_staff_appointment_notifications
+          AS has_staff_appointment_notifications,
+        EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND table_name = 'appointments'
+            AND column_name = 'is_alternate_location'
+        ) AS has_appointment_locations
     `);
     if (!result.rows[0]?.is_current_baseline) return false;
 
     const hasStaffNotifications = result.rows[0].has_staff_appointment_notifications ?? true;
-    const baselineMigrations = hasStaffNotifications
-      ? migrations
-      : migrations.filter(migration => migration.version < '011_staff_booking_notifications.sql');
+    const hasAppointmentLocations = result.rows[0].has_appointment_locations ?? true;
+    const baselineMigrations = migrations.filter(migration =>
+      (hasStaffNotifications || migration.version < '011_staff_booking_notifications.sql')
+      && (hasAppointmentLocations || migration.version < '012_availability_locations.sql'));
     for (const migration of baselineMigrations) {
       await client.query(
         'INSERT INTO schema_migrations (version, checksum) VALUES ($1, $2) ON CONFLICT (version) DO NOTHING',
         [migration.version, migration.checksum]
       );
     }
-    return hasStaffNotifications ? 'current' : 'legacy';
+    return hasStaffNotifications && hasAppointmentLocations ? 'current' : 'legacy';
   });
   if (isCurrentBaseline === 'current') return [];
 

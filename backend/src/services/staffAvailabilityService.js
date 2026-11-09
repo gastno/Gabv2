@@ -30,10 +30,15 @@ const normalizeAvailabilityShifts = shifts => {
     if (shift.is_active !== undefined && typeof shift.is_active !== 'boolean') {
       return { error: 'is_active must be a boolean.' };
     }
+    if (shift.location !== undefined && shift.location !== null
+        && (typeof shift.location !== 'string' || !shift.location.trim() || shift.location.trim().length > 500)) {
+      return { error: 'location must be null or a non-empty address of at most 500 characters.' };
+    }
     normalized.push({
       startTime: `${shift.start_time.length === 5 ? `${shift.start_time}:00` : shift.start_time}`,
       endTime: `${shift.end_time.length === 5 ? `${shift.end_time}:00` : shift.end_time}`,
       isActive: shift.is_active ?? true,
+      location: shift.location?.trim() ?? null,
       start,
       end,
     });
@@ -48,10 +53,11 @@ const normalizeAvailabilityShifts = shifts => {
     }
   }
 
-  return { value: normalized.map(({ startTime, endTime, isActive }) => ({
+  return { value: normalized.map(({ startTime, endTime, isActive, location }) => ({
     startTime,
     endTime,
     isActive,
+    location,
   })) };
 };
 
@@ -91,7 +97,7 @@ const lockStaffAvailability = (client, staffId) => client.query(
 const getStaffAvailability = async (database, staffId, date) => {
   const [availability, unavailabilities] = await Promise.all([
     database.query(`
-      SELECT id, availability_date, start_time, end_time, is_active
+      SELECT id, availability_date, start_time, end_time, is_active, location
       FROM staff_availabilities
       WHERE staff_id = $1 AND availability_date = $2::date
       ORDER BY start_time
@@ -137,28 +143,30 @@ const replaceStaffAvailability = (database, staffId, date, shifts) => database.w
   const conflictingAppointment = await client.query(`
     SELECT 1
     FROM appointments appointment
+    JOIN brands brand ON brand.id = appointment.brand_id
     WHERE appointment.staff_id = $1
       AND appointment.status IN ('pending', 'confirmed')
       AND (appointment.start_time AT TIME ZONE 'Atlantic/Reykjavik')::date = $2::date
       AND NOT EXISTS (
         SELECT 1
-        FROM jsonb_to_recordset($3::jsonb) AS shift(start_time TIME, end_time TIME, is_active BOOLEAN)
-        WHERE shift.is_active = TRUE
-          AND appointment.start_time >= (($2::date + shift.start_time) AT TIME ZONE 'Atlantic/Reykjavik')
-          AND appointment.end_time <= (($2::date + shift.end_time) AT TIME ZONE 'Atlantic/Reykjavik')
+        FROM jsonb_to_recordset($3::jsonb) AS shift("startTime" TIME, "endTime" TIME, "isActive" BOOLEAN, location TEXT)
+        WHERE shift."isActive" = TRUE
+          AND appointment.start_time >= (($2::date + shift."startTime") AT TIME ZONE 'Atlantic/Reykjavik')
+          AND appointment.end_time <= (($2::date + shift."endTime") AT TIME ZONE 'Atlantic/Reykjavik')
+          AND appointment.location = COALESCE(shift.location, brand.location)
       )
     LIMIT 1
   `, [staffId, date, JSON.stringify(shifts)]);
   if (conflictingAppointment.rows.length) {
-    throw new BookingError('Availability changes would exclude an existing appointment.', 409);
+    throw new BookingError('Availability changes would exclude an existing appointment or change its location.', 409);
   }
 
   await client.query('DELETE FROM staff_availabilities WHERE staff_id = $1 AND availability_date = $2::date', [staffId, date]);
   for (const shift of shifts) {
     await client.query(`
-      INSERT INTO staff_availabilities (staff_id, availability_date, start_time, end_time, is_active)
-      VALUES ($1, $2, $3, $4, $5)
-    `, [staffId, date, shift.startTime, shift.endTime, shift.isActive]);
+      INSERT INTO staff_availabilities (staff_id, availability_date, start_time, end_time, is_active, location)
+      VALUES ($1, $2, $3, $4, $5, $6)
+    `, [staffId, date, shift.startTime, shift.endTime, shift.isActive, shift.location]);
   }
   return getStaffAvailability(client, staffId, date);
 });

@@ -44,6 +44,8 @@ describe("CalendarTab", () => {
             fee_status: "fee_waived",
             payment_status: "accepted",
             status: "confirmed",
+            location: "Other studio",
+            is_alternate_location: true,
           },
           {
             id: 22,
@@ -166,6 +168,8 @@ describe("CalendarTab", () => {
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Alex Client");
     expect(screen.getByText("alex@example.com")).toBeInTheDocument();
     expect(screen.getByText("Lash Service")).toBeInTheDocument();
+    expect(screen.getByText("Other studio")).toBeInTheDocument();
+    expect(screen.getByText("Different from the usual studio")).toBeInTheDocument();
     expect(screen.getByText("fee waived")).toBeInTheDocument();
     expect(screen.getByText("accepted")).toBeInTheDocument();
     fireEvent.keyDown(window, { key: "Escape" });

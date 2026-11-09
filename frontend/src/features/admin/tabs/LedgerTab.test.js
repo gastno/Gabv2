@@ -43,6 +43,8 @@ describe("LedgerTab", () => {
           price_snapshot_isk: "14000.00",
           payment_status: "accepted",
           fee_status: "fee_waived",
+          location: "Other studio",
+          is_alternate_location: true,
         },
         {
           id: 2,
@@ -75,6 +77,8 @@ describe("LedgerTab", () => {
     expect(screen.getByText("completed@example.com")).toBeInTheDocument();
     expect(screen.getAllByText("60 minutes")).toHaveLength(2);
     expect(screen.getByText("fee waived")).toBeInTheDocument();
+    expect(screen.getByText("Other studio")).toBeInTheDocument();
+    expect(screen.getByText("Different from the usual studio")).toBeInTheDocument();
     expect(screen.getByText("Customer request")).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Filter ledger by brand" })).toHaveValue("all");
     expect(screen.getAllByRole("row")[1]).toHaveTextContent("#3");

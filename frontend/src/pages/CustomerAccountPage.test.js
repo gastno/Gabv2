@@ -31,6 +31,8 @@ beforeEach(() => {
       start_time: "2026-11-01T12:00:00Z",
       status: "confirmed",
       price_snapshot_isk: "9000",
+      location: "Other studio",
+      is_alternate_location: true,
     }],
   });
   notificationApi.getPreferences.mockResolvedValue({ preferences: { email_enabled: false } });
@@ -55,6 +57,8 @@ test("shows customer appointment price snapshots, notification history, and save
   expect(apptApi.listCustomerAppointments).toHaveBeenCalledWith({ period: "upcoming" });
   expect(await screen.findByText("Lash lift")).toBeInTheDocument();
   expect(screen.getByText(/9[.,]000\s+kr/)).toBeInTheDocument();
+  expect(screen.getByText("Location: Other studio")).toBeInTheDocument();
+  expect(screen.getByText("Different from the usual studio location.")).toBeInTheDocument();
   expect(screen.getByText("Appointment reminder")).toBeInTheDocument();
   expect(screen.getByText("sent")).toBeInTheDocument();
   expect(screen.getByText("Unread")).toBeInTheDocument();
@@ -66,6 +70,12 @@ test("shows customer appointment price snapshots, notification history, and save
     email_enabled: true,
   }));
   expect(await screen.findByText("Your email preference has been saved.")).toBeInTheDocument();
+});
+
+test("previous appointment history shows its saved location", async () => {
+  render(<CustomerAccountPage previousOnly />);
+  expect(await screen.findByText("Location: Other studio")).toBeInTheDocument();
+  expect(screen.getByText("Different from the usual studio location.")).toBeInTheDocument();
 });
 
 test("requires customer sign-in before showing personal history", async () => {

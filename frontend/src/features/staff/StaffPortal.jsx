@@ -340,6 +340,8 @@ function StaffPortal() {
       key: `new-${selectedDateKey}-${Date.now()}-${Math.random()}`,
       start_time: "09:00",
       end_time: "10:00",
+      location: "",
+      is_active: true,
     }]);
   };
 
@@ -364,7 +366,9 @@ function StaffPortal() {
 
     setAvailabilitySaving(true);
     try {
-      const payload = shifts.map(({ start_time, end_time }) => ({ start_time, end_time, is_active: true }));
+      const payload = shifts.map(({ start_time, end_time, location, is_active }) => ({
+        start_time, end_time, location: location.trim() || null, is_active,
+      }));
       const result = await staffAvailabilityApi.replaceForDate(selectedDateKey, payload);
       const nextAvailability = Array.isArray(result?.availability)
         ? result.availability
@@ -507,8 +511,9 @@ function StaffPortal() {
             start_time: String(shift.start_time).slice(0, 5),
             end_time: String(shift.end_time).slice(0, 5),
             is_active: shift.is_active !== false,
+            location: shift.location || null,
           })),
-          { start_time: form.startTime, end_time: form.endTime, is_active: true },
+          { start_time: form.startTime, end_time: form.endTime, is_active: true, location: form.location.trim() || null },
         ];
         const result = await staffAvailabilityApi.replaceForDate(dateKey, shifts);
         const nextAvailability = Array.isArray(result?.availability)
@@ -594,6 +599,7 @@ function StaffPortal() {
             start_time: String(shift.start_time).slice(0, 5),
             end_time: String(shift.end_time).slice(0, 5),
             is_active: shift.is_active !== false,
+            location: shift.location || null,
           }));
         const result = await staffAvailabilityApi.replaceForDate(dateKey, shifts);
         const nextAvailability = Array.isArray(result?.availability)

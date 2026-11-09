@@ -119,6 +119,8 @@ function CustomerAccountPage({ previousOnly = false }) {
                       <div>
                         <h3>{appointment.service_name || "Appointment"}</h3>
                         <p>{appointment.brand_name || "Studio"} · {formatDate(appointment.start_time)}</p>
+                        <p>Location: {appointment.location || "Unavailable"}</p>
+                        {appointment.is_alternate_location && <p>Different from the usual studio location.</p>}
                       </div>
                       <div className="customer-appointment-details">
                         <span className={`customer-appointment-status status-${appointment.status}`}>

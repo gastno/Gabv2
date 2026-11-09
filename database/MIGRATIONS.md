@@ -107,3 +107,13 @@ Apply `migrations/011_staff_booking_notifications.sql` to add optional staff ema
 ```powershell
 Get-Content -Raw database/migrations/011_staff_booking_notifications.sql | docker compose exec -T postgres_db psql -U $env:POSTGRES_USER -d $env:POSTGRES_DB
 ```
+
+## Alternate Appointment Locations
+
+Back up the database and apply `migrations/012_availability_locations.sql` with the tracked migration runner before deploying this API. Existing appointments are backfilled with their brand's current location and marked as normal; historical addresses cannot be recovered if the brand location changed, so review them before relying on the backfill.
+
+Staff can specify `location` as a non-empty address (up to 500 characters), or `null` for the brand's normal location, on each shift in `PUT /api/staff-availability/me/availability/:date`. Omitting the field also selects the normal location. Existing availability reads include this override. Replacing shifts that would remove an active appointment or change its snapshotted address returns 409. Shifts remain staff-wide across assigned brands; a null override resolves to the selected service's brand location.
+
+Each public `GET /api/appointments/availability` slot includes `location` and `is_alternate_location`. Clients must show the address and a clear alternate-location warning in booking details whenever the flag is true, and send the displayed address as `expected_location` in `POST /api/appointments` (JSON or multipart). Alternate-location bookings without matching confirmation return 409; clients should refresh slots and ask the customer to review the address again. Supplying `expected_location` for normal slots also detects an address change; legacy clients can continue booking normal slots without it.
+
+Booking creation snapshots the address and alternate flag. Appointment creation, authenticated list/detail (including customer history), status, payment, fee, and cancellation responses include `location` and `is_alternate_location`. Staff calendar details and customer history must render these fields. No frontend behavior changes are included in this migration; until clients are updated, alternate bookings cannot be completed by those clients.

@@ -49,6 +49,8 @@ function AppointmentDetailsModal({
         <div className="appointment-detail-list">
           <div><span>👤 Customer</span><strong>{appointment.clientName}</strong></div>
           <div><span>✂️ Service</span><strong>{appointment.service}</strong></div>
+          <div><span>Location</span><strong>{appointment.location || "Unavailable"}</strong></div>
+          {appointment.is_alternate_location && <div><span>Location notice</span><strong>Different from the usual studio</strong></div>}
           <div><span>📞 Phone</span><strong>{appointment.phone}</strong></div>
           <div><span>✉️ Email</span><strong>{appointment.email || "Unavailable"}</strong></div>
           <div><span>🪪 Kennitala</span><strong>{appointment.kennitala || "Unavailable"}</strong></div>

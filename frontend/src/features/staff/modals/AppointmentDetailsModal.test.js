@@ -17,6 +17,8 @@ describe("AppointmentDetailsModal payment status", () => {
     status: "pending",
     fee_status: "none",
     payment_status: "pending",
+    location: "Other studio",
+    is_alternate_location: true,
   };
 
   it("shows payment status and allows staff to choose accepted or pending", () => {
@@ -81,6 +83,8 @@ describe("AppointmentDetailsModal payment status", () => {
       selector: ".appointment-detail-list span",
     }).closest("div");
     expect(within(healthInfoRow).getByText("Allergic to fragrance")).toBeInTheDocument();
+    expect(screen.getByText("Other studio")).toBeInTheDocument();
+    expect(screen.getByText("Different from the usual studio")).toBeInTheDocument();
   });
 
   it("shows reference images in the appointment details", () => {

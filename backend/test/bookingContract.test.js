@@ -45,6 +45,13 @@ test('rejects invalid multipart custom options', () => {
   }).error, /custom_options/i);
 });
 
+test('validates the location acknowledged by the customer', () => {
+  assert.equal(validateBookingRequest({ ...validRequest(), expected_location: 'Other studio' }).value.expectedLocation, 'Other studio');
+  for (const expected_location of [null, '', '  ', 42, 'x'.repeat(2001)]) {
+    assert.match(validateBookingRequest({ ...validRequest(), expected_location }).error, /expected_location/i);
+  }
+});
+
 test('rejects missing or invalid guest email addresses', () => {
   for (const email of [undefined, '', 'not-an-email', 'x'.repeat(250) + '@example.com']) {
     assert.match(validateBookingRequest({ ...validRequest(), email }).error, /email/i);

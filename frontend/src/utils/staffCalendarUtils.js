@@ -178,6 +178,8 @@ export function makeAvailabilityDrafts(shifts = []) {
     id: shift.id,
     start_time: String(shift.start_time || "09:00").slice(0, 5),
     end_time: String(shift.end_time || "17:00").slice(0, 5),
+    location: shift.location || "",
+    is_active: shift.is_active !== false,
   }));
 }
 

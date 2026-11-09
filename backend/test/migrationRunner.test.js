@@ -140,3 +140,35 @@ test('migration runner upgrades the previous baseline without replaying its migr
     fs.rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test('migration runner applies location migration to an untracked previous baseline', async () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'gabv2-migrations-'));
+  fs.writeFileSync(path.join(directory, '011_staff_booking_notifications.sql'), 'SELECT 11;\n');
+  fs.writeFileSync(path.join(directory, '012_availability_locations.sql'), 'SELECT 12;\n');
+  const versions = new Map();
+  const database = {
+    query: async () => ({ rows: [] }),
+    withTransaction: callback => callback({
+      query: async (sql, params = []) => {
+        if (sql.includes('SELECT version FROM schema_migrations')) return { rows: [] };
+        if (sql.includes('SELECT checksum FROM schema_migrations')) {
+          const checksum = versions.get(params[0]);
+          return { rows: checksum ? [{ checksum }] : [] };
+        }
+        if (sql.includes('AS has_staff_appointment_notifications')) return { rows: [{
+          is_current_baseline: true,
+          has_staff_appointment_notifications: true,
+          has_appointment_locations: false,
+        }] };
+        if (sql.includes('INSERT INTO schema_migrations')) versions.set(params[0], params[1]);
+        return { rows: [] };
+      },
+    }),
+  };
+  try {
+    assert.deepEqual(await applyMigrations(database, directory), ['012_availability_locations.sql']);
+    assert.equal(versions.size, 2);
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
+});

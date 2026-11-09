@@ -61,6 +61,7 @@ function ScheduleStep({
   onDateSelect,
   isLoadingAvailability,
   availabilityError,
+  conflictMessage,
   selectedDateLabel,
   timeOptions,
   selectedSlot,
@@ -108,7 +109,8 @@ function ScheduleStep({
           ))}
         </div>
         {isLoadingAvailability && <p className="placeholder-message">{t("booking.checkAvailability")}</p>}
-        {availabilityError && <p className="placeholder-message">{availabilityError}</p>}
+        {availabilityError && <p className="placeholder-message" role="alert">{availabilityError}</p>}
+        {conflictMessage && <p className="placeholder-message" role="alert">{conflictMessage}</p>}
       </div>
       {selectedDateKey && (
         <div className="time-slots-section">
@@ -133,10 +135,16 @@ function ScheduleStep({
           )}
         </div>
       )}
+      {selectedSlot && (
+        <div className="booking-location" aria-live="polite">
+          <p><strong>{t("booking.location")}</strong> {selectedSlot.location || t("booking.locationUnavailable")}</p>
+          {selectedSlot.is_alternate_location && <p className="booking-location-warning">{t("booking.alternateLocation")}</p>}
+        </div>
+      )}
       <button
         type="button"
         className="modal-next-btn"
-        disabled={!selectedDateKey || !selectedSlot}
+        disabled={!selectedDateKey || !selectedSlot || !selectedSlot.location}
         onClick={onNext}
       >
         {t("booking.next")}
@@ -145,7 +153,7 @@ function ScheduleStep({
   );
 }
 
-function AccountStep({ service, dateLabel, timeLabel, onContinue }) {
+function AccountStep({ service, dateLabel, timeLabel, selectedSlot, onContinue }) {
   const { t } = useLanguage();
   return (
     <div className="modal-step" key="account">
@@ -153,6 +161,10 @@ function AccountStep({ service, dateLabel, timeLabel, onContinue }) {
       <p className="modal-subtitle">
         {service.name} on {dateLabel} at {timeLabel}
       </p>
+      <div className="booking-location">
+        <p><strong>{t("booking.location")}</strong> {selectedSlot.location}</p>
+        {selectedSlot.is_alternate_location && <p className="booking-location-warning">{t("booking.alternateLocation")}</p>}
+      </div>
       <div className="auth-choice-container">
         <a
           className="auth-btn primary"
@@ -175,6 +187,7 @@ function GuestDetailsStep({
   employee,
   dateLabel,
   timeLabel,
+  selectedSlot,
   guestForm,
   onFieldChange,
   referenceImages,
@@ -214,7 +227,9 @@ function GuestDetailsStep({
             <div className="summary-row"><span className="summary-label">{t("booking.price")}</span><span className="summary-value highlight">{service.salePrice ? <><del className="service-regular-price">{service.regularPrice}</del> {service.salePrice}</> : service.price}</span></div>
             <div className="summary-row"><span className="summary-label">{t("booking.specialist")}</span><span className="summary-value">{employee?.name}</span></div>
             <div className="summary-row"><span className="summary-label">{t("booking.dateAndTime")}</span><span className="summary-value highlight">{dateLabel} {t("booking.at")} {timeLabel}</span></div>
+            <div className="summary-row"><span className="summary-label">{t("booking.location")}</span><span className="summary-value">{selectedSlot.location}</span></div>
           </div>
+          {selectedSlot.is_alternate_location && <p className="booking-location-warning">{t("booking.alternateLocation")}</p>}
         </div>
 
         <div className="form-group">
@@ -310,6 +325,7 @@ function BookingModal({ service, brandName, onClose }) {
   const [referenceImages, setReferenceImages] = useState([]);
   const [referenceImageError, setReferenceImageError] = useState("");
   const [submitError, setSubmitError] = useState("");
+  const [conflictMessage, setConflictMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -384,6 +400,7 @@ function BookingModal({ service, brandName, onClose }) {
     setMonthCursor({ year: initialYear, month: initialMonth - 1 });
     setAvailabilityByDate({});
     setAvailabilityError("");
+    setConflictMessage("");
     setSelectedDateKey(null);
     setSelectedSlot(null);
     setStep(2);
@@ -457,6 +474,7 @@ function BookingModal({ service, brandName, onClose }) {
         phone_number: submittedGuestForm.phone,
         kennitala: submittedGuestForm.kennitala,
         start_time: finalStartTime,
+        expected_location: selectedSlot.location,
         duration_minutes: parsedDuration,
         price_isk: parsedPrice,
         health_info: submittedGuestForm.healthInfo,
@@ -472,15 +490,26 @@ function BookingModal({ service, brandName, onClose }) {
       } else {
         await apptApi.createAppointment(payload);
       }
-      window.alert(t("booking.confirmed", {
+      window.alert(`${t("booking.confirmed", {
         service: service.name,
         specialist: selectedEmployee.name,
         date: selectedDateLabel,
         time: selectedTimeLabel,
-      }));
+      })}\n${t("booking.location")} ${selectedSlot.location}${selectedSlot.is_alternate_location ? `\n${t("booking.alternateLocation")}` : ""}`);
       onClose();
     } catch (error) {
       console.error("Booking API Error:", error);
+      if (error.status === 409) {
+        setSelectedSlot(null);
+        setAvailabilityByDate((previous) => {
+          const next = { ...previous };
+          delete next[selectedDateKey];
+          return next;
+        });
+        setConflictMessage(`${error.message} ${t("booking.locationChanged")}`);
+        setStep(2);
+        return;
+      }
       setSubmitError(t("booking.failed", {
         error: error.message || (language === "is" ? "Innri villa á netþjóni" : "Internal Server Error"),
       }));
@@ -517,10 +546,14 @@ function BookingModal({ service, brandName, onClose }) {
             onDateSelect={handleDateSelect}
             isLoadingAvailability={isLoadingAvailability}
             availabilityError={availabilityError}
+            conflictMessage={conflictMessage}
             selectedDateLabel={selectedDateLabel}
             timeOptions={timeOptions}
             selectedSlot={selectedSlot}
-            onTimeSelect={setSelectedSlot}
+            onTimeSelect={(slot) => {
+              setConflictMessage("");
+              setSelectedSlot(slot);
+            }}
             onNext={() => setStep(3)}
           />
         )}
@@ -529,6 +562,7 @@ function BookingModal({ service, brandName, onClose }) {
             service={service}
             dateLabel={selectedDateLabel}
             timeLabel={selectedTimeLabel}
+            selectedSlot={selectedSlot}
             onContinue={() => setStep(4)}
           />
         )}
@@ -539,6 +573,7 @@ function BookingModal({ service, brandName, onClose }) {
             employee={selectedEmployee}
             dateLabel={selectedDateLabel}
             timeLabel={selectedTimeLabel}
+            selectedSlot={selectedSlot}
             guestForm={guestForm}
             onFieldChange={(field, value) => {
               setGuestForm((previous) => ({ ...previous, [field]: value }));

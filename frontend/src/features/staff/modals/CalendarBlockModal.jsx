@@ -20,6 +20,7 @@ function CalendarBlockModal({
     endDate: period ? getStudioDateKey(period.block_end) : dateKey,
     endTime: period ? formatStudioTime(period.block_end) : availability?.end_time?.slice(0, 5) || "17:00",
     reason: period?.reason || "",
+    location: availability?.location || "",
   }));
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -95,6 +96,18 @@ function CalendarBlockModal({
             <label className="calendar-modal-field">
               <span>Reason (optional)</span>
               <input type="text" maxLength="255" value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} />
+            </label>
+          )}
+          {!isUnavailable && (
+            <label className="calendar-modal-field">
+              <span>Alternate location (optional)</span>
+              <input
+                type="text"
+                maxLength="500"
+                value={form.location}
+                placeholder="Leave blank for the usual studio"
+                onChange={(event) => setForm({ ...form, location: event.target.value })}
+              />
             </label>
           )}
           {error && <p className="staff-error-message" role="alert">{error}</p>}

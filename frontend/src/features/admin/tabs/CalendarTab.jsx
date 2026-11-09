@@ -90,6 +90,8 @@ function CalendarBlockDetailsModal({ block, dateKey, onClose }) {
     details.push(
       ["Customer", appointment.clientName],
       ["Service", appointment.service],
+      ["Location", appointment.location || "Unavailable"],
+      ...(appointment.is_alternate_location ? [["Location notice", "Different from the usual studio"]] : []),
       ["Phone", appointment.phone],
       ["Email", appointment.email || "Unavailable"],
       ["Price", appointment.price],
@@ -107,6 +109,7 @@ function CalendarBlockDetailsModal({ block, dateKey, onClose }) {
     }
   } else if (block.availability) {
     details.push(["Availability", "Scheduled working hours"]);
+    details.push(["Location", block.availability.location || "Usual studio for the service"]);
   }
 
   return (

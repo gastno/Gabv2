@@ -26,9 +26,12 @@ const getAvailability = (database, { serviceId, staffId, date }) => database.que
     staff_member.id AS staff_id,
     staff_member.full_name AS staff_name,
     target.brand_id,
+    COALESCE(availability.location, brand.location) AS location,
+    (availability.location IS NOT NULL AND availability.location <> brand.location) AS is_alternate_location,
     slot.start_time,
     slot.start_time + make_interval(mins => target.duration_minutes) AS end_time
   FROM services target
+  JOIN brands brand ON brand.id = target.brand_id
   JOIN staff_services assignment ON assignment.service_id = target.id
   JOIN staff staff_member ON staff_member.id = assignment.staff_id AND staff_member.is_active = TRUE
   JOIN roles staff_role ON staff_role.id = staff_member.role_id AND staff_role.name = 'staff'

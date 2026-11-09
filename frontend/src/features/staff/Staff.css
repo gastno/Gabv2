@@ -877,6 +877,11 @@ button.zoom-appt-card {
   margin-bottom: 8px;
 }
 
+.schedule-shift-fields .availability-location-field {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
 .schedule-shift-fields:last-child {
   margin-bottom: 0;
 }
