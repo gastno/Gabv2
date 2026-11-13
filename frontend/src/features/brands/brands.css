@@ -20,6 +20,11 @@
   isolation: isolate;
 }
 
+.studio-page .main-header,
+.studio-page .site-footer {
+  background-color: rgba(29, 33, 30, 0.94);
+}
+
 .studio-page::before {
   position: fixed;
   z-index: 1000;
@@ -2305,6 +2310,176 @@
 
   .brand-page .portfolio-layout-feature {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+
+/* Keep the booking flow compact; scrolling remains available at extreme zoom or viewport sizes. */
+.brand-page .modal-content .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.brand-page .modal-content {
+  width: min(100%, 720px);
+  max-width: 720px;
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 22px 26px;
+}
+
+.brand-page .modal-subtitle {
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+
+.brand-page .booking-step-footer {
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 8px;
+}
+
+.brand-page .booking-step-indicator {
+  flex: 1;
+  min-width: 0;
+}
+
+.brand-page .booking-back-btn {
+  flex: none;
+}
+
+.brand-page .employee-selection-list {
+  gap: 8px;
+}
+
+.brand-page .employee-option-card {
+  padding: 8px 12px;
+}
+
+.brand-page .booking-list-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+  color: var(--hud-text-secondary);
+}
+
+.brand-page .booking-list-pagination button {
+  padding: 6px 12px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+.brand-page .booking-list-pagination button:disabled {
+  opacity: 0.4;
+}
+
+.brand-page .booking-schedule-step {
+  max-width: 100%;
+}
+
+.brand-page .booking-schedule-step .calendar-container {
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.brand-page .booking-schedule-step .time-slots-section,
+.brand-page .booking-schedule-step .booking-location {
+  margin: 0 0 8px;
+}
+
+.brand-page .booking-change-date {
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  border: 1px solid var(--hud-border-subtle);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--hud-text-secondary);
+  cursor: pointer;
+}
+
+.brand-page .calendar-header {
+  margin-bottom: 6px;
+}
+
+.brand-page .calendar-weekdays {
+  margin-bottom: 4px;
+}
+
+.brand-page .calendar-days-grid {
+  gap: 3px;
+}
+
+.brand-page .calendar-day-cell,
+.brand-page .calendar-day-cell-empty {
+  aspect-ratio: auto;
+  height: 32px;
+}
+
+.brand-page .guest-booking-form {
+  gap: 10px;
+}
+
+.brand-page .booking-personal-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.brand-page .form-group input,
+.brand-page .form-group textarea {
+  min-width: 0;
+}
+
+.brand-page .reference-image-preview-list {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.brand-page .reference-image-preview-list img {
+  height: 54px;
+}
+
+.brand-page .reference-image-preview-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .brand-page .modal-backdrop {
+    padding: 12px;
+  }
+
+  .brand-page .modal-content {
+    padding: 18px 16px 14px;
+  }
+
+  .brand-page .modal-step h2 {
+    font-size: 1.25rem;
+  }
+
+  .brand-page .calendar-day-cell,
+  .brand-page .calendar-day-cell-empty {
+    height: 28px;
+  }
+
+  .brand-page .time-chip {
+    padding: 6px;
+  }
+
+  .brand-page .booking-personal-fields {
+    grid-template-columns: 1fr;
   }
 }
 

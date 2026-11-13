@@ -8,6 +8,7 @@ const { uploadAvatar } = require('../middleware/uploadMiddleware');
 
 // Public route: Fetch all active brands
 router.get('/', brandController.getAllBrands);
+router.get('/manageable', authenticateToken, requireRole('admin', 'super_admin'), brandController.getManageableBrands);
 router.get('/:id/portfolio', brandController.getBrandPortfolio);
 
 const requireBrandAdmin = [authenticateToken, requireRole('admin', 'super_admin'), requireBrandAccess];

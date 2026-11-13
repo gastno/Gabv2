@@ -8,7 +8,7 @@ import ServicesTab from "../tabs/ServicesTab";
 import StaffTab from "../tabs/StaffTab";
 import LedgerTab from "../tabs/LedgerTab";
 import StaffServicesTab from "../tabs/StaffServicesTab";
-import PortfolioTab from "../tabs/PortfolioTab";
+import PortfolioWorkspace from "../tabs/PortfolioWorkspace";
 
 const AdminWorkspace = React.memo(function AdminWorkspace({
   sidebarCollapsed,
@@ -28,8 +28,6 @@ const AdminWorkspace = React.memo(function AdminWorkspace({
   loadingCategories,
   services,
   loadingServices,
-  manageableBrands,
-  staffRole,
   handleOpenBrandModal,
   setCategoryModalOpen,
   setInspectCategory,
@@ -83,11 +81,7 @@ const AdminWorkspace = React.memo(function AdminWorkspace({
           )}
 
           {activeTab === "portfolio" && (
-            <PortfolioTab
-              brands={manageableBrands}
-              loadingBrands={loadingBrands || (staffRole === "admin" && loadingStaff)}
-              onBrandUpdate={onBrandUpdate}
-            />
+            <PortfolioWorkspace onBrandUpdate={onBrandUpdate} />
           )}
 
           {activeTab === "categories" && (

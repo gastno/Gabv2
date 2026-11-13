@@ -5,7 +5,7 @@ RUN npm ci
 COPY frontend/ ./
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
-RUN node -e "const value = process.env.REACT_APP_API_URL; let url; try { url = new URL(value); } catch { throw new Error('REACT_APP_API_URL must be an absolute HTTPS API URL ending in /api.'); } if (url.protocol !== 'https:' || !url.pathname.endsWith('/api')) throw new Error('REACT_APP_API_URL must be an absolute HTTPS API URL ending in /api.');"
+RUN node -e "const value = process.env.REACT_APP_API_URL; if (value !== '/api') { let url; try { url = new URL(value); } catch { throw new Error('REACT_APP_API_URL must be /api or an absolute HTTPS API URL ending in /api.'); } if (url.protocol !== 'https:' || !url.pathname.endsWith('/api')) throw new Error('REACT_APP_API_URL must be /api or an absolute HTTPS API URL ending in /api.'); }"
 RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:1.28-alpine AS runtime

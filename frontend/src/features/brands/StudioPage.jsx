@@ -1,5 +1,6 @@
 import { startTransition, useEffect, useMemo, useState } from "react";
 import CustomerLayout from "../../components/layout/CustomerLayout/CustomerLayout";
+import ParallaxStars from "../home/ParallaxStars";
 import {
   brandPortfolioApi,
   getAssetUrl,
@@ -105,7 +106,7 @@ function StudioPage({ brandId }) {
   };
 
   return (
-    <CustomerLayout pageClassName="brand-page studio-page">
+    <CustomerLayout pageClassName="brand-page studio-page" background={<ParallaxStars />}>
       <main className="brand-content">
         <section className="store-information">
           <div className="store-details">

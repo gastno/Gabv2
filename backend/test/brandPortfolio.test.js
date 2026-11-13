@@ -119,6 +119,31 @@ test('portfolio updates validate preset and replace gallery order as one transac
   );
 });
 
+test('a brand layout can be saved without portfolio images', async () => {
+  const statements = [];
+  db.withTransaction = async callback => callback({
+    async query(sql, params) {
+      statements.push({ sql, params });
+      if (sql.includes('SELECT id FROM brands')) return { rows: [{ id: '2' }] };
+      return { rows: [] };
+    },
+  });
+  db.query = async () => ({ rows: [{ id: '2', gallery_layout: 'carousel', images: [] }] });
+
+  const res = response();
+  await controller.updatePortfolio({
+    params: { id: '2' },
+    body: { layout: 'carousel', image_ids: [] },
+  }, res);
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.layout, 'carousel');
+  assert.deepEqual(res.body.images, []);
+  const update = statements.find(statement => statement.sql.startsWith('UPDATE brands'));
+  assert.deepEqual(update.params, ['carousel', '2']);
+  assert.equal(statements.filter(statement => statement.sql.startsWith('UPDATE brand_portfolio_images')).length, 0);
+});
+
 test('portfolio updates reject unsupported layouts and incomplete image orders without writing', async () => {
   let transactionCount = 0;
   db.withTransaction = async () => {

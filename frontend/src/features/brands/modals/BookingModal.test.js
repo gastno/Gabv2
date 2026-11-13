@@ -55,6 +55,19 @@ describe("BookingModal reference images", () => {
     expect(portal.closest(".booking-modal-portal").parentElement).toBe(document.body);
   });
 
+  it("paginates specialists without making any unavailable", async () => {
+    staffServiceApi.getByServiceId.mockResolvedValue(
+      Array.from({ length: 5 }, (_, index) => ({ id: index + 1, full_name: `Specialist ${index + 1}` }))
+    );
+    render(<BookingModal service={{ id: 3, name: "Custom design" }} brandName="Amor Tattoo" onClose={jest.fn()} />);
+    expect(await screen.findByRole("button", { name: /Specialist 1/ })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Specialist 4/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByRole("button", { name: /Specialist 4/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    expect(screen.getByRole("button", { name: /Specialist 1/ })).toBeInTheDocument();
+  });
+
   it("includes the selected reference image in the customer booking request", async () => {
     const image = new File(["image"], "design.png", { type: "image/png" });
     render(
@@ -78,6 +91,10 @@ describe("BookingModal reference images", () => {
       return day;
     });
     fireEvent.click(availableDay);
+    expect(screen.queryByRole("button", { name: "Previous month" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Change date" }));
+    expect(screen.getByRole("button", { name: "Previous month" })).toBeInTheDocument();
+    fireEvent.click(document.querySelector(".calendar-day-cell.available"));
     fireEvent.click(screen.getByRole("button", { name: "10:00" }));
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue as Guest" }));
@@ -86,8 +103,10 @@ describe("BookingModal reference images", () => {
     fireEvent.change(screen.getByLabelText("Email *"), { target: { value: "taylor@example.com" } });
     fireEvent.change(screen.getByLabelText("Phone Number *"), { target: { value: "+354 555 0100" } });
     fireEvent.change(screen.getByLabelText("Kennitala *"), { target: { value: "010190-1234" } });
-    fireEvent.click(screen.getByLabelText(/I consent to Amor Tattoo/));
-    fireEvent.click(screen.getByLabelText(/I have read and accept/));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    expect(screen.getByLabelText("Full Name *")).toHaveValue("Taylor Customer");
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.change(screen.getByLabelText("Reference images (optional)"), {
       target: { files: [new File(["document"], "document.gif", { type: "image/gif" })] },
     });
@@ -107,6 +126,10 @@ describe("BookingModal reference images", () => {
     });
 
     expect(await screen.findByAltText("Preview of design.png")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByLabelText(/I consent to Amor Tattoo/));
+    fireEvent.click(screen.getByLabelText(/I have read and accept/));
     fireEvent.click(screen.getByRole("button", { name: "Confirm & Book Appointment" }));
 
     await waitFor(() => expect(apptApi.createAppointment).toHaveBeenCalledTimes(1));
@@ -134,12 +157,15 @@ describe("BookingModal reference images", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByText("Other studio, 12 Street")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Continue as Guest" }));
-    expect(screen.getByText("Other studio, 12 Street")).toBeInTheDocument();
-    expect(screen.getByText(/different location than the usual studio/i)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Full Name *"), { target: { value: "Taylor Customer" } });
     fireEvent.change(screen.getByLabelText("Email *"), { target: { value: "taylor@example.com" } });
     fireEvent.change(screen.getByLabelText("Phone Number *"), { target: { value: "5550100" } });
     fireEvent.change(screen.getByLabelText("Kennitala *"), { target: { value: "010190-1234" } });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    expect(screen.getByText("Other studio, 12 Street")).toBeInTheDocument();
+    expect(screen.getByText(/different location than the usual studio/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByLabelText(/I consent to Amor Tattoo/));
     fireEvent.click(screen.getByLabelText(/I have read and accept/));
     fireEvent.click(screen.getByRole("button", { name: "Confirm & Book Appointment" }));
@@ -208,6 +234,9 @@ describe("BookingModal reference images", () => {
     fireEvent.change(screen.getByLabelText("Email *"), { target: { value: "taylor@example.com" } });
     fireEvent.change(screen.getByLabelText("Phone Number *"), { target: { value: "5550100" } });
     fireEvent.change(screen.getByLabelText("Kennitala *"), { target: { value: "010190-1234" } });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByLabelText(/I consent to Amor Tattoo/));
     fireEvent.click(screen.getByLabelText(/I have read and accept/));
     address = "New address";
@@ -220,6 +249,9 @@ describe("BookingModal reference images", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue as Guest" }));
     expect(screen.getByLabelText("Full Name *")).toHaveValue("Taylor Customer");
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
     fireEvent.click(screen.getByRole("button", { name: "Confirm & Book Appointment" }));
     await waitFor(() => expect(apptApi.createAppointment).toHaveBeenLastCalledWith(
       expect.objectContaining({ expected_location: "New address" })

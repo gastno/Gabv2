@@ -1,0 +1,60 @@
+.parallax-stars {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at bottom,
+    var(--stars-glow, #344139) 0%,
+    var(--stars-background, var(--hud-bg-main)) 100%
+  );
+}
+
+.parallax-stars-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  opacity: 0.55;
+  animation: parallax-stars-drift 50s linear infinite;
+}
+
+.parallax-stars-layer::after {
+  position: absolute;
+  top: 100vh;
+  width: inherit;
+  height: inherit;
+  box-shadow: inherit;
+  content: "";
+}
+
+.parallax-stars-layer--medium {
+  width: 2px;
+  height: 2px;
+  opacity: 0.4;
+}
+
+.parallax-stars-layer--large {
+  width: 3px;
+  height: 3px;
+  opacity: 0.3;
+}
+
+@keyframes parallax-stars-drift {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-100vh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax-stars-layer {
+    animation: none;
+  }
+}

@@ -251,6 +251,7 @@ export const staffApi = {
 
 export const brandApi = {
   getAll: () => request("/brands"),
+  getManageable: () => request("/brands/manageable", { method: "GET" }),
 
   update: (id, data) =>
     request(`/brands/${id}`, {

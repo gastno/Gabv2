@@ -20,6 +20,28 @@ const images = [
   { id: "2", image_url: "/uploads/brands/two.webp" },
 ];
 
+test.each([
+  [1, "Gabbablu"],
+  [2, "Amor Tattoo"],
+])("renders the decorative background and usable tabs for %s", async (brandId, brandName) => {
+  const { brandApi, brandPortfolioApi, categoryApi, serviceApi } = require("../../services/api");
+  brandApi.getAll.mockResolvedValue([{ id: brandId, name: brandName }]);
+  brandPortfolioApi.get.mockResolvedValue({ layout: "feature", images: [] });
+  categoryApi.getAll.mockResolvedValue([]);
+  serviceApi.getAll.mockResolvedValue([]);
+
+  const { container } = render(<StudioPage brandId={brandId} />);
+  const background = container.querySelector(".parallax-stars");
+  expect(background.parentElement).toHaveClass("studio-page");
+  expect(background).toHaveAttribute("aria-hidden", "true");
+  expect(background.querySelectorAll(".parallax-stars-layer")).toHaveLength(3);
+
+  expect(await screen.findByText("No services are available at this time.")).toBeInTheDocument();
+  expect(await screen.findByRole("heading", { name: brandName })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("tab", { name: "About" }));
+  expect(screen.getByRole("tab", { name: "About" })).toHaveAttribute("aria-selected", "true");
+});
+
 describe("PortfolioGallery", () => {
   it("shows one image at a time and allows carousel navigation", () => {
     render(<PortfolioGallery images={images} layout="carousel" brandName="Gabbablu" />);

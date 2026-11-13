@@ -16,6 +16,8 @@ import {
 
 function SpecialistStep({ service, employees, isLoading, onSelect }) {
   const { t } = useLanguage();
+  const [page, setPage] = useState(0);
+  const pageCount = Math.ceil(employees.length / 3);
   return (
     <div className="modal-step" key="specialist">
       <h2>{t("booking.chooseEmployee")}</h2>
@@ -27,7 +29,7 @@ function SpecialistStep({ service, employees, isLoading, onSelect }) {
           <p className="placeholder-message">{t("booking.loadingTeam")}</p>
         ) : employees.length === 0 ? (
           <p className="placeholder-message">{t("booking.noTeam")}</p>
-        ) : employees.map((employee) => (
+        ) : employees.slice(page * 3, page * 3 + 3).map((employee) => (
           <button
             type="button"
             key={employee.id}
@@ -45,6 +47,13 @@ function SpecialistStep({ service, employees, isLoading, onSelect }) {
           </button>
         ))}
       </div>
+      {pageCount > 1 && (
+        <div className="booking-list-pagination">
+          <button type="button" onClick={() => setPage((current) => current - 1)} disabled={page === 0}>{t("booking.back")}</button>
+          <span>{page + 1} / {pageCount}</span>
+          <button type="button" onClick={() => setPage((current) => current + 1)} disabled={page >= pageCount - 1}>{t("booking.next")}</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -73,10 +82,10 @@ function ScheduleStep({
     ? ["Mán", "Þri", "Mið", "Fim", "Fös", "Lau", "Sun"]
     : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
   return (
-    <div className="modal-step" key="schedule">
+    <div className="modal-step booking-schedule-step" key="schedule">
       <h2>{t("booking.dateTime")}</h2>
       <p className="modal-subtitle">{service.name} with {employee?.name}</p>
-      <div className="calendar-container">
+      {!selectedDateKey && <div className="calendar-container">
         <div className="calendar-header">
           <button type="button" className="calendar-nav-btn" onClick={onPrevMonth} disabled={!canGoPrevMonth} aria-label="Previous month">
             ‹
@@ -108,12 +117,15 @@ function ScheduleStep({
             )
           ))}
         </div>
-        {isLoadingAvailability && <p className="placeholder-message">{t("booking.checkAvailability")}</p>}
-        {availabilityError && <p className="placeholder-message" role="alert">{availabilityError}</p>}
-        {conflictMessage && <p className="placeholder-message" role="alert">{conflictMessage}</p>}
-      </div>
+      </div>}
+      {isLoadingAvailability && <p className="placeholder-message">{t("booking.checkAvailability")}</p>}
+      {availabilityError && <p className="placeholder-message" role="alert">{availabilityError}</p>}
+      {conflictMessage && <p className="placeholder-message" role="alert">{conflictMessage}</p>}
       {selectedDateKey && (
         <div className="time-slots-section">
+          <button type="button" className="booking-change-date" onClick={() => onDateSelect(null)}>
+            {t("booking.changeDate")}
+          </button>
           <label className="picker-label">
             {t("booking.availableHours", { date: selectedDateLabel })}
           </label>
@@ -197,10 +209,16 @@ function GuestDetailsStep({
   onSubmit,
   submitError,
   isSubmitting,
+  guestPage,
+  onNextPage,
 }) {
   const { t } = useLanguage();
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (guestPage < 3) {
+      onNextPage();
+      return;
+    }
     if (!guestForm.consentPrivacy) {
       window.alert(t("booking.privacyRequired"));
       return;
@@ -215,8 +233,9 @@ function GuestDetailsStep({
   return (
     <div className="modal-step" key="guest-details">
       <h2>{t("booking.customerInfo")}</h2>
-      <p className="modal-subtitle">{t("booking.completeDetails")}</p>
+      <p className="modal-subtitle">{t("booking.completeDetails")} · {guestPage + 1} / 4</p>
       <form className="guest-booking-form" onSubmit={handleSubmit}>
+        {guestPage === 2 && (
         <div className="appointment-summary-card">
           <div className="summary-header">
             <span className="summary-badge">{t("booking.appointmentDetails")}</span>
@@ -231,7 +250,10 @@ function GuestDetailsStep({
           </div>
           {selectedSlot.is_alternate_location && <p className="booking-location-warning">{t("booking.alternateLocation")}</p>}
         </div>
+        )}
 
+        {guestPage === 0 && (
+        <div className="booking-personal-fields">
         <div className="form-group">
           <label htmlFor="booking-full-name">{t("booking.fullName")}</label>
           <input id="booking-full-name" type="text" required value={guestForm.fullName} onChange={(event) => onFieldChange("fullName", event.target.value)} placeholder="e.g. Guðrún Jónsdóttir" />
@@ -248,6 +270,10 @@ function GuestDetailsStep({
           <label htmlFor="booking-kennitala">{t("booking.kennitala")}</label>
           <input id="booking-kennitala" type="text" required value={guestForm.kennitala} onChange={(event) => onFieldChange("kennitala", event.target.value)} placeholder="e.g. 123456-7890" />
         </div>
+        </div>
+        )}
+        {guestPage === 1 && (
+        <>
         <div className="form-group">
           <label htmlFor="booking-health-info">{t("booking.healthInfo")}</label>
           <textarea id="booking-health-info" rows="3" value={guestForm.healthInfo} onChange={(event) => onFieldChange("healthInfo", event.target.value)} placeholder={t("booking.healthPlaceholder")} />
@@ -259,6 +285,10 @@ function GuestDetailsStep({
           onFilesSelected={onReferenceImagesSelected}
           onRemove={onReferenceImageRemove}
         />
+        </>
+        )}
+        {guestPage === 3 && (
+        <>
         <div className="form-checkbox-group">
           <input id="consentKennitala" type="checkbox" checked={guestForm.consentPrivacy} onChange={(event) => onFieldChange("consentPrivacy", event.target.checked)} />
           <label htmlFor="consentKennitala">
@@ -283,9 +313,11 @@ function GuestDetailsStep({
             {t("booking.cancellationConsent")}
           </label>
         </div>
+        </>
+        )}
         {submitError && <p className="booking-submit-error" role="alert">{submitError}</p>}
         <button type="submit" className="submit-booking-btn" disabled={isSubmitting}>
-          {isSubmitting ? t("booking.submitting") : t("booking.confirm")}
+          {guestPage < 3 ? t("booking.next") : isSubmitting ? t("booking.submitting") : t("booking.confirm")}
         </button>
       </form>
     </div>
@@ -304,6 +336,7 @@ function BookingModal({ service, brandName, onClose }) {
   const [initialYear, initialMonth] = todayDateKey.split("-").map(Number);
 
   const [step, setStep] = useState(1);
+  const [guestPage, setGuestPage] = useState(0);
   const [guestForm, setGuestForm] = useState({
     fullName: "",
     email: "",
@@ -563,7 +596,7 @@ function BookingModal({ service, brandName, onClose }) {
             dateLabel={selectedDateLabel}
             timeLabel={selectedTimeLabel}
             selectedSlot={selectedSlot}
-            onContinue={() => setStep(4)}
+            onContinue={() => { setGuestPage(0); setStep(4); }}
           />
         )}
         {step === 4 && (
@@ -588,6 +621,8 @@ function BookingModal({ service, brandName, onClose }) {
             onSubmit={handleGuestSubmit}
             submitError={submitError}
             isSubmitting={isSubmitting}
+            guestPage={guestPage}
+            onNextPage={() => setGuestPage((current) => current + 1)}
           />
         )}
 
@@ -615,7 +650,10 @@ function BookingModal({ service, brandName, onClose }) {
             })}
           </ol>
           {step > 1 && (
-            <button type="button" className="booking-back-btn" onClick={() => setStep((current) => current - 1)}>
+            <button type="button" className="booking-back-btn" onClick={() => {
+              if (step === 4 && guestPage > 0) setGuestPage((current) => current - 1);
+              else setStep((current) => current - 1);
+            }}>
               {t("booking.back")}
             </button>
           )}

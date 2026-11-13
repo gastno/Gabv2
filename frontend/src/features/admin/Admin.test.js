@@ -1,14 +1,15 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import AdminDashboard from "./AdminDashboard";
-import { brandApi, categoryApi, serviceApi, staffApi, staffServiceApi } from "../../services/api";
+import { brandApi, brandPortfolioApi, categoryApi, serviceApi, staffApi, staffServiceApi } from "../../services/api";
 
 jest.mock("react-router-dom", () => ({
   useNavigate: () => jest.fn(),
 }));
 
 jest.mock("../../services/api", () => ({
-  brandApi: { getAll: jest.fn() },
+  brandApi: { getAll: jest.fn(), getManageable: jest.fn() },
+  brandPortfolioApi: { get: jest.fn(), save: jest.fn() },
   categoryApi: { getAll: jest.fn() },
   serviceApi: { getAll: jest.fn() },
   staffApi: { getAll: jest.fn() },
@@ -23,9 +24,10 @@ jest.mock("./layout/AdminSidebar", () => {
   const React = require("react");
   return function MockAdminSidebar({ handleTabSelect }) {
     return React.createElement(
-      "button",
-      { onClick: () => handleTabSelect("staff_services") },
-      "Staff Services"
+      React.Fragment,
+      null,
+      React.createElement("button", { onClick: () => handleTabSelect("staff_services") }, "Staff Services"),
+      React.createElement("button", { onClick: () => handleTabSelect("portfolio") }, "Portfolio")
     );
   };
 });
@@ -42,6 +44,8 @@ describe("AdminDashboard staff service modal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.localStorage.removeItem("gabv2_workspace_theme");
+    window.localStorage.removeItem("staff_role");
+    window.localStorage.removeItem("staff_id");
     brandApi.getAll.mockResolvedValue([{ id: 1, name: "Gabbablu" }]);
     categoryApi.getAll.mockResolvedValue([
       { id: 1, brand_id: 1, brand: "Gabbablu", title: "Beauty" },
@@ -122,5 +126,41 @@ describe("AdminDashboard staff service modal", () => {
     fireEvent.click(await screen.findByText("Service"));
 
     expect(screen.getByText("Assigned Workers for Service").closest(".admin-theme-root")).toBe(themeRoot);
+  });
+
+  it("loads both manageable studios without looking for the admin in the staff directory", async () => {
+    localStorage.setItem("staff_role", "admin");
+    localStorage.setItem("staff_id", "99");
+    brandApi.getManageable.mockResolvedValue([
+      { id: 1, name: "Gabbablu" },
+      { id: 2, name: "Amor Tattoo" },
+    ]);
+    brandPortfolioApi.get.mockImplementation((id) => Promise.resolve({
+      brand_id: id,
+      layout: "grid",
+      available_layouts: [{ id: "grid", name: "Classic grid" }, { id: "mosaic", name: "Mixed-size grid" }],
+      images: [],
+    }));
+    brandPortfolioApi.save.mockImplementation((id, changes) => Promise.resolve({
+      brand_id: id,
+      layout: changes.layout,
+      available_layouts: [{ id: "grid", name: "Classic grid" }, { id: "mosaic", name: "Mixed-size grid" }],
+      images: [],
+    }));
+    render(<AdminDashboard />);
+    fireEvent.click(screen.getByRole("button", { name: "Portfolio" }));
+
+    expect(await screen.findByRole("option", { name: "Gabbablu" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Amor Tattoo" })).toBeInTheDocument();
+    await screen.findByRole("button", { name: "Classic grid" });
+    fireEvent.change(screen.getByLabelText("Studio"), { target: { value: "2" } });
+    await waitFor(() => expect(brandPortfolioApi.get).toHaveBeenLastCalledWith("2"));
+    fireEvent.click(await screen.findByRole("button", { name: "Mixed-size grid" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save gallery" }));
+    await waitFor(() => expect(brandPortfolioApi.save).toHaveBeenCalledWith("2", {
+      layout: "mosaic",
+      imageIds: [],
+    }));
+    expect(await screen.findByRole("status")).toHaveTextContent("Gallery layout and image order saved.");
   });
 });

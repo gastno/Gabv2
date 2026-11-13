@@ -116,7 +116,7 @@ exports.getAllBrands = async (req, res) => {
     const result = await db.query(
       `SELECT id, name, slug, location,
               COALESCE(description_en, about_description) AS about_description,
-              description_en, description_is, cover_image_url, gallery_layout, updated_at
+              description_en, description_is, logo_url, cover_image_url, gallery_layout, updated_at
        FROM brands
        ORDER BY id ASC`
     );
@@ -124,6 +124,42 @@ exports.getAllBrands = async (req, res) => {
   } catch (error) {
     console.error('Error fetching brands:', error);
     res.status(500).json({ error: 'Failed to retrieve brands.' });
+  }
+};
+
+exports.getManageableBrands = async (req, res) => {
+  if (req.user.type !== 'staff') {
+    return res.status(403).json({ error: 'Staff authentication is required.' });
+  }
+
+  try {
+    const account = await db.query(
+      `SELECT r.name AS role
+       FROM staff s JOIN roles r ON r.id = s.role_id
+       WHERE s.id = $1 AND s.is_active = TRUE AND r.name = $2
+         AND r.name IN ('admin', 'super_admin')`,
+      [req.user.id, req.user.role]
+    );
+    if (account.rows.length === 0) {
+      return res.status(403).json({ error: 'An active administrator account is required.' });
+    }
+
+    const result = await db.query(
+      `SELECT b.id, b.name, b.slug, b.location,
+              COALESCE(b.description_en, b.about_description) AS about_description,
+              b.description_en, b.description_is, b.logo_url, b.cover_image_url,
+              b.gallery_layout, b.updated_at
+       FROM brands b
+       WHERE $2 = 'super_admin' OR EXISTS (
+         SELECT 1 FROM staff_brands sb WHERE sb.staff_id = $1 AND sb.brand_id = b.id
+       )
+       ORDER BY b.id ASC`,
+      [req.user.id, account.rows[0].role]
+    );
+    return res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching manageable brands:', error);
+    return res.status(500).json({ error: 'Failed to retrieve manageable brands.' });
   }
 };
 

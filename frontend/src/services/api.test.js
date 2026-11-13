@@ -1,4 +1,30 @@
-import { apptApi } from "./api";
+import { apptApi, brandApi } from "./api";
+
+describe("manageable brands API", () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    localStorage.removeItem("staff_auth_token");
+  });
+
+  it("requests manageable brands with staff authentication", async () => {
+    localStorage.setItem("staff_auth_token", "staff-token");
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => [{ id: 1 }] });
+    await expect(brandApi.getManageable()).resolves.toEqual([{ id: 1 }]);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringMatching(/\/api\/brands\/manageable$/),
+      expect.objectContaining({ method: "GET", headers: expect.objectContaining({ Authorization: "Bearer staff-token" }) })
+    );
+  });
+
+  it("propagates endpoint errors", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false, status: 403, json: async () => ({ error: "Access denied" }),
+    });
+    await expect(brandApi.getManageable()).rejects.toMatchObject({ message: "Access denied", status: 403 });
+  });
+});
 
 describe("appointment reference image API", () => {
   const originalFetch = global.fetch;

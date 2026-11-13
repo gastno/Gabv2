@@ -1,4 +1,6 @@
 .home-page {
+  position: relative;
+  isolation: isolate;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -21,6 +23,11 @@
   align-items: center;
   gap: clamp(20px, 3vw, 42px);
   padding: 0 0 clamp(24px, 4vw, 48px);
+}
+
+.home-page .main-header,
+.home-page .site-footer {
+  background-color: rgba(29, 33, 30, 0.94);
 }
 
 .home-page .home-hero h1 {
@@ -117,11 +124,10 @@
   display: flex;
   min-width: 0;
   min-height: 340px;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
+  align-items: stretch;
+  justify-content: stretch;
   overflow: hidden;
-  padding: clamp(20px, 3vw, 44px);
+  padding: 0;
   color: var(--hud-text-primary);
   text-decoration: none;
   isolation: isolate;
@@ -136,8 +142,11 @@
 .home-page .interactive-side::after {
   position: absolute;
   z-index: -1;
-  inset: 45% 0 0;
-  background: rgba(19, 23, 20, 0.66);
+  inset: 0;
+  box-sizing: border-box;
+  background: rgba(19, 23, 20, 0.12);
+  border: 18px solid rgba(29, 33, 30, 0.62);
+  border-bottom: 108px solid rgba(29, 33, 30, 0.76);
   content: "";
   transition: opacity 220ms ease;
 }
@@ -161,11 +170,23 @@
   outline-offset: -5px;
 }
 
+.home-page .interactive-caption {
+  position: absolute;
+  z-index: 1;
+  right: 32px;
+  bottom: 18px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .home-page .interactive-logo {
-  width: clamp(90px, 15vw, 210px);
-  max-height: 110px;
+  width: clamp(80px, 11vw, 144px);
+  max-height: 76px;
   object-fit: contain;
-  object-position: left bottom;
+  object-position: left center;
   animation: home-detail-enter 500ms ease-out 120ms both;
 }
 
@@ -260,9 +281,25 @@
     min-height: 280px;
   }
 
+  .home-page .interactive-side::after {
+    border-width: 14px;
+    border-bottom-width: 92px;
+  }
+
+  .home-page .interactive-caption {
+    right: 20px;
+    bottom: 12px;
+    left: 20px;
+    gap: 10px;
+  }
+
   .home-page .interactive-logo {
-    width: 116px;
-    max-height: 76px;
+    width: 88px;
+    max-height: 66px;
+  }
+
+  .home-page .interactive-subtitle {
+    font-size: clamp(1rem, 4.5vw, 1.35rem);
   }
 }
 

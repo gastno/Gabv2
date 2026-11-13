@@ -13,7 +13,7 @@ const FALLBACK_LAYOUTS = [
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-function PortfolioTab({ brands = [], loadingBrands = false, onBrandUpdate }) {
+function PortfolioTab({ brands = [], loadingBrands = false, brandsError = "", onRetryBrands, onBrandUpdate }) {
   const [selectedBrandId, setSelectedBrandId] = useState("");
   const [portfolio, setPortfolio] = useState(null);
   const [portfolioBrandId, setPortfolioBrandId] = useState("");
@@ -195,6 +195,11 @@ function PortfolioTab({ brands = [], loadingBrands = false, onBrandUpdate }) {
 
       {loadingBrands ? (
         <p>Loading studios...</p>
+      ) : brandsError ? (
+        <div>
+          <p className="portfolio-feedback portfolio-feedback-error" role="alert">{brandsError}</p>
+          <button type="button" className="primary-action-btn" onClick={onRetryBrands}>Retry</button>
+        </div>
       ) : brands.length === 0 ? (
         <p className="portfolio-empty">No studios are available to edit.</p>
       ) : (

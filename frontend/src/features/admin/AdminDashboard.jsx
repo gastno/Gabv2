@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   staffApi,
@@ -529,16 +529,6 @@ function AdminDashboard() {
     setMobileSidebarOpen(false);
   }, []);
 
-  const currentStaffId = localStorage.getItem("staff_id");
-  const staffRole = localStorage.getItem("staff_role");
-  const currentAdmin = staffList.find((staff) => String(staff.id) === String(currentStaffId));
-  const manageableBrands = useMemo(() => (
-    staffRole === "super_admin"
-      ? brandsList
-      : staffRole === "admin"
-        ? brandsList.filter((brand) => currentAdmin?.brandIds.includes(String(brand.id)))
-        : []
-  ), [brandsList, currentAdmin, staffRole]);
   const handleSelectStaffService = useCallback(
     (service) => setSelectedServiceForModal(service),
     []
@@ -569,8 +559,6 @@ function AdminDashboard() {
         loadingCategories={loadingCategories}
         services={services}
         loadingServices={loadingServices}
-        manageableBrands={manageableBrands}
-        staffRole={staffRole}
         handleOpenBrandModal={handleOpenBrandModal}
         setCategoryModalOpen={setCategoryModalOpen}
         setInspectCategory={setInspectCategory}

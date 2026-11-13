@@ -1,6 +1,17 @@
 # Deployment and recovery
 
-The root `docker-compose.yml` is for local PostgreSQL development only. `compose.production.yml` runs PostgreSQL, the API, and the static web app with separate health checks, a private database network, persistent database/uploads volumes, non-root application images, read-only root filesystems, and file-mounted database/JWT secrets. It does not provide TLS; put a maintained HTTPS reverse proxy in front of the web/API ports.
+The root `docker-compose.yml` defaults to local PostgreSQL development and has an opt-in local full-stack profile. `compose.production.yml` runs PostgreSQL, the API, and the static web app with separate health checks, a private database network, persistent database/uploads volumes, non-root application images, read-only root filesystems, and file-mounted database/JWT secrets. It does not provide TLS; put a maintained HTTPS reverse proxy in front of the web/API ports.
+
+## Local full stack
+
+The root Compose file reuses `Dockerfile.backend`, `Dockerfile.frontend`, and the root `.dockerignore` for both builds. Its `full-stack` profile serves the website and proxies `/api/` and `/uploads/` through `deploy/nginx.local.conf`. The website is available at `http://localhost` and the API also binds to `127.0.0.1:5000`; set `WEB_PORT`, `API_PORT`, or `POSTGRES_PORT` if those ports are occupied. PostgreSQL retains its existing `postgres_data` volume and loopback port. Ordinary `docker compose up -d` still starts only PostgreSQL.
+
+1. Add `POSTGRES_PASSWORD` and a random `JWT_SECRET` of at least 32 characters to a private, untracked `.env` in the repository root, preserving any existing settings. On a new volume choose a unique database password; for an existing volume use its existing password. `POSTGRES_DB` and `POSTGRES_USER` can also be set, but must match an existing database. Compose environment variables do not change credentials already stored in a PostgreSQL volume. Generate a JWT secret, for example, with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Never use the development database defaults for production.
+2. Ensure `uploads/` exists and is writable by the non-root backend container user, including existing subdirectories where files will be changed. On Linux, inspect the image user with `docker compose --profile full-stack build backend` followed by `docker compose --profile full-stack run --rm --no-deps --entrypoint id backend`, then grant that UID/GID appropriate access without changing unrelated files. Docker Desktop bind-mount permissions differ by host. `UPLOADS_PATH` can select an existing writable directory instead.
+3. If the database is not new, back it up and review [database/MIGRATIONS.md](./database/MIGRATIONS.md) before upgrading. Run `docker compose --profile maintenance run --rm --build migrate` to apply the tracked migrations.
+4. Run `docker compose --profile full-stack up -d --build`, then check `docker compose --profile full-stack ps`, `http://localhost/health`, and `http://localhost/api/brands`. The initial database contains schema but does not automatically provision the first admin or catalog.
+
+This profile is for local use: it has no TLS, does not expose port 443, uses environment variables for secrets, and retains the root Compose development PostgreSQL defaults and loopback port. Do not expose it directly to the internet. Use the production configuration below, with a maintained HTTPS reverse proxy and real certificate management, for deployment.
 
 ## Production configuration
 

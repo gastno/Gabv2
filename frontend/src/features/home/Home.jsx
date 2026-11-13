@@ -1,13 +1,14 @@
 import "./Home.css";
 import CustomerLayout from "../../components/layout/CustomerLayout/CustomerLayout";
 import BrandChooser from "./BrandChooser";
+import ParallaxStars from "./ParallaxStars";
 import { useLanguage } from "../../components/i18n/LanguageContext";
 
 function Home() {
   const { t } = useLanguage();
 
   return (
-    <CustomerLayout pageClassName="home-page">
+    <CustomerLayout pageClassName="home-page" background={<ParallaxStars />}>
       <main className="home-content">
         <section className="home-hero" aria-labelledby="home-brand-statement">
           <h1 id="home-brand-statement">
